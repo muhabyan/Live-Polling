@@ -400,6 +400,18 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           refreshEvent();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'participants',
+          filter: `event_id=eq.${currentEventId}`,
+        },
+        () => {
+          refreshEvent();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -495,6 +507,26 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const sendModeratorAction = async (action: string, payload?: any) => {
     if (!currentEvent) return;
+    if (action === 'reset_session' || action === 'clear_room') {
+      setEvents(prev =>
+        prev.map(evt => {
+          if (evt.id !== currentEvent.id) return evt;
+          return {
+            ...evt,
+            status: 'waiting',
+            currentQuestionIndex: 0,
+            isTimerRunning: false,
+            isVotingLocked: false,
+            showResultsOnProjector: true,
+            revealAnswer: false,
+            timerRemainingSeconds: 45,
+            participants: [],
+            responses: [],
+            reactions: [],
+          };
+        })
+      );
+    }
     try {
       await api.sendControlAction(currentEvent.id, action, payload);
     } catch (err: any) {
