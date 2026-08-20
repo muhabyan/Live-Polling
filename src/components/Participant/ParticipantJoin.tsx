@@ -10,23 +10,24 @@ interface ParticipantJoinProps {
 
 export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) => {
   const { currentEvent, joinRoom, error, clearError } = useEvent();
-  const [roomCode, setRoomCode] = useState(currentEvent?.roomCode || '');
+  const [roomCode, setRoomCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code')?.toUpperCase() || '';
+  });
   const [nickname, setNickname] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('🚀');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const emojiOptions = ['🚀', '💡', '🎯', '⚡', '🌟', '🔥', '✨', '🧠', '🎉', '👋'];
 
-  // Check URL query parameters for auto code
+  // Check URL query parameters for auto code (from scanned QR code)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const codeParam = params.get('code');
     if (codeParam) {
       setRoomCode(codeParam.toUpperCase());
-    } else if (currentEvent?.roomCode) {
-      setRoomCode(currentEvent.roomCode);
     }
-  }, [currentEvent]);
+  }, []);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
