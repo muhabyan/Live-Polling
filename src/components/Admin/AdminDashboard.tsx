@@ -282,116 +282,135 @@ export const AdminDashboard: React.FC = () => {
           <span className="text-xs text-slate-400 font-medium">{events.length} total</span>
         </div>
 
-        <div className="divide-y divide-slate-100">
-          {events.map((evt) => {
-            const isLive = evt.status === 'live';
-            const isWaiting = evt.status === 'waiting';
+        {events.length === 0 ? (
+          <div className="p-12 text-center text-slate-500 space-y-4">
+            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">No Events Yet</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              You haven't created any interactive polling sessions yet. Click the button below to create your first event!
+            </p>
+            <button
+              onClick={handleOpenCreateModal}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition-all inline-flex items-center space-x-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Your First Event</span>
+            </button>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {events.map((evt) => {
+              const isLive = evt.status === 'live';
+              const isWaiting = evt.status === 'waiting';
 
-            return (
-              <div
-                key={evt.id}
-                onClick={() => setCurrentEventId(evt.id)}
-                className="p-5 sm:p-6 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
-              >
-                {/* Event Details */}
-                <div className="space-y-1.5 max-w-xl">
-                  <div className="flex items-center space-x-2.5">
-                    <span className="text-xs font-semibold font-mono tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
-                      {evt.roomCode}
-                    </span>
-                    <h3 className="text-lg font-semibold text-slate-900 hover:text-slate-600 transition-colors">
-                      {evt.title}
-                    </h3>
-                    {isLive && (
-                      <span className="px-2 py-0.5 bg-rose-500 text-white rounded-full text-[10px] font-semibold tracking-wider animate-pulse">
-                        LIVE
+              return (
+                <div
+                  key={evt.id}
+                  onClick={() => setCurrentEventId(evt.id)}
+                  className="p-5 sm:p-6 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer"
+                >
+                  {/* Event Details */}
+                  <div className="space-y-1.5 max-w-xl">
+                    <div className="flex items-center space-x-2.5">
+                      <span className="text-xs font-semibold font-mono tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                        {evt.roomCode}
                       </span>
-                    )}
-                    {isWaiting && (
-                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-semibold border border-slate-200">
-                        WAITING
-                      </span>
-                    )}
+                      <h3 className="text-lg font-semibold text-slate-900 hover:text-slate-600 transition-colors">
+                        {evt.title}
+                      </h3>
+                      {isLive && (
+                        <span className="px-2 py-0.5 bg-rose-500 text-white rounded-full text-[10px] font-semibold tracking-wider animate-pulse">
+                          LIVE
+                        </span>
+                      )}
+                      {isWaiting && (
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-semibold border border-slate-200">
+                          WAITING
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-500 line-clamp-1">
+                      {evt.description || 'No description provided.'}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 font-medium pt-1">
+                      <span>{evt.category}</span>
+                      <span>•</span>
+                      <span>{evt.questions.length} questions</span>
+                      <span>•</span>
+                      <span>{evt.participants.length} participants</span>
+                      <span>•</span>
+                      <span>{evt.responses.length} responses</span>
+                    </div>
                   </div>
 
-                  <p className="text-xs text-slate-500 line-clamp-1">
-                    {evt.description || 'No description provided.'}
-                  </p>
+                  {/* Event Action Toolbar */}
+                  <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    
+                    {/* Launch Live Presenter */}
+                    <button
+                      onClick={() => {
+                        setCurrentEventId(evt.id);
+                        setActiveView('presenter');
+                      }}
+                      className="flex items-center space-x-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium shadow-sm transition-colors"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-white" />
+                      <span>Presenter</span>
+                    </button>
 
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 font-medium pt-1">
-                    <span>{evt.category}</span>
-                    <span>•</span>
-                    <span>{evt.questions.length} questions</span>
-                    <span>•</span>
-                    <span>{evt.participants.length} participants</span>
-                    <span>•</span>
-                    <span>{evt.responses.length} responses</span>
+                    {/* Open Projector */}
+                    <button
+                      onClick={() => {
+                        setCurrentEventId(evt.id);
+                        setActiveView('projector');
+                      }}
+                      className="flex items-center space-x-1 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium shadow-sm transition-colors"
+                      title="Open Projector Display"
+                    >
+                      <Tv className="w-3.5 h-3.5 text-slate-500" />
+                      <span className="hidden sm:inline">Projector</span>
+                    </button>
+
+                    {/* Analytics & Export */}
+                    <button
+                      onClick={() => {
+                        setCurrentEventId(evt.id);
+                        setActiveView('analytics');
+                      }}
+                      className="flex items-center space-x-1 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium shadow-sm transition-colors"
+                      title="View Analytics"
+                    >
+                      <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
+                      <span className="hidden sm:inline">Report</span>
+                    </button>
+
+                    {/* Duplicate */}
+                    <button
+                      onClick={(e) => handleDuplicateEvent(evt, e)}
+                      className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg shadow-sm transition-colors"
+                      title="Duplicate Event"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Delete */}
+                    <button
+                      onClick={(e) => handleDeleteEvent(evt.id, e)}
+                      className="p-2 bg-white border border-slate-200 hover:bg-rose-50 text-slate-400 hover:border-rose-200 hover:text-rose-600 rounded-lg shadow-sm transition-colors"
+                      title="Delete Event"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                {/* Event Action Toolbar */}
-                <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                  
-                  {/* Launch Live Presenter */}
-                  <button
-                    onClick={() => {
-                      setCurrentEventId(evt.id);
-                      setActiveView('presenter');
-                    }}
-                    className="flex items-center space-x-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium shadow-sm transition-colors"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Presenter</span>
-                  </button>
-
-                  {/* Open Projector */}
-                  <button
-                    onClick={() => {
-                      setCurrentEventId(evt.id);
-                      setActiveView('projector');
-                    }}
-                    className="flex items-center space-x-1 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium shadow-sm transition-colors"
-                    title="Open Projector Display"
-                  >
-                    <Tv className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="hidden sm:inline">Projector</span>
-                  </button>
-
-                  {/* Analytics & Export */}
-                  <button
-                    onClick={() => {
-                      setCurrentEventId(evt.id);
-                      setActiveView('analytics');
-                    }}
-                    className="flex items-center space-x-1 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium shadow-sm transition-colors"
-                    title="View Analytics"
-                  >
-                    <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="hidden sm:inline">Report</span>
-                  </button>
-
-                  {/* Duplicate */}
-                  <button
-                    onClick={(e) => handleDuplicateEvent(evt, e)}
-                    className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg shadow-sm transition-colors"
-                    title="Duplicate Event"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Delete */}
-                  <button
-                    onClick={(e) => handleDeleteEvent(evt.id, e)}
-                    className="p-2 bg-white border border-slate-200 hover:bg-rose-50 text-slate-400 hover:border-rose-200 hover:text-rose-600 rounded-lg shadow-sm transition-colors"
-                    title="Delete Event"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* CREATE EVENT MODAL WITH QUESTION BUILDER & AI GENERATOR */}

@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   RotateCcw,
   Tv,
-  Sliders
+  Sliders,
+  BarChart3
 } from 'lucide-react';
 
 export const EventSummaryExport: React.FC = () => {
@@ -26,8 +27,20 @@ export const EventSummaryExport: React.FC = () => {
 
   if (!currentEvent) {
     return (
-      <div className="p-8 text-center text-slate-500">
-        <p>No active event selected.</p>
+      <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200/80 shadow-xl text-center space-y-4">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
+          <BarChart3 className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">No Event Selected</h2>
+        <p className="text-sm text-slate-500">
+          Create or select an event in Admin Studio to view its analytics report.
+        </p>
+        <button
+          onClick={() => setActiveView('admin')}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
+        >
+          <span>Go to Admin Studio</span>
+        </button>
       </div>
     );
   }

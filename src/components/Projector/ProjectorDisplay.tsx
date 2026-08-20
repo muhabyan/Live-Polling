@@ -35,10 +35,11 @@ export const ProjectorDisplay: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [setActiveView, session]);
 
-  const currentQ = currentEvent?.questions[currentEvent.currentQuestionIndex];
+  const currentQIndex = currentEvent?.currentQuestionIndex ?? 0;
+  const currentQ = currentEvent?.questions?.[currentQIndex];
   const responses = (currentEvent?.responses || []).filter(r => r.questionId === currentQ?.id);
   const totalResponses = responses.length;
-  const totalParticipants = Math.max(currentEvent?.participants.length || 0, totalResponses);
+  const totalParticipants = Math.max(currentEvent?.participants?.length || 0, totalResponses);
   const responsePercentage = totalParticipants > 0 ? Math.round((totalResponses / totalParticipants) * 100) : 0;
 
   // Trigger confetti when correct answer is revealed

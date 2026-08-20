@@ -47,29 +47,33 @@ export const PresenterControl: React.FC = () => {
     moderatorTip: string;
   } | null>(null);
 
-  if (!currentEvent) {
+  const currentQIndex = currentEvent?.currentQuestionIndex ?? 0;
+  const currentQ = currentEvent?.questions?.[currentQIndex];
+
+  if (!currentEvent || !currentEvent.questions || currentEvent.questions.length === 0 || !currentQ) {
     return (
       <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200/80 shadow-xl text-center space-y-4">
         <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
           <Radio className="w-8 h-8 animate-pulse" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">No Active Event Selected</h2>
+        <h2 className="text-xl font-bold text-slate-900">
+          {!currentEvent ? 'No Active Event Selected' : 'No Questions in this Event'}
+        </h2>
         <p className="text-sm text-slate-500">
-          You haven't created any live polling sessions yet. Open Admin Studio to create your first event!
+          {!currentEvent
+            ? "You haven't created any live polling sessions yet. Open Admin Studio to create your first event!"
+            : "This event doesn't have any questions yet. Add questions in Admin Studio to start polling."}
         </p>
         <button
           onClick={() => setActiveView('admin')}
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Create Event in Admin Studio</span>
+          <span>Open Admin Studio</span>
         </button>
       </div>
     );
   }
-
-  const currentQIndex = currentEvent.currentQuestionIndex;
-  const currentQ = currentEvent.questions[currentQIndex];
   const responses = (currentEvent.responses || []).filter(r => r.questionId === currentQ?.id);
   const totalResponses = responses.length;
   const totalParticipants = Math.max(currentEvent.participants.length, totalResponses);
