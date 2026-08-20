@@ -44,7 +44,7 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
   const handleDownloadQR = () => {
     if (!canvasRef.current) return;
     const link = document.createElement('a');
-    link.download = `PulseLive-${roomCode}-QR.png`;
+    link.download = `StageSync-${roomCode}-QR.png`;
     link.href = canvasRef.current.toDataURL('image/png');
     link.click();
   };

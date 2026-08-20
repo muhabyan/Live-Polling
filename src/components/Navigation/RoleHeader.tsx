@@ -18,6 +18,7 @@ import {
   Shield
 } from 'lucide-react';
 import { QRCodeModal } from '../Shared/QRCodeModal';
+import { BrandLogo } from '../Shared/BrandLogo';
 
 export const RoleHeader: React.FC = () => {
   const { 
@@ -82,19 +83,9 @@ export const RoleHeader: React.FC = () => {
           <div className="flex items-center space-x-3">
             <div 
               onClick={() => setActiveView('participant')}
-              className="flex items-center space-x-2.5 cursor-pointer select-none group"
+              className="cursor-pointer select-none group hover:opacity-90 transition-opacity"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-                <Radio className="w-5 h-5 animate-pulse" />
-              </div>
-              <div>
-                <div className="font-extrabold text-lg tracking-tight text-slate-900 leading-none">
-                  Pulse<span className="text-blue-600">Live</span>
-                </div>
-                <p className="text-[10px] text-slate-400 font-medium tracking-wide uppercase mt-0.5">
-                  Interactive Polling
-                </p>
-              </div>
+              <BrandLogo size="md" />
             </div>
 
             {/* Event Switcher (Only visible to Admin) */}

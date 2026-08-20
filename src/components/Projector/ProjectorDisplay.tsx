@@ -15,6 +15,7 @@ import {
   Radio,
   ArrowLeft
 } from 'lucide-react';
+import { BrandLogo } from '../Shared/BrandLogo';
 
 export const ProjectorDisplay: React.FC = () => {
   const { currentEvent, fireConfetti, setActiveView, session } = useEvent();
@@ -155,9 +156,7 @@ export const ProjectorDisplay: React.FC = () => {
         
         {/* Left: Session Branding & Progress */}
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-slate-900 font-bold text-2xl shadow-sm">
-            P
-          </div>
+          <BrandLogo size="md" showText={false} theme="dark" />
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">
@@ -167,8 +166,8 @@ export const ProjectorDisplay: React.FC = () => {
                 Question {currentEvent.currentQuestionIndex + 1} of {currentEvent.questions.length}
               </span>
             </div>
-            <h1 className="text-sm sm:text-base text-slate-500 font-medium">
-              Live Projector Feed
+            <h1 className="text-sm sm:text-base text-slate-400 font-medium">
+              StageSync Live Feed
             </h1>
           </div>
         </div>

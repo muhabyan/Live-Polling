@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useEvent } from '../../context/EventContext';
-import { Lock, Mail, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import { ButtonSpinner } from '../Shared/Loaders';
+import { BrandLogo } from '../Shared/BrandLogo';
 
 export const LoginScreen: React.FC = () => {
   const { login, error, clearError, setActiveView } = useEvent();
@@ -34,11 +35,9 @@ export const LoginScreen: React.FC = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-8 pt-2">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
-            <Shield className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Host Sign In</h2>
+        <div className="flex flex-col items-center text-center mb-8 pt-2">
+          <BrandLogo size="lg" showText={false} className="mb-3" />
+          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">StageSync Host Sign In</h2>
           <p className="text-slate-500 text-sm mt-1">Access Presenter Controls & Admin Studio</p>
         </div>
 

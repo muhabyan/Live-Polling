@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
 import { Sparkles, QrCode, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { ButtonSpinner } from '../Shared/Loaders';
+import { BrandLogo } from '../Shared/BrandLogo';
 
 interface ParticipantJoinProps {
   onJoined?: () => void;
@@ -45,15 +46,13 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col justify-center min-h-[calc(100vh-5rem)]">
       
       {/* Brand & Greeting */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 text-white font-black text-2xl shadow-md mb-3 ring-4 ring-blue-50">
-          P
-        </div>
+      <div className="flex flex-col items-center text-center mb-6">
+        <BrandLogo size="lg" showText={false} className="mb-2" />
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Join Live Event
+          Join StageSync Session
         </h1>
         <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">
-          Enter the room code from the presenter's screen to vote and interact in real time.
+          Enter the room PIN from the presentation screen to vote and interact live.
         </p>
       </div>
 
