@@ -41,6 +41,7 @@ export const AdminDashboard: React.FC = () => {
 
   // Form state for creating / editing event
   const [formTitle, setFormTitle] = useState('');
+  const [formRoomCode, setFormRoomCode] = useState('');
   const [formCategory, setFormCategory] = useState('Workshop / Seminar');
   const [formOrganizer, setFormOrganizer] = useState('');
   const [formDescription, setFormDescription] = useState('');
@@ -74,30 +75,29 @@ export const AdminDashboard: React.FC = () => {
 
   const handleOpenCreateModal = () => {
     setFormTitle('');
+    setFormRoomCode(Math.random().toString(36).substring(2, 8).toUpperCase());
     setFormCategory('Workshop / Seminar');
-    setFormOrganizer('Event Host');
+    setFormOrganizer('');
     setFormDescription('');
     setFormQuestions([
       {
-        id: 'q-1',
+        id: 'q-new-1',
         type: 'multiple_choice',
-        title: 'What is your primary objective today?',
+        title: 'What is your primary goal for today’s session?',
+        subtitle: 'Select one option',
         timerSeconds: 45,
         options: [
-          { id: 'opt-1', text: 'Gain practical technical insights', isCorrect: false },
-          { id: 'opt-2', text: 'Explore strategic industry trends', isCorrect: false },
-          { id: 'opt-3', text: 'Connect with expert speakers', isCorrect: false },
+          { id: 'opt-1', text: 'Learn new practical skills & tools', isCorrect: false },
+          { id: 'opt-2', text: 'Network with industry peers', isCorrect: false },
+          { id: 'opt-3', text: 'Get actionable frameworks for our team', isCorrect: false },
         ],
       },
       {
-        id: 'q-2',
-        type: 'rating',
-        title: 'How relevant is today’s topic to your current projects?',
-        timerSeconds: 30,
-        ratingMin: 1,
-        ratingMax: 5,
-        ratingMinLabel: 'Not Relevant',
-        ratingMaxLabel: 'Extremely Critical',
+        id: 'q-new-2',
+        type: 'word_cloud',
+        title: 'In 1 word, what is your current mindset?',
+        timerSeconds: 45,
+        maxWordCount: 1,
       }
     ]);
     setIsCreateModalOpen(true);
@@ -110,6 +110,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       const newEvt = await api.createNewEvent({
         title: formTitle.trim(),
+        roomCode: formRoomCode.trim() || undefined,
         category: formCategory,
         organizerName: formOrganizer.trim() || 'Moderator',
         description: formDescription.trim(),
@@ -470,6 +471,29 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setFormOrganizer(e.target.value)}
                     placeholder="e.g. Dr. Jane Doe"
                     className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Custom Room PIN / Code
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setFormRoomCode(Math.random().toString(36).substring(2, 8).toUpperCase())}
+                      className="text-[10px] text-blue-600 hover:text-blue-700 font-bold flex items-center space-x-0.5 cursor-pointer"
+                    >
+                      <span>🎲 Random Code</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={formRoomCode}
+                    onChange={(e) => setFormRoomCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. SEMINAR88"
+                    maxLength={10}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold font-mono tracking-widest text-blue-700 focus:bg-white focus:border-blue-600 focus:outline-none uppercase"
                   />
                 </div>
 

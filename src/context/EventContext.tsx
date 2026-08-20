@@ -408,6 +408,37 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, [currentEventId, refreshEvent]);
 
   // ============================================
+  // SYNCHRONIZED COUNTDOWN TIMER TICKER
+  // ============================================
+
+  useEffect(() => {
+    if (!currentEvent?.id || !currentEvent.isTimerRunning) return;
+
+    const timer = setInterval(() => {
+      setEvents(prev =>
+        prev.map(evt => {
+          if (evt.id !== currentEvent.id) return evt;
+          const currentRemaining = evt.timerRemainingSeconds ?? 45;
+          if (currentRemaining <= 1) {
+            return {
+              ...evt,
+              timerRemainingSeconds: 0,
+              isTimerRunning: false,
+              isVotingLocked: true,
+            };
+          }
+          return {
+            ...evt,
+            timerRemainingSeconds: currentRemaining - 1,
+          };
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentEvent?.id, currentEvent?.isTimerRunning]);
+
+  // ============================================
   // USER ACTIONS
   // ============================================
 

@@ -114,13 +114,14 @@ export async function getSession() {
 
 export async function createNewEvent(eventData: {
   title: string;
+  roomCode?: string;
   description?: string;
   category?: string;
   organizerName?: string;
   questions?: Partial<Question>[];
 }) {
   const session = await getSession();
-  const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const roomCode = eventData.roomCode?.trim()?.toUpperCase() || Math.random().toString(36).substring(2, 8).toUpperCase();
 
   const { data: event, error: evtErr } = await supabase
     .from('events')
@@ -266,27 +267,56 @@ export async function sendControlAction(eventId: string, action: string, payload
 
   switch (action) {
     case 'start_session':
-      updates = { status: 'live' };
+      updates = {
+        status: 'live',
+        is_timer_running: true,
+        question_started_at: new Date().toISOString(),
+        timer_remaining_seconds: event.timer_remaining_seconds || 45,
+        is_voting_locked: false,
+      };
       break;
     case 'end_session':
       updates = { status: 'ended', is_timer_running: false };
       break;
+    case 'reset_session':
+      updates = {
+        status: 'waiting',
+        current_question_index: 0,
+        is_timer_running: false,
+        is_voting_locked: false,
+        show_results_on_projector: true,
+        reveal_answer: false,
+        timer_remaining_seconds: 45,
+      };
+      await supabase.from('responses').delete().eq('event_id', eventId);
+      await supabase.from('participants').delete().eq('event_id', eventId);
+      break;
     case 'next_question':
       updates = {
         current_question_index: event.current_question_index + 1,
-        is_timer_running: false,
+        is_timer_running: true,
+        question_started_at: new Date().toISOString(),
+        timer_remaining_seconds: 45,
         is_voting_locked: false,
-        show_results_on_projector: false,
+        show_results_on_projector: true,
         reveal_answer: false,
       };
       break;
     case 'prev_question':
       updates = {
         current_question_index: Math.max(0, event.current_question_index - 1),
-        is_timer_running: false,
+        is_timer_running: true,
+        question_started_at: new Date().toISOString(),
+        timer_remaining_seconds: 45,
         is_voting_locked: false,
-        show_results_on_projector: false,
+        show_results_on_projector: true,
         reveal_answer: false,
+      };
+      break;
+    case 'toggle_timer':
+      updates = {
+        is_timer_running: !event.is_timer_running,
+        question_started_at: !event.is_timer_running ? new Date().toISOString() : event.question_started_at,
       };
       break;
     case 'start_timer':
@@ -305,13 +335,16 @@ export async function sendControlAction(eventId: string, action: string, payload
       updates = { is_voting_locked: true, is_timer_running: false };
       break;
     case 'unlock_voting':
-      updates = { is_voting_locked: false };
+      updates = { is_voting_locked: false, is_timer_running: true };
       break;
     case 'toggle_results':
       updates = { show_results_on_projector: payload?.show ?? !event.show_results_on_projector };
       break;
     case 'reveal_answer':
       updates = { reveal_answer: true, show_results_on_projector: true };
+      break;
+    case 'update_room_code':
+      updates = { room_code: payload?.roomCode?.trim()?.toUpperCase() };
       break;
     case 'simulate_crowd':
       return handleSimulateCrowdDirect(eventId, payload?.count || 10);
