@@ -179,6 +179,12 @@ export async function updateExistingEvent(id: string, eventData: Partial<EventDa
 }
 
 export async function deleteEventById(id: string) {
+  await Promise.all([
+    supabase.from('responses').delete().eq('event_id', id),
+    supabase.from('participants').delete().eq('event_id', id),
+    supabase.from('reactions').delete().eq('event_id', id),
+    supabase.from('questions').delete().eq('event_id', id),
+  ]);
   const { error } = await supabase.from('events').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }

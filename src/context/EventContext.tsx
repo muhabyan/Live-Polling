@@ -145,80 +145,15 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const refreshAllEvents = useCallback(async () => {
     try {
-      let data = await api.fetchAllEvents();
-      
-      // If database is completely empty, auto-seed the demo keynote event
-      if (data.length === 0) {
-        try {
-          await api.createNewEvent({
-            title: 'Future of Work & AI Summit 2026',
-            category: 'Conference / Keynote',
-            organizerName: 'Dr. Evelyn Vance',
-            description: 'Interactive live session covering modern communication, leadership dynamics, and AI collaboration.',
-            questions: [
-              {
-                id: 'q1',
-                type: 'multiple_choice',
-                title: 'What is the biggest challenge in modern team communication?',
-                subtitle: 'Select the option that most directly impacts your team daily',
-                timerSeconds: 45,
-                points: 100,
-                options: [
-                  { id: 'opt-1', text: 'Information silos & misaligned department goals' },
-                  { id: 'opt-2', text: 'Meeting overload & context switching fatigue' },
-                  { id: 'opt-3', text: 'Lack of clear documentation & async standards' },
-                  { id: 'opt-4', text: 'Time-zone delays & cross-functional friction' },
-                ],
-              },
-              {
-                id: 'q2',
-                type: 'word_cloud',
-                title: 'In 1 or 2 words, what quality defines an exceptional leader in 2026?',
-                subtitle: 'Submit up to 2 key attributes you value most',
-                timerSeconds: 60,
-                maxWordCount: 2,
-              },
-              {
-                id: 'q3',
-                type: 'rating',
-                title: 'How confident do you feel leveraging AI tools to accelerate your workflow?',
-                subtitle: 'Rate your everyday AI proficiency on a scale of 1 to 5',
-                timerSeconds: 30,
-                ratingMin: 1,
-                ratingMax: 5,
-                ratingMinLabel: 'Just Starting',
-                ratingMaxLabel: 'Advanced Power User',
-              },
-              {
-                id: 'q4',
-                type: 'open_text',
-                title: 'What is your single most urgent question for today’s executive panel?',
-                subtitle: 'Feel free to share challenges, ideas, or discussion topics',
-                timerSeconds: 90,
-              },
-              {
-                id: 'q5',
-                type: 'true_false',
-                title: 'Interactive real-time polling boosts seminar retention rates by over 60%.',
-                subtitle: 'Based on educational psychology and conference research',
-                timerSeconds: 30,
-                points: 100,
-                options: [
-                  { id: 'tf-true', text: 'True — Active recall strongly enhances retention', isCorrect: true },
-                  { id: 'tf-false', text: 'False — Passive listening produces identical outcomes', isCorrect: false },
-                ],
-              },
-            ],
-          });
-          data = await api.fetchAllEvents();
-        } catch (seedErr) {
-          console.warn('Auto-seed demo notice:', seedErr);
-        }
-      }
-
+      const data = await api.fetchAllEvents();
       setEvents(data);
       if (data.length > 0) {
-        setCurrentEventIdState(prev => prev || data[0].id);
+        setCurrentEventIdState(prev => {
+          const stillExists = data.some(e => e.id === prev);
+          return stillExists ? prev : data[0].id;
+        });
+      } else {
+        setCurrentEventIdState('');
       }
     } catch (err: any) {
       console.error('Failed to load events:', err);
