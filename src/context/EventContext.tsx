@@ -71,12 +71,23 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // AUTH MANAGEMENT
   // ============================================
 
+  // Check URL params on initial load (e.g. ?view=projector or ?code=PULSE88)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view') as ActiveAppView;
+    if (viewParam && ['projector', 'participant'].includes(viewParam)) {
+      setActiveViewState(viewParam);
+    }
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
       setIsAuthLoading(false);
-      if (s?.user) {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view');
+      if (s?.user && !viewParam) {
         setActiveViewState('presenter');
       }
     });
