@@ -279,6 +279,7 @@ export async function sendControlAction(eventId: string, action: string, payload
       updates = { status: 'ended', is_timer_running: false };
       break;
     case 'reset_session':
+    case 'clear_room':
       updates = {
         status: 'waiting',
         current_question_index: 0,
@@ -288,8 +289,11 @@ export async function sendControlAction(eventId: string, action: string, payload
         reveal_answer: false,
         timer_remaining_seconds: 45,
       };
-      await supabase.from('responses').delete().eq('event_id', eventId);
-      await supabase.from('participants').delete().eq('event_id', eventId);
+      await Promise.all([
+        supabase.from('responses').delete().eq('event_id', eventId),
+        supabase.from('participants').delete().eq('event_id', eventId),
+        supabase.from('reactions').delete().eq('event_id', eventId),
+      ]);
       break;
     case 'next_question':
       updates = {
