@@ -76,7 +76,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setSession(s);
       setUser(s?.user ?? null);
       setIsAuthLoading(false);
-      // If logged in, default to presenter view
       if (s?.user) {
         setActiveViewState('presenter');
       }
@@ -94,6 +93,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setError(null);
     try {
       await api.signInWithEmail(email, password);
+      await refreshAllEvents();
       setActiveViewState('presenter');
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -121,7 +121,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ============================================
 
   const setActiveView = (view: ActiveAppView) => {
-    // Only allow presenter/admin/analytics if logged in
     if (['presenter', 'admin', 'analytics'].includes(view) && !session) {
       setActiveViewState('login');
       return;
@@ -130,22 +129,92 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // ============================================
-  // DATA LOADING
+  // DATA LOADING & AUTO-SEED
   // ============================================
 
   const refreshAllEvents = useCallback(async () => {
     try {
-      const data = await api.fetchAllEvents();
+      let data = await api.fetchAllEvents();
+      
+      // If database is completely empty, auto-seed the demo keynote event
+      if (data.length === 0) {
+        try {
+          await api.createNewEvent({
+            title: 'Future of Work & AI Summit 2026',
+            category: 'Conference / Keynote',
+            organizerName: 'Dr. Evelyn Vance',
+            description: 'Interactive live session covering modern communication, leadership dynamics, and AI collaboration.',
+            questions: [
+              {
+                id: 'q1',
+                type: 'multiple_choice',
+                title: 'What is the biggest challenge in modern team communication?',
+                subtitle: 'Select the option that most directly impacts your team daily',
+                timerSeconds: 45,
+                points: 100,
+                options: [
+                  { id: 'opt-1', text: 'Information silos & misaligned department goals' },
+                  { id: 'opt-2', text: 'Meeting overload & context switching fatigue' },
+                  { id: 'opt-3', text: 'Lack of clear documentation & async standards' },
+                  { id: 'opt-4', text: 'Time-zone delays & cross-functional friction' },
+                ],
+              },
+              {
+                id: 'q2',
+                type: 'word_cloud',
+                title: 'In 1 or 2 words, what quality defines an exceptional leader in 2026?',
+                subtitle: 'Submit up to 2 key attributes you value most',
+                timerSeconds: 60,
+                maxWordCount: 2,
+              },
+              {
+                id: 'q3',
+                type: 'rating',
+                title: 'How confident do you feel leveraging AI tools to accelerate your workflow?',
+                subtitle: 'Rate your everyday AI proficiency on a scale of 1 to 5',
+                timerSeconds: 30,
+                ratingMin: 1,
+                ratingMax: 5,
+                ratingMinLabel: 'Just Starting',
+                ratingMaxLabel: 'Advanced Power User',
+              },
+              {
+                id: 'q4',
+                type: 'open_text',
+                title: 'What is your single most urgent question for today’s executive panel?',
+                subtitle: 'Feel free to share challenges, ideas, or discussion topics',
+                timerSeconds: 90,
+              },
+              {
+                id: 'q5',
+                type: 'true_false',
+                title: 'Interactive real-time polling boosts seminar retention rates by over 60%.',
+                subtitle: 'Based on educational psychology and conference research',
+                timerSeconds: 30,
+                points: 100,
+                options: [
+                  { id: 'tf-true', text: 'True — Active recall strongly enhances retention', isCorrect: true },
+                  { id: 'tf-false', text: 'False — Passive listening produces identical outcomes', isCorrect: false },
+                ],
+              },
+            ],
+          });
+          data = await api.fetchAllEvents();
+        } catch (seedErr) {
+          console.warn('Auto-seed demo notice:', seedErr);
+        }
+      }
+
       setEvents(data);
-      if (data.length > 0 && !currentEventId) {
-        setCurrentEventIdState(data[0].id);
+      if (data.length > 0) {
+        setCurrentEventIdState(prev => prev || data[0].id);
       }
     } catch (err: any) {
       console.error('Failed to load events:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [currentEventId]);
+  }, []);
 
   const refreshEvent = useCallback(async () => {
     if (!currentEventId) return;
@@ -175,12 +244,30 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // SUPABASE REALTIME SUBSCRIPTIONS
   // ============================================
 
+  // 1. Global subscription for all events changes
+  useEffect(() => {
+    const globalChannel = supabase
+      .channel('global-events-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'events' },
+        () => {
+          refreshAllEvents();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(globalChannel);
+    };
+  }, [refreshAllEvents]);
+
+  // 2. Active event specific real-time channel
   useEffect(() => {
     if (!currentEventId) return;
 
     const channel = supabase
-      .channel(`event-${currentEventId}`)
-      // Listen for event state changes (timer, status, etc.)
+      .channel(`event-live-${currentEventId}`)
       .on(
         'postgres_changes',
         {
@@ -194,7 +281,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
-              // Merge updated event fields while keeping nested arrays
               return {
                 ...evt,
                 status: updatedRow.status,
@@ -212,7 +298,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           );
         }
       )
-      // Listen for new participants joining
       .on(
         'postgres_changes',
         {
@@ -232,7 +317,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           );
         }
       )
-      // Listen for new responses
       .on(
         'postgres_changes',
         {
@@ -246,7 +330,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
-              // Replace if same participant+question, otherwise append
               const filtered = evt.responses.filter(
                 r => !(r.participantId === newResponse.participantId && r.questionId === newResponse.questionId)
               );
@@ -255,7 +338,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           );
         }
       )
-      // Listen for participant score updates
       .on(
         'postgres_changes',
         {
@@ -277,7 +359,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           );
         }
       )
-      // Listen for new reactions
       .on(
         'postgres_changes',
         {
@@ -296,7 +377,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           );
         }
       )
-      // Listen for response deletions (reset session)
       .on(
         'postgres_changes',
         {
@@ -306,7 +386,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           filter: `event_id=eq.${currentEventId}`,
         },
         () => {
-          // On mass delete (reset), reload full event
           refreshEvent();
         }
       )
@@ -333,7 +412,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       localStorage.setItem('pulselive_participant', JSON.stringify(res.participant));
       if (res.eventId) {
         setCurrentEventIdState(res.eventId);
-        // Refresh to load full event
         const fullEvent = await api.fetchFullEvent(res.eventId);
         if (fullEvent) {
           setEvents(prev => {
@@ -367,7 +445,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         participantName: currentParticipant.name,
         ...payload,
       });
-      // Realtime subscription will handle UI update
     } catch (err: any) {
       setError(err.message || 'Failed to submit response');
       throw err;
@@ -378,7 +455,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!currentEvent) return;
     try {
       await api.sendControlAction(currentEvent.id, action, payload);
-      // Realtime subscription will handle UI update
     } catch (err: any) {
       setError(err.message || 'Moderator action failed');
     }
@@ -387,7 +463,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const sendReaction = (emoji: string) => {
     if (!currentEvent) return;
     const name = currentParticipant?.name || 'Attendee';
-    // Direct Supabase insert for speed
     api.sendReactionDirect(currentEvent.id, emoji, name);
   };
 
