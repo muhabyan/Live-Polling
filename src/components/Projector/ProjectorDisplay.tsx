@@ -20,6 +20,20 @@ export const ProjectorDisplay: React.FC = () => {
   const { currentEvent, fireConfetti, setActiveView, session } = useEvent();
   const miniQrRef = useRef<HTMLCanvasElement | null>(null);
 
+  // Press ESC to exit Projector mode anytime cleanly
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        setActiveView(session ? 'presenter' : 'participant');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setActiveView, session]);
+
   const currentQ = currentEvent?.questions[currentEvent.currentQuestionIndex];
   const responses = (currentEvent?.responses || []).filter(r => r.questionId === currentQ?.id);
   const totalResponses = responses.length;
@@ -139,19 +153,9 @@ export const ProjectorDisplay: React.FC = () => {
       {/* Top Projector Stage Bar */}
       <header className="flex items-center justify-between pb-6 border-b border-slate-800">
         
-        {/* Left: Exit button & Session Branding & Progress */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          <button
-            id="exit-projector-btn"
-            onClick={() => setActiveView(session ? 'presenter' : 'participant')}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white rounded-xl border border-slate-700/80 transition-all text-xs font-semibold shadow-sm cursor-pointer"
-            title="Exit Projector Screen"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Exit Projector</span>
-          </button>
-
-          <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-slate-900 font-bold text-xl shadow-sm">
+        {/* Left: Session Branding & Progress */}
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-slate-900 font-bold text-2xl shadow-sm">
             P
           </div>
           <div>
@@ -163,8 +167,8 @@ export const ProjectorDisplay: React.FC = () => {
                 Question {currentEvent.currentQuestionIndex + 1} of {currentEvent.questions.length}
               </span>
             </div>
-            <h1 className="text-xs sm:text-sm text-slate-400 font-medium">
-              Live Stage Screen
+            <h1 className="text-sm sm:text-base text-slate-500 font-medium">
+              Live Projector Feed
             </h1>
           </div>
         </div>
