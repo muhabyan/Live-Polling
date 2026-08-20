@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useEvent } from '../../context/EventContext';
-import { Lock, Mail, ArrowRight, User } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
+import { ButtonSpinner } from '../Shared/Loaders';
 
 export const LoginScreen: React.FC = () => {
   const { login, error, clearError, setActiveView } = useEvent();
@@ -12,8 +13,8 @@ export const LoginScreen: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(email, password);
-    } catch (err) {
+      await login(email.trim(), password);
+    } catch {
       // Error is handled in context
     } finally {
       setIsLoading(false);
@@ -21,58 +22,67 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4.5rem)] flex items-center justify-center bg-slate-50 p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+    <div className="min-h-[calc(100vh-4.5rem)] flex items-center justify-center p-4 sm:p-6">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative">
         
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8" />
+        {/* Back button */}
+        <button
+          onClick={() => setActiveView('participant')}
+          className="absolute top-6 left-6 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          title="Back to audience view"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+
+        <div className="text-center mb-8 pt-2">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
+            <Shield className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">Admin Login</h2>
-          <p className="text-slate-500 text-sm mt-2">Sign in to manage your Live Polling events</p>
+          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Host Sign In</h2>
+          <p className="text-slate-500 text-sm mt-1">Access Presenter Controls & Admin Studio</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex justify-between items-center">
+          <div className="mb-6 p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-2xl border border-rose-200 flex justify-between items-center animate-fade-in">
             <span>{error}</span>
-            <button onClick={clearError} className="text-red-400 hover:text-red-600 font-bold">×</button>
+            <button onClick={clearError} className="text-rose-400 hover:text-rose-700 font-bold text-base ml-2">✕</button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Email Address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="w-5 h-5 text-slate-400" />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Mail className="w-4 h-4 text-slate-400" />
               </div>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="admin@example.com"
+                className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
+                placeholder="host@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="w-5 h-5 text-slate-400" />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Lock className="w-4 h-4 text-slate-400" />
               </div>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -81,29 +91,26 @@ export const LoginScreen: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2 disabled:opacity-70"
+            className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-70 cursor-pointer"
           >
             {isLoading ? (
-              <span className="animate-pulse">Signing in...</span>
+              <span className="flex items-center space-x-2">
+                <ButtonSpinner size="w-4 h-4" color="text-white" />
+                <span className="animate-pulse tracking-wider text-xs uppercase">Authenticating...</span>
+              </span>
             ) : (
               <>
-                <span>Sign In to Studio</span>
+                <span>Enter Presenter Studio</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 text-center border-t border-slate-100 pt-6">
-          <p className="text-sm text-slate-500">
-            Just want to join an event?
+        <div className="mt-6 pt-5 text-center border-t border-slate-100">
+          <p className="text-xs text-slate-400">
+            Need an account? Create one in your Supabase Auth dashboard.
           </p>
-          <button 
-            onClick={() => setActiveView('participant')}
-            className="mt-2 text-indigo-600 font-semibold hover:text-indigo-800 flex items-center justify-center w-full"
-          >
-            <User className="w-4 h-4 mr-1" /> Return to Participant View
-          </button>
         </div>
       </div>
     </div>
