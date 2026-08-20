@@ -7,11 +7,12 @@ import { Groq } from 'groq-sdk';
 dotenv.config();
 
 const app = express();
+const router = express.Router();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// Initialize Supabase with service role key or anon key fallback
+// Initialize Supabase
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -21,11 +22,18 @@ const groqApiKey = process.env.GROQ_API_KEY || '';
 const groq = groqApiKey ? new Groq({ apiKey: groqApiKey }) : null;
 
 // ==========================================
-// 1. EVENT MANAGEMENT ROUTES
+// 1. HEALTH CHECK
+// ==========================================
+router.get('/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ==========================================
+// 2. EVENT MANAGEMENT ROUTES
 // ==========================================
 
 // Create Event
-app.post('/api/events', async (req: Request, res: Response) => {
+router.post('/events', async (req: Request, res: Response) => {
   const { title, description, category, organizerName, questions } = req.body;
   const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
@@ -76,7 +84,7 @@ app.post('/api/events', async (req: Request, res: Response) => {
 });
 
 // Update Event
-app.put('/api/events/:id', async (req: Request, res: Response) => {
+router.put('/events/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const updateData = req.body;
   try {
@@ -94,7 +102,7 @@ app.put('/api/events/:id', async (req: Request, res: Response) => {
 });
 
 // Delete Event
-app.delete('/api/events/:id', async (req: Request, res: Response) => {
+router.delete('/events/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const { error } = await supabase.from('events').delete().eq('id', id);
@@ -106,11 +114,11 @@ app.delete('/api/events/:id', async (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 2. PARTICIPANT ROUTES
+// 3. PARTICIPANT ROUTES
 // ==========================================
 
 // Join Event
-app.post('/api/join', async (req: Request, res: Response) => {
+router.post('/join', async (req: Request, res: Response) => {
   const { roomCode, name, avatarEmoji } = req.body;
   if (!roomCode || !name) {
     return res.status(400).json({ error: 'Room code and participant name are required' });
@@ -149,7 +157,7 @@ app.post('/api/join', async (req: Request, res: Response) => {
 });
 
 // Submit Response
-app.post('/api/events/:id/respond', async (req: Request, res: Response) => {
+router.post('/events/:id/respond', async (req: Request, res: Response) => {
   const { id: event_id } = req.params;
   const { participantId, participantName, questionId, selectedOptionIds, textResponse, ratingValue, timeTakenSeconds } = req.body;
 
@@ -175,10 +183,10 @@ app.post('/api/events/:id/respond', async (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 3. MODERATOR CONTROLS
+// 4. MODERATOR CONTROLS
 // ==========================================
 
-app.post('/api/events/:id/control', async (req: Request, res: Response) => {
+router.post('/events/:id/control', async (req: Request, res: Response) => {
   const { id } = req.params;
   const { action, payload } = req.body;
 
@@ -311,10 +319,10 @@ async function handleSimulateCrowd(eventId: string, count: number, res: Response
 }
 
 // ==========================================
-// 4. GROQ AI ROUTES (Optional)
+// 5. GROQ AI ROUTES (Optional)
 // ==========================================
 
-app.post('/api/ai/generate-questions', async (req: Request, res: Response) => {
+router.post('/ai/generate-questions', async (req: Request, res: Response) => {
   if (!groq) {
     return res.status(503).json({ error: 'Groq API key not configured' });
   }
@@ -377,7 +385,7 @@ app.post('/api/ai/generate-questions', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/ai/summarize-responses', async (req: Request, res: Response) => {
+router.post('/ai/summarize-responses', async (req: Request, res: Response) => {
   if (!groq) {
     return res.status(503).json({ error: 'Groq API key not configured' });
   }
@@ -423,5 +431,9 @@ app.post('/api/ai/summarize-responses', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to summarize with Groq' });
   }
 });
+
+// Mount on both /api and root for maximum compatibility
+app.use('/api', router);
+app.use('/', router);
 
 export default app;
