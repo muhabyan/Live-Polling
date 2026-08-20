@@ -24,7 +24,8 @@ import {
   Layers,
   ChevronRight,
   TrendingUp,
-  BrainCircuit
+  BrainCircuit,
+  Trash2
 } from 'lucide-react';
 import * as api from '../../utils/api';
 
@@ -34,7 +35,8 @@ export const PresenterControl: React.FC = () => {
     sendModeratorAction, 
     simulateAudienceVotes, 
     isSimulatingCrowd,
-    setActiveView 
+    setActiveView,
+    refreshEvent
   } = useEvent();
 
   const [isSummarizingAI, setIsSummarizingAI] = useState(false);
@@ -143,15 +145,19 @@ export const PresenterControl: React.FC = () => {
             </button>
           )}
 
-          {currentEvent.status === 'ended' && (
-            <button
-              onClick={() => sendModeratorAction('reset_session')}
-              className="flex items-center space-x-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium transition-colors"
-            >
-              <RotateCcw className="w-4 h-4 text-slate-500" />
-              <span>Restart Session</span>
-            </button>
-          )}
+          <button
+            onClick={async () => {
+              if (window.confirm('Reset all participants and vote responses for this session?')) {
+                await sendModeratorAction('reset_session');
+                await refreshEvent();
+              }
+            }}
+            className="flex items-center space-x-1.5 px-3 py-2 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+            title="Clear all responses and participants"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-slate-400 hover:text-rose-500" />
+            <span>Reset Data</span>
+          </button>
         </div>
       </div>
 
@@ -520,14 +526,32 @@ export const PresenterControl: React.FC = () => {
                 <span>Connected Room ({currentEvent.participants.length})</span>
               </div>
 
-              <button
-                onClick={() => simulateAudienceVotes(8)}
-                disabled={isSimulatingCrowd}
-                className="text-xs text-slate-600 font-medium hover:underline flex items-center space-x-1"
-              >
-                <Zap className="w-3.5 h-3.5 text-slate-400" />
-                <span>+8 simulated</span>
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => simulateAudienceVotes(8)}
+                  disabled={isSimulatingCrowd}
+                  className="text-xs text-slate-600 font-medium hover:underline flex items-center space-x-1 cursor-pointer"
+                >
+                  <Zap className="w-3.5 h-3.5 text-slate-400" />
+                  <span>+8 simulated</span>
+                </button>
+
+                {currentEvent.participants.length > 0 && (
+                  <button
+                    onClick={async () => {
+                      if (window.confirm(`Clear all ${currentEvent.participants.length} connected participants and reset votes?`)) {
+                        await sendModeratorAction('reset_session');
+                        await refreshEvent();
+                      }
+                    }}
+                    className="text-xs text-rose-600 hover:text-rose-700 font-semibold hover:underline flex items-center space-x-1 ml-1 cursor-pointer"
+                    title="Clear all participants"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Clear</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
