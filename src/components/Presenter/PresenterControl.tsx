@@ -47,8 +47,21 @@ export const PresenterControl: React.FC = () => {
 
   if (!currentEvent) {
     return (
-      <div className="p-8 text-center text-slate-500">
-        <p>No active event selected.</p>
+      <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200/80 shadow-xl text-center space-y-4">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+          <Radio className="w-8 h-8 animate-pulse" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">No Active Event Selected</h2>
+        <p className="text-sm text-slate-500">
+          You haven't created any live polling sessions yet. Open Admin Studio to create your first event!
+        </p>
+        <button
+          onClick={() => setActiveView('admin')}
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Create Event in Admin Studio</span>
+        </button>
       </div>
     );
   }

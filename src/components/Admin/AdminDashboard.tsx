@@ -29,7 +29,8 @@ export const AdminDashboard: React.FC = () => {
     events, 
     setCurrentEventId, 
     setActiveView, 
-    refreshEvent 
+    refreshEvent,
+    refreshAllEvents 
   } = useEvent();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -107,14 +108,17 @@ export const AdminDashboard: React.FC = () => {
     if (!formTitle.trim()) return;
 
     try {
-      await api.createNewEvent({
+      const newEvt = await api.createNewEvent({
         title: formTitle.trim(),
         category: formCategory,
         organizerName: formOrganizer.trim() || 'Moderator',
         description: formDescription.trim(),
         questions: formQuestions,
       });
-      await refreshEvent();
+      await refreshAllEvents();
+      if (newEvt && newEvt.id) {
+        setCurrentEventId(newEvt.id);
+      }
       setIsCreateModalOpen(false);
     } catch (err) {
       console.error('Failed to create event:', err);
@@ -126,7 +130,7 @@ export const AdminDashboard: React.FC = () => {
     if (confirm('Are you sure you want to delete this event?')) {
       try {
         await api.deleteEventById(id);
-        await refreshEvent();
+        await refreshAllEvents();
       } catch (err) {
         console.error(err);
       }
@@ -136,14 +140,17 @@ export const AdminDashboard: React.FC = () => {
   const handleDuplicateEvent = async (evt: EventData, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await api.createNewEvent({
+      const newEvt = await api.createNewEvent({
         title: `${evt.title} (Copy)`,
         category: evt.category,
         organizerName: evt.organizerName,
         description: evt.description,
         questions: JSON.parse(JSON.stringify(evt.questions)),
       });
-      await refreshEvent();
+      await refreshAllEvents();
+      if (newEvt && newEvt.id) {
+        setCurrentEventId(newEvt.id);
+      }
     } catch (err) {
       console.error(err);
     }
