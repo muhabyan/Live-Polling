@@ -71,12 +71,12 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       </div>
 
       {showText && (
-        <div className="flex flex-col leading-tight">
-          <div className={`font-black tracking-tight ${textSizes[size]} ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Stage<span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Sync</span>
+        <div className="flex flex-col leading-none">
+          <div className={`font-black tracking-tight font-display ${textSizes[size]} ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            Pulse<span className="text-indigo-600 dark:text-indigo-400">Live</span>
           </div>
-          <span className={`text-[9px] uppercase tracking-widest font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Audience Engagement
+          <span className={`text-[9px] uppercase tracking-widest font-bold mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Audience Polling
           </span>
         </div>
       )}

@@ -5,7 +5,7 @@ import { ButtonSpinner } from '../Shared/Loaders';
 import { BrandLogo } from '../Shared/BrandLogo';
 
 export const LoginScreen: React.FC = () => {
-  const { login, error, clearError, setActiveView } = useEvent();
+  const { login, error, clearError, setActiveView, loginAsDemoHost } = useEvent();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,41 +16,45 @@ export const LoginScreen: React.FC = () => {
     try {
       await login(email.trim(), password);
     } catch {
-      // Error is handled in context
+      // Error handled in context
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4.5rem)] flex items-center justify-center p-4 sm:p-6">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative">
+    <div className="w-full flex-1 flex items-center justify-center p-4 sm:p-6 pb-safe">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200/90 p-6 sm:p-8 relative">
         
         {/* Back button */}
         <button
           onClick={() => setActiveView('participant')}
-          className="absolute top-6 left-6 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          title="Back to audience view"
+          className="absolute top-5 left-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          title="Back to audience mode"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
         </button>
 
-        <div className="flex flex-col items-center text-center mb-8 pt-2">
-          <BrandLogo size="lg" showText={false} className="mb-3" />
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">StageSync Host Sign In</h2>
-          <p className="text-slate-500 text-sm mt-1">Access Presenter Controls & Admin Studio</p>
+        <div className="flex flex-col items-center text-center mb-6 pt-2">
+          <BrandLogo size="md" showText={false} className="mb-2" />
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight font-display">
+            PulseLive Host Sign In
+          </h2>
+          <p className="text-slate-500 text-xs mt-0.5">
+            Access Presenter Controls & Admin Studio
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-rose-50 text-rose-700 text-xs font-semibold rounded-2xl border border-rose-200 flex justify-between items-center animate-fade-in">
+          <div className="mb-4 p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 flex justify-between items-center animate-in fade-in">
             <span>{error}</span>
-            <button onClick={clearError} className="text-rose-400 hover:text-rose-700 font-bold text-base ml-2">✕</button>
+            <button onClick={clearError} className="text-rose-500 hover:text-rose-700 font-bold ml-2">✕</button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
               Email Address
             </label>
             <div className="relative">
@@ -62,14 +66,14 @@ export const LoginScreen: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
+                className="block w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-indigo-600 focus:outline-none transition-all"
                 placeholder="host@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
               Password
             </label>
             <div className="relative">
@@ -81,7 +85,7 @@ export const LoginScreen: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
+                className="block w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-indigo-600 focus:outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -90,25 +94,32 @@ export const LoginScreen: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-70 cursor-pointer"
+            className="w-full mt-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer"
           >
             {isLoading ? (
               <span className="flex items-center space-x-2">
                 <ButtonSpinner size="w-4 h-4" color="text-white" />
-                <span className="animate-pulse tracking-wider text-xs uppercase">Authenticating...</span>
+                <span className="tracking-wider text-xs">Authenticating...</span>
               </span>
             ) : (
               <>
-                <span>Enter Presenter Studio</span>
+                <span>Enter Host Studio</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-6 pt-5 text-center border-t border-slate-100">
-          <p className="text-xs text-slate-400">
-            Need an account? Create one in your Supabase Auth dashboard.
+        <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col items-center space-y-2">
+          <button
+            type="button"
+            onClick={loginAsDemoHost}
+            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+          >
+            <span>⚡ Instant Demo Host Access (Presenter & Admin)</span>
+          </button>
+          <p className="text-[11px] text-slate-400 text-center">
+            No signup required to test live polls, projector, and reports.
           </p>
         </div>
       </div>

@@ -8,9 +8,9 @@ import {
   Lock, 
   CheckCircle2, 
   Star, 
-  AlertCircle,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Check
 } from 'lucide-react';
 
 interface ParticipantLiveQuestionProps {
@@ -44,12 +44,16 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
   const timerRemaining = currentEvent?.timerRemainingSeconds ?? 30;
   const isLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
 
-  const optionLetterMap = ['A', 'B', 'C', 'D', 'E', 'F'];
+  const optionLetterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  
+  // Distinct high-contrast brand colors for options (like Slido & Mentimeter)
   const optionColorStyles = [
-    { bg: 'bg-indigo-500', text: 'text-white', border: 'border-indigo-600', light: 'bg-indigo-50' },
-    { bg: 'bg-emerald-500', text: 'text-white', border: 'border-emerald-600', light: 'bg-emerald-50' },
-    { bg: 'bg-amber-500', text: 'text-white', border: 'border-amber-600', light: 'bg-amber-50' },
-    { bg: 'bg-violet-500', text: 'text-white', border: 'border-violet-600', light: 'bg-violet-50' },
+    { bg: 'bg-indigo-600', text: 'text-white', badge: 'bg-indigo-100 text-indigo-800' },
+    { bg: 'bg-teal-600', text: 'text-white', badge: 'bg-teal-100 text-teal-800' },
+    { bg: 'bg-amber-600', text: 'text-white', badge: 'bg-amber-100 text-amber-800' },
+    { bg: 'bg-rose-600', text: 'text-white', badge: 'bg-rose-100 text-rose-800' },
+    { bg: 'bg-purple-600', text: 'text-white', badge: 'bg-purple-100 text-purple-800' },
+    { bg: 'bg-sky-600', text: 'text-white', badge: 'bg-sky-100 text-sky-800' },
   ];
 
   const handleOptionToggle = (optionId: string) => {
@@ -101,39 +105,56 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
     }
   };
 
-  // Timer urgency color
-  const getTimerBadgeStyle = () => {
-    if (timerRemaining <= 5) return 'bg-rose-500 text-white animate-pulse';
-    if (timerRemaining <= 15) return 'bg-amber-500 text-white';
-    return 'bg-slate-800 text-white';
+  const isFormValid = () => {
+    if (question.type === 'multiple_choice' || question.type === 'true_false') {
+      return selectedOptionIds.length > 0;
+    }
+    if (question.type === 'word_cloud' || question.type === 'open_text') {
+      return textAnswer.trim().length > 0;
+    }
+    if (question.type === 'rating') {
+      return ratingValue !== null;
+    }
+    return false;
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto p-4 sm:p-6 flex flex-col justify-between min-h-[calc(100vh-6rem)]">
+    <div className="w-full max-w-md mx-auto px-3 py-4 sm:p-6 flex flex-col justify-between flex-1">
       
       {/* Top Header: Progress & Live Countdown */}
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
           <div className="flex items-center space-x-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-              Question {questionNumber} of {totalQuestions}
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200">
+              Q {questionNumber} / {totalQuestions}
             </span>
-            {question.points && (
-              <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
-                +{question.points} pts
+            {question.allowMultiple && (
+              <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                Select multiple
               </span>
             )}
+            {question.points ? (
+              <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                +{question.points} pts
+              </span>
+            ) : null}
           </div>
 
           {/* Countdown Badge */}
-          <div className={`flex items-center space-x-1.5 px-3 py-1 rounded-xl text-xs font-black font-mono shadow-xs transition-colors ${getTimerBadgeStyle()}`}>
-            <Clock className="w-3.5 h-3.5" />
-            <span>00:{timerRemaining < 10 ? `0${timerRemaining}` : timerRemaining}</span>
+          <div className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold font-mono-numbers shadow-2xs transition-colors ${
+            timerRemaining <= 5 
+              ? 'bg-rose-600 text-white animate-pulse' 
+              : timerRemaining <= 15 
+              ? 'bg-amber-500 text-white' 
+              : 'bg-slate-800 text-white'
+          }`}>
+            <Clock className="w-3 h-3" />
+            <span>{timerRemaining}s</span>
           </div>
         </div>
 
         {/* Linear Progress Bar */}
-        <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-6">
+        <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-4 sm:mb-5">
           <div 
             className="bg-indigo-600 h-full rounded-full transition-all duration-300"
             style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
@@ -141,24 +162,24 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
         </div>
 
         {/* Question Title & Subtitle */}
-        <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug tracking-tight font-display">
             {question.title}
           </h2>
           {question.subtitle && (
-            <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               {question.subtitle}
             </p>
           )}
         </div>
       </div>
 
-      {/* Interactive Question Inputs based on Type */}
+      {/* Interactive Question Inputs */}
       <div className="my-auto py-2">
         
         {/* TYPE 1: MULTIPLE CHOICE */}
         {question.type === 'multiple_choice' && (
-          <div className="space-y-3">
+          <div className="space-y-2.5 sm:space-y-3">
             {(question.options || []).map((opt, idx) => {
               const isSelected = selectedOptionIds.includes(opt.id);
               const color = optionColorStyles[idx % optionColorStyles.length];
@@ -170,31 +191,33 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
                   type="button"
                   disabled={isLocked}
                   onClick={() => handleOptionToggle(opt.id)}
-                  className={`w-full text-left p-4 rounded-xl border border-slate-200 transition-all flex items-center justify-between group ${
+                  className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
                     isSelected
-                      ? 'border-indigo-600 bg-indigo-50/50 shadow-sm ring-1 ring-indigo-600'
-                      : 'bg-white hover:border-slate-300 hover:bg-slate-50/50 shadow-sm'
-                  } ${isLocked ? 'opacity-60 cursor-not-allowed' : 'active:scale-[0.99]'}`}
+                      ? 'border-indigo-600 bg-indigo-50/60 shadow-sm ring-2 ring-indigo-600/30'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 shadow-2xs'
+                  } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}`}
                 >
-                  <div className="flex items-center space-x-3.5 pr-2">
+                  <div className="flex items-center space-x-3 pr-2 min-w-0">
                     <div 
-                      className={`w-8 h-8 rounded-lg font-semibold flex items-center justify-center text-sm shrink-0 shadow-sm ${
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-bold flex items-center justify-center text-xs sm:text-sm shrink-0 transition-transform ${
                         isSelected 
                           ? 'bg-indigo-600 text-white' 
-                          : `${color.bg} text-white group-hover:scale-105 transition-transform`
+                          : `${color.bg} text-white`
                       }`}
                     >
                       {optionLetterMap[idx] || idx + 1}
                     </div>
-                    <span className={`text-sm sm:text-base font-medium ${isSelected ? 'text-indigo-900 font-semibold' : 'text-slate-800'}`}>
+                    <span className={`text-sm sm:text-base font-semibold leading-snug ${
+                      isSelected ? 'text-indigo-950 font-bold' : 'text-slate-800'
+                    }`}>
                       {opt.text}
                     </span>
                   </div>
 
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                    isSelected ? 'border-indigo-600 bg-indigo-600 text-white scale-105' : 'border-slate-300'
                   }`}>
-                    {isSelected && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                   </div>
                 </button>
               );
@@ -204,7 +227,7 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
 
         {/* TYPE 2: TRUE / FALSE */}
         {question.type === 'true_false' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {(question.options || [
               { id: 'tf-true', text: 'True' },
               { id: 'tf-false', text: 'False' }
@@ -218,21 +241,23 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
                   type="button"
                   disabled={isLocked}
                   onClick={() => handleOptionToggle(opt.id)}
-                  className={`p-6 rounded-xl border border-slate-200 transition-all flex flex-col items-center text-center justify-center shadow-sm ${
+                  className={`p-5 sm:p-6 rounded-2xl border transition-all flex flex-col items-center text-center justify-center cursor-pointer shadow-2xs ${
                     isSelected
-                      ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600'
-                      : 'bg-white hover:bg-slate-50 hover:border-slate-300'
-                  } ${isLocked ? 'opacity-60 cursor-not-allowed' : 'active:scale-95'}`}
+                      ? 'border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-600/30'
+                      : 'border-slate-200 bg-white hover:bg-slate-50'
+                  } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-semibold mb-3 shadow-sm ${
-                    isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-white'
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold mb-2 shadow-2xs ${
+                    isSelected 
+                      ? 'bg-indigo-600 text-white' 
+                      : isTrue 
+                      ? 'bg-emerald-600 text-white' 
+                      : 'bg-rose-600 text-white'
                   }`}>
                     {isTrue ? '✓' : '✕'}
                   </div>
-                  <span className={`text-base font-medium ${
-                    isSelected 
-                      ? 'text-indigo-900'
-                      : 'text-slate-800'
+                  <span className={`text-base font-bold ${
+                    isSelected ? 'text-indigo-950' : 'text-slate-800'
                   }`}>
                     {opt.text}
                   </span>
@@ -244,9 +269,9 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
 
         {/* TYPE 3: WORD CLOUD */}
         {question.type === 'word_cloud' && (
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-            <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              <Sparkles className="w-4 h-4 text-slate-500" />
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs">
+            <div className="flex items-center space-x-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               <span>Submit 1 or 2 keywords</span>
             </div>
             <input
@@ -254,27 +279,28 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
               type="text"
               value={textAnswer}
               onChange={(e) => setTextAnswer(e.target.value)}
-              placeholder="e.g. Innovation, Empathy"
+              placeholder="Type keyword e.g. Innovation"
               maxLength={40}
               disabled={isLocked}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-lg text-lg font-medium text-slate-900 focus:bg-white focus:border-slate-400 focus:outline-none transition-all placeholder:text-slate-400 placeholder:text-base shadow-sm"
+              autoFocus
+              className="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-base sm:text-lg font-semibold text-slate-900 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-50 focus:outline-none transition-all placeholder:text-slate-400 placeholder:text-sm"
             />
-            <div className="flex justify-between items-center mt-2 text-xs text-slate-400">
-              <span>Short words display best on the big screen</span>
-              <span>{textAnswer.length}/40</span>
+            <div className="flex justify-between items-center mt-2 text-[11px] text-slate-400">
+              <span>Will appear live on the big stage</span>
+              <span className="font-mono-numbers">{textAnswer.length}/40</span>
             </div>
           </div>
         )}
 
         {/* TYPE 4: RATING SCALE */}
         {question.type === 'rating' && (
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-            <div className="flex justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
-              <span>{question.ratingMinLabel || '1 = Low'}</span>
-              <span>{question.ratingMaxLabel || '5 = High'}</span>
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs">
+            <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
+              <span>{question.ratingMinLabel || '1 (Low)'}</span>
+              <span>{question.ratingMaxLabel || '5 (High)'}</span>
             </div>
 
-            <div className="grid grid-cols-5 gap-2 sm:gap-3">
+            <div className="grid grid-cols-5 gap-2">
               {[1, 2, 3, 4, 5].map((num) => {
                 const isSelected = ratingValue === num;
                 return (
@@ -283,22 +309,22 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
                     type="button"
                     disabled={isLocked}
                     onClick={() => setRatingValue(num)}
-                    className={`py-4 rounded-xl border font-semibold text-xl flex flex-col items-center justify-center transition-all shadow-sm ${
+                    className={`py-3.5 sm:py-4 rounded-xl border font-bold text-lg sm:text-xl flex flex-col items-center justify-center transition-all cursor-pointer shadow-2xs ${
                       isSelected
-                        ? 'border-indigo-600 bg-indigo-600 text-white scale-105'
+                        ? 'border-indigo-600 bg-indigo-600 text-white scale-105 shadow-xs'
                         : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
-                    } ${isLocked ? 'opacity-60 cursor-not-allowed' : 'active:scale-95'}`}
+                    } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
                   >
                     <span>{num}</span>
-                    <Star className={`w-3.5 h-3.5 mt-1 ${isSelected ? 'fill-slate-200 text-slate-200' : 'text-slate-300'}`} />
+                    <Star className={`w-3.5 h-3.5 mt-1 ${isSelected ? 'fill-white text-white' : 'text-slate-300'}`} />
                   </button>
                 );
               })}
             </div>
 
             {ratingValue && (
-              <div className="text-center mt-4 text-xs font-semibold text-slate-700 bg-slate-100 py-1.5 rounded-lg border border-slate-200">
-                Selected rating: {ratingValue} out of 5
+              <div className="text-center mt-3 text-xs font-bold text-indigo-700 bg-indigo-50 py-1.5 rounded-lg border border-indigo-100 animate-in fade-in">
+                Selected rating: {ratingValue} / 5
               </div>
             )}
           </div>
@@ -306,29 +332,30 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
 
         {/* TYPE 5: OPEN TEXT */}
         {question.type === 'open_text' && (
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs">
             <textarea
               id="open-text-input"
-              rows={4}
+              rows={3}
               value={textAnswer}
               onChange={(e) => setTextAnswer(e.target.value)}
               placeholder="Type your response here..."
               maxLength={280}
               disabled={isLocked}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-800 focus:bg-white focus:border-slate-400 focus:outline-none transition-all resize-none shadow-sm"
+              autoFocus
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-50 focus:outline-none transition-all resize-none placeholder:text-slate-400"
             />
-            <div className="flex justify-between items-center mt-2 text-xs text-slate-400">
-              <span>Visible to moderator</span>
-              <span>{textAnswer.length}/280 characters</span>
+            <div className="flex justify-between items-center mt-1.5 text-[11px] text-slate-400">
+              <span>Submitted live to moderator</span>
+              <span className="font-mono-numbers">{textAnswer.length}/280</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Submit Action or Lock Notice */}
-      <div className="pt-4">
+      {/* Bottom Submit Action */}
+      <div className="pt-3">
         {isLocked ? (
-          <div className="w-full py-3.5 px-4 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 font-bold text-sm flex items-center justify-center space-x-2">
+          <div className="w-full py-3.5 px-4 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2">
             <Lock className="w-4 h-4 text-slate-400" />
             <span>Voting is closed for this question</span>
           </div>
@@ -337,19 +364,13 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
             id="participant-submit-answer-btn"
             type="button"
             onClick={() => handleSubmit()}
-            disabled={
-              isSubmitting ||
-              (question.type === 'multiple_choice' && selectedOptionIds.length === 0) ||
-              (question.type === 'true_false' && selectedOptionIds.length === 0) ||
-              ((question.type === 'word_cloud' || question.type === 'open_text') && !textAnswer.trim()) ||
-              (question.type === 'rating' && ratingValue === null)
-            }
-            className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-medium rounded-lg text-base shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            disabled={isSubmitting || !isFormValid()}
+            className="w-full py-3.5 sm:py-4 px-5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold rounded-xl text-sm sm:text-base shadow-sm hover:shadow transition-all flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? (
               <span className="flex items-center space-x-2">
-                <ButtonSpinner size="w-5 h-5" color="text-white" />
-                <span className="animate-pulse tracking-wider">RECORDING VOTE</span>
+                <ButtonSpinner size="w-4 h-4" color="text-white" />
+                <span className="tracking-wide">Submitting Vote...</span>
               </span>
             ) : (
               <>

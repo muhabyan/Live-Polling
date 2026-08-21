@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
 import { useEvent } from '../../context/EventContext';
 import { 
-  Download, 
-  Trash2, 
   Users, 
   MessageSquare, 
   Clock, 
   CheckCircle2, 
-  Star, 
   Trophy, 
   FileSpreadsheet, 
-  Calendar, 
   Layers, 
-  Sparkles,
   AlertTriangle,
-  RotateCcw,
-  Tv,
   Sliders,
-  BarChart3
+  BarChart3,
+  Trash2
 } from 'lucide-react';
 
 export const EventSummaryExport: React.FC = () => {
@@ -27,17 +21,17 @@ export const EventSummaryExport: React.FC = () => {
 
   if (!currentEvent) {
     return (
-      <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200/80 shadow-xl text-center space-y-4">
-        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
-          <BarChart3 className="w-8 h-8" />
+      <div className="max-w-md mx-auto my-12 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-sm text-center space-y-4">
+        <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+          <BarChart3 className="w-7 h-7" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">No Event Selected</h2>
-        <p className="text-sm text-slate-500">
+        <h2 className="text-xl font-bold text-slate-900 font-display">No Event Selected</h2>
+        <p className="text-xs sm:text-sm text-slate-500">
           Create or select an event in Admin Studio to view its analytics report.
         </p>
         <button
           onClick={() => setActiveView('admin')}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
+          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
         >
           <span>Go to Admin Studio</span>
         </button>
@@ -99,7 +93,7 @@ export const EventSummaryExport: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `StageSync-${currentEvent.roomCode}-Analytics-Report.csv`);
+    link.setAttribute('download', `PulseLive-${currentEvent.roomCode}-Analytics-Report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -114,49 +108,49 @@ export const EventSummaryExport: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8 space-y-6 animate-in fade-in">
       
       {/* Top Header & Export Banner */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2.5 mb-1.5">
-            <span className="text-xs font-semibold font-mono bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200">
-              ROOM: {currentEvent.roomCode}
+          <div className="flex items-center space-x-2 mb-1">
+            <span className="text-[11px] font-bold font-mono-numbers bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+              PIN: {currentEvent.roomCode}
             </span>
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
               {currentEvent.category}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
-            {currentEvent.title} — Event Analytics
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">
+            {currentEvent.title} — Analytics & Export
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-0.5">
             Organized by <strong>{currentEvent.organizerName}</strong> • {new Date(currentEvent.createdAt).toLocaleDateString()}
           </p>
         </div>
 
-        {/* Primary Export & Action Toolbar */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Action Toolbar */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             id="download-csv-report-btn"
             onClick={handleExportCSV}
-            className="flex items-center space-x-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-medium rounded-xl text-xs sm:text-sm shadow-sm transition-all"
+            className="flex items-center space-x-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold rounded-xl text-xs sm:text-sm shadow-2xs transition-all cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4" />
-            <span>{downloadSuccess ? 'CSV File Downloaded!' : 'Export CSV / Excel'}</span>
+            <span>{downloadSuccess ? 'Downloaded!' : 'Export CSV'}</span>
           </button>
 
           <button
             onClick={() => setActiveView('presenter')}
-            className="flex items-center space-x-1.5 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition-colors"
+            className="flex items-center space-x-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer"
           >
-            <Sliders className="w-4 h-4 text-slate-500" />
-            <span>Open Presenter</span>
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Presenter</span>
           </button>
 
           <button
             onClick={() => setShowCleanupModal(true)}
-            className="p-3 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition-colors"
+            className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition-colors cursor-pointer"
             title="Clean up responses"
           >
             <Trash2 className="w-4 h-4" />
@@ -165,64 +159,64 @@ export const EventSummaryExport: React.FC = () => {
       </div>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Participants</span>
-            <Users className="w-4 h-4 text-slate-400" />
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Participants</span>
+            <Users className="w-4 h-4 text-indigo-600" />
           </div>
-          <div className="text-3xl font-semibold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
             {totalParticipants}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Unique attendees in session</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Unique attendees joined</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Votes Cast</span>
-            <MessageSquare className="w-4 h-4 text-slate-400" />
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Votes</span>
+            <MessageSquare className="w-4 h-4 text-teal-600" />
           </div>
-          <div className="text-3xl font-semibold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
             {totalResponses}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">~{avgResponsesPerQ} responses / question</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">~{avgResponsesPerQ} per question</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Interactive Questions</span>
-            <Layers className="w-4 h-4 text-slate-400" />
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Questions</span>
+            <Layers className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-3xl font-semibold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
             {totalQuestions}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Multiple choice, rating, clouds</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Polls & quizzes</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Avg Response Time</span>
-            <Clock className="w-4 h-4 text-slate-400" />
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-400 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Avg Speed</span>
+            <Clock className="w-4 h-4 text-purple-600" />
           </div>
-          <div className="text-3xl font-semibold text-slate-900 font-mono-numbers">
-            7.4s
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
+            6.8s
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">Fast mobile engagement</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Average response time</p>
         </div>
       </div>
 
       {/* Main Breakdown: Question-by-Question Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left 2 Cols: Question Performance Cards */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Question Performance Breakdown</h2>
-            <span className="text-xs font-medium text-slate-500">{currentEvent.questions.length} total questions</span>
+            <h2 className="text-sm font-bold text-slate-900 font-display">Question Performance Breakdown</h2>
+            <span className="text-xs text-slate-400 font-semibold">{currentEvent.questions.length} questions</span>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {currentEvent.questions.map((q, idx) => {
               const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
               const qTotal = qResponses.length;
@@ -230,45 +224,45 @@ export const EventSummaryExport: React.FC = () => {
               return (
                 <div
                   key={q.id}
-                  className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4"
+                  className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">
+                      <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                         Q{idx + 1} • {q.type.replace('_', ' ').toUpperCase()}
                       </span>
-                      {q.points && (
-                        <span className="text-xs font-medium text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                          {q.points} pts
+                      {q.points ? (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                          +{q.points} pts
                         </span>
-                      )}
+                      ) : null}
                     </div>
-                    <span className="text-xs font-semibold font-mono text-slate-500">
+                    <span className="text-xs font-bold font-mono-numbers text-slate-600">
                       {qTotal} responses
                     </span>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-semibold text-slate-900">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 font-display">
                     {q.title}
                   </h3>
 
-                  {/* Multiple Choice Option Stats */}
+                  {/* Multiple Choice Stats */}
                   {(q.type === 'multiple_choice' || q.type === 'true_false') && (
-                    <div className="space-y-2.5 pt-2">
+                    <div className="space-y-2 pt-1">
                       {(q.options || []).map((opt, optIdx) => {
                         const count = qResponses.filter(r => r.selectedOptionIds?.includes(opt.id)).length;
                         const pct = qTotal > 0 ? Math.round((count / qTotal) * 100) : 0;
 
                         return (
                           <div key={opt.id} className="space-y-1">
-                            <div className="flex justify-between text-xs font-medium text-slate-700">
+                            <div className="flex justify-between text-xs font-semibold text-slate-700">
                               <span className="flex items-center space-x-2">
-                                <span className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-[10px] font-semibold text-slate-600">
+                                <span className="w-5 h-5 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">
                                   {['A', 'B', 'C', 'D'][optIdx] || optIdx + 1}
                                 </span>
                                 <span>{opt.text}</span>
                                 {opt.isCorrect && (
-                                  <span className="text-[10px] text-slate-700 font-semibold bg-slate-100 px-1.5 py-0.5 rounded">
+                                  <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                                     Correct
                                   </span>
                                 )}
@@ -277,7 +271,7 @@ export const EventSummaryExport: React.FC = () => {
                             </div>
                             <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                               <div
-                                className={`h-full rounded-full ${opt.isCorrect ? 'bg-slate-900' : 'bg-slate-300'}`}
+                                className={`h-full rounded-full ${opt.isCorrect ? 'bg-emerald-500' : 'bg-indigo-600'}`}
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
@@ -289,26 +283,30 @@ export const EventSummaryExport: React.FC = () => {
 
                   {/* Word Cloud Summary */}
                   {q.type === 'word_cloud' && (
-                    <div className="pt-2">
-                      <div className="flex flex-wrap gap-2">
-                        {qResponses.map((r, i) => (
-                          <span
-                            key={r.id || i}
-                            className="px-3 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium"
-                          >
-                            {r.textResponse}
-                          </span>
-                        ))}
+                    <div className="pt-1">
+                      <div className="flex flex-wrap gap-1.5">
+                        {qResponses.length === 0 ? (
+                          <span className="text-xs text-slate-400">No submissions yet</span>
+                        ) : (
+                          qResponses.map((r, i) => (
+                            <span
+                              key={r.id || i}
+                              className="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg text-xs font-semibold"
+                            >
+                              {r.textResponse}
+                            </span>
+                          ))
+                        )}
                       </div>
                     </div>
                   )}
 
                   {/* Rating Score Summary */}
                   {q.type === 'rating' && (
-                    <div className="pt-2 flex items-center space-x-4 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+                    <div className="pt-1 flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
                       <div>
-                        <div className="text-[10px] font-semibold uppercase text-slate-500">Average Rating</div>
-                        <div className="text-2xl font-semibold text-slate-900 font-mono">
+                        <div className="text-[10px] font-bold uppercase text-slate-500">Average Rating</div>
+                        <div className="text-xl font-bold text-amber-500 font-mono-numbers">
                           {qTotal > 0 ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / qTotal).toFixed(1) : '0.0'} / 5.0
                         </div>
                       </div>
@@ -320,9 +318,9 @@ export const EventSummaryExport: React.FC = () => {
 
                   {/* Open Text Summary */}
                   {q.type === 'open_text' && (
-                    <div className="pt-2 space-y-2 max-h-40 overflow-y-auto">
+                    <div className="pt-1 space-y-1.5 max-h-36 overflow-y-auto">
                       {qResponses.map(r => (
-                        <div key={r.id} className="p-2.5 bg-slate-50 rounded-xl text-xs border border-slate-200/80">
+                        <div key={r.id} className="p-2 bg-slate-50 rounded-xl text-xs border border-slate-200">
                           <strong className="text-slate-800">{r.participantName}:</strong> "{r.textResponse}"
                         </div>
                       ))}
@@ -334,37 +332,37 @@ export const EventSummaryExport: React.FC = () => {
           </div>
         </div>
 
-        {/* Right 1 Col: Top Participant Leaderboard & Session Summary */}
-        <div className="space-y-6">
+        {/* Right 1 Col: Leaderboard & Summary */}
+        <div className="space-y-5">
           
           {/* Top Leaderboard */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2 text-slate-800 font-semibold text-sm">
-                <Trophy className="w-4 h-4 text-slate-500" />
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-xs sm:text-sm font-display">
+                <Trophy className="w-4 h-4 text-amber-500" />
                 <span>Leaderboard Standings</span>
               </div>
-              <span className="text-xs font-medium text-slate-500">Top 5</span>
+              <span className="text-xs text-slate-400 font-semibold">Top 5</span>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {leaderboard.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center">No participant scores recorded.</p>
+                <p className="text-xs text-slate-400 py-3 text-center">No participant scores recorded.</p>
               ) : (
                 leaderboard.map((p, idx) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
                   >
-                    <div className="flex items-center space-x-2.5">
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center font-medium text-xs ${
-                        idx === 0 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-600'
+                    <div className="flex items-center space-x-2">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
+                        idx === 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
                       }`}>
                         {idx + 1}
                       </span>
-                      <span className="font-semibold text-slate-800">{p.name}</span>
+                      <span className="font-bold text-slate-800">{p.name}</span>
                     </div>
-                    <span className="font-mono font-semibold text-slate-700">{p.score || 0} pts</span>
+                    <span className="font-mono-numbers font-bold text-indigo-700">{p.score || 0} pts</span>
                   </div>
                 ))
               )}
@@ -372,56 +370,56 @@ export const EventSummaryExport: React.FC = () => {
           </div>
 
           {/* Quick Session Health Check */}
-          <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm text-xs space-y-3">
-            <h4 className="font-semibold text-slate-900 flex items-center space-x-1.5">
-              <CheckCircle2 className="w-4 h-4 text-slate-500" />
-              <span>Data Export Certified</span>
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs text-xs space-y-2.5">
+            <h4 className="font-bold text-slate-900 flex items-center space-x-1.5 font-display">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Full Raw Data Export</span>
             </h4>
-            <p className="text-slate-600 leading-relaxed font-medium">
-              All participant timestamps, answer choices, and response durations are indexed and formatted for Microsoft Excel, Google Sheets, and BI dashboards.
+            <p className="text-slate-500 leading-relaxed">
+              Export all audience vote choices, text submissions, and response durations for analysis in Microsoft Excel or Google Sheets.
             </p>
             <button
               onClick={handleExportCSV}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-sm transition-colors"
+              className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
             >
-              Download Full Raw CSV Log
+              Download CSV Report
             </button>
           </div>
         </div>
       </div>
 
-      {/* DATA RESET & CLEANUP MODAL */}
+      {/* DATA RESET MODAL */}
       {showCleanupModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-fade-in">
-            <div className="flex items-center space-x-3 text-rose-600">
-              <div className="p-2.5 bg-rose-100 rounded-2xl">
-                <AlertTriangle className="w-6 h-6 text-rose-600" />
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-5 space-y-3.5 animate-in fade-in">
+            <div className="flex items-center space-x-2.5 text-rose-600">
+              <div className="p-2 bg-rose-100 rounded-xl">
+                <AlertTriangle className="w-5 h-5 text-rose-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Reset Session Responses?</h3>
-                <p className="text-xs text-slate-500">This will clear all participant votes for this event.</p>
+                <h3 className="text-sm font-bold text-slate-900">Reset Session Responses?</h3>
+                <p className="text-[11px] text-slate-500">This will clear all participant votes for this event.</p>
               </div>
             </div>
 
             <p className="text-xs text-slate-600">
-              Are you sure you want to reset <strong className="text-slate-800">{currentEvent.title}</strong>? All {totalResponses} response records will be cleared so you can run a fresh session with a new audience.
+              Are you sure you want to reset <strong className="text-slate-800">{currentEvent.title}</strong>? All {totalResponses} responses will be cleared for a new session.
             </p>
 
-            <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setShowCleanupModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleResetData}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-xs"
+                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-2xs cursor-pointer"
               >
-                Confirm & Clear Responses
+                Confirm Reset
               </button>
             </div>
           </div>

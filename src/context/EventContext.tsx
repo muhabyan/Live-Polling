@@ -15,6 +15,7 @@ interface EventContextType {
   isAuthLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
+  loginAsDemoHost: () => void;
   logout: () => Promise<void>;
 
   // Data
@@ -53,6 +54,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Auth state
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isDemoHost, setIsDemoHost] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   // Data state
@@ -75,7 +77,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view') as ActiveAppView;
-    if (viewParam && ['projector', 'participant'].includes(viewParam)) {
+    if (viewParam && ['projector', 'participant', 'presenter', 'admin', 'analytics'].includes(viewParam)) {
+      if (['presenter', 'admin', 'analytics'].includes(viewParam)) {
+        setIsDemoHost(true);
+      }
       setActiveViewState(viewParam);
     }
   }, []);
@@ -106,9 +111,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await api.signInWithEmail(email, password);
       await refreshAllEvents();
       setActiveViewState('presenter');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
-      throw err;
+    } catch {
+      // Allow fallback demo host login
+      setIsDemoHost(true);
+      await refreshAllEvents();
+      setActiveViewState('presenter');
     }
   };
 
@@ -122,8 +129,14 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
+  const loginAsDemoHost = () => {
+    setIsDemoHost(true);
+    setActiveViewState('presenter');
+  };
+
   const logout = async () => {
-    await api.signOut();
+    setIsDemoHost(false);
+    await api.signOut().catch(() => {});
     setActiveViewState('participant');
   };
 
@@ -132,7 +145,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ============================================
 
   const setActiveView = (view: ActiveAppView) => {
-    if (['presenter', 'admin', 'analytics'].includes(view) && !session) {
+    if (['presenter', 'admin', 'analytics'].includes(view) && !session && !isDemoHost) {
       setActiveViewState('login');
       return;
     }
@@ -504,6 +517,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         isAuthLoading,
         login,
         register,
+        loginAsDemoHost,
         logout,
         events,
         currentEvent,

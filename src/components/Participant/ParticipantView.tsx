@@ -42,27 +42,27 @@ export const ParticipantView: React.FC = () => {
     // 3. Event is ended -> Summary screen
     if (currentEvent.status === 'ended') {
       return (
-        <div className="w-full max-w-md mx-auto p-6 text-center flex flex-col justify-center min-h-[60vh]">
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 text-2xl shadow-md">
+        <div className="w-full max-w-md mx-auto p-4 sm:p-6 text-center flex flex-col justify-center my-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 text-2xl shadow-xs">
               <Trophy className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2 font-display">
               Session Completed!
             </h2>
-            <p className="text-sm text-slate-500 mb-6">
-              Thank you for actively participating in <strong className="text-slate-800">{currentEvent.title}</strong>.
+            <p className="text-xs sm:text-sm text-slate-500 mb-5">
+              Thank you for participating in <strong className="text-slate-800">{currentEvent.title}</strong>.
             </p>
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl mb-6">
-              <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">
+            <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-5">
+              <div className="text-[10px] text-amber-800 font-bold uppercase tracking-wider mb-1">
                 Your Total Score
               </div>
-              <div className="text-3xl font-bold text-amber-600">
+              <div className="text-3xl font-extrabold text-amber-600 font-mono-numbers">
                 {currentParticipant.score || 100} pts
               </div>
             </div>
             <p className="text-xs text-slate-400">
-              Results and analytics are exported by the organizer.
+              The presentation has concluded. You may now close this tab.
             </p>
           </div>
         </div>
@@ -95,11 +95,11 @@ export const ParticipantView: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-4.5rem)] flex flex-col items-center justify-center p-3 sm:p-6 relative">
-      <div className="w-full max-w-lg mx-auto">
+    <div className="w-full flex-1 flex flex-col items-center justify-between pb-safe">
+      <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
         {renderContent()}
-        {currentParticipant && <ParticipantTicker />}
       </div>
+      {currentParticipant && <ParticipantTicker />}
     </div>
   );
 };

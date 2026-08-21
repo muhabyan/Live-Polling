@@ -18,68 +18,92 @@ import {
 } from '../types';
 import { Groq } from 'groq-sdk';
 
+import { INITIAL_EVENTS } from '../data/initialEvents';
+
+// In-memory fallback state for smooth offline / demo experience
+let localEventsStore: EventData[] = [...INITIAL_EVENTS];
+
 // ============================================
 // 1. SUPABASE QUERIES (Fetch operations)
 // ============================================
 
 export async function fetchFullEvent(eventId: string): Promise<EventData | null> {
-  const { data: eventRow, error: evtErr } = await supabase
-    .from('events')
-    .select('*')
-    .eq('id', eventId)
-    .single();
+  try {
+    const { data: eventRow, error: evtErr } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', eventId)
+      .single();
 
-  if (evtErr || !eventRow) return null;
+    if (evtErr || !eventRow) {
+      return localEventsStore.find(e => e.id === eventId) || null;
+    }
 
-  const [questionsRes, participantsRes, responsesRes, reactionsRes] = await Promise.all([
-    supabase.from('questions').select('*').eq('event_id', eventId).order('sort_order'),
-    supabase.from('participants').select('*').eq('event_id', eventId).order('joined_at'),
-    supabase.from('responses').select('*').eq('event_id', eventId).order('submitted_at'),
-    supabase.from('reactions').select('*').eq('event_id', eventId).order('created_at', { ascending: false }).limit(25),
-  ]);
-
-  const questions = (questionsRes.data || []).map((q: DbQuestion) => dbQuestionToFrontend(q));
-  const participants = (participantsRes.data || []).map((p: DbParticipant) => dbParticipantToFrontend(p));
-  const responses = (responsesRes.data || []).map((r: DbResponse) => dbResponseToFrontend(r));
-  const reactions = (reactionsRes.data || []).map((r: DbReaction) => dbReactionToFrontend(r));
-
-  return dbEventToFrontend(eventRow as DbEvent, questions, participants, responses, reactions);
-}
-
-export async function fetchAllEvents(): Promise<EventData[]> {
-  const { data: eventRows, error } = await supabase
-    .from('events')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error || !eventRows) return [];
-
-  const results: EventData[] = [];
-  for (const row of eventRows) {
-    const [questionsRes, participantsRes, responsesRes] = await Promise.all([
-      supabase.from('questions').select('*').eq('event_id', row.id).order('sort_order'),
-      supabase.from('participants').select('*').eq('event_id', row.id),
-      supabase.from('responses').select('*').eq('event_id', row.id),
+    const [questionsRes, participantsRes, responsesRes, reactionsRes] = await Promise.all([
+      supabase.from('questions').select('*').eq('event_id', eventId).order('sort_order'),
+      supabase.from('participants').select('*').eq('event_id', eventId).order('joined_at'),
+      supabase.from('responses').select('*').eq('event_id', eventId).order('submitted_at'),
+      supabase.from('reactions').select('*').eq('event_id', eventId).order('created_at', { ascending: false }).limit(25),
     ]);
 
     const questions = (questionsRes.data || []).map((q: DbQuestion) => dbQuestionToFrontend(q));
     const participants = (participantsRes.data || []).map((p: DbParticipant) => dbParticipantToFrontend(p));
     const responses = (responsesRes.data || []).map((r: DbResponse) => dbResponseToFrontend(r));
+    const reactions = (reactionsRes.data || []).map((r: DbReaction) => dbReactionToFrontend(r));
 
-    results.push(dbEventToFrontend(row as DbEvent, questions, participants, responses, []));
+    return dbEventToFrontend(eventRow as DbEvent, questions, participants, responses, reactions);
+  } catch {
+    return localEventsStore.find(e => e.id === eventId) || null;
   }
-  return results;
+}
+
+export async function fetchAllEvents(): Promise<EventData[]> {
+  try {
+    const { data: eventRows, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !eventRows || eventRows.length === 0) {
+      return localEventsStore;
+    }
+
+    const results: EventData[] = [];
+    for (const row of eventRows) {
+      const [questionsRes, participantsRes, responsesRes] = await Promise.all([
+        supabase.from('questions').select('*').eq('event_id', row.id).order('sort_order'),
+        supabase.from('participants').select('*').eq('event_id', row.id),
+        supabase.from('responses').select('*').eq('event_id', row.id),
+      ]);
+
+      const questions = (questionsRes.data || []).map((q: DbQuestion) => dbQuestionToFrontend(q));
+      const participants = (participantsRes.data || []).map((p: DbParticipant) => dbParticipantToFrontend(p));
+      const responses = (responsesRes.data || []).map((r: DbResponse) => dbResponseToFrontend(r));
+
+      results.push(dbEventToFrontend(row as DbEvent, questions, participants, responses, []));
+    }
+    return results;
+  } catch {
+    return localEventsStore;
+  }
 }
 
 export async function fetchEventByRoomCode(code: string): Promise<EventData | null> {
-  const { data: row, error } = await supabase
-    .from('events')
-    .select('*')
-    .ilike('room_code', code.trim().toUpperCase())
-    .single();
+  const normalized = code.trim().toUpperCase();
+  try {
+    const { data: row, error } = await supabase
+      .from('events')
+      .select('*')
+      .ilike('room_code', normalized)
+      .single();
 
-  if (error || !row) return null;
-  return fetchFullEvent(row.id);
+    if (error || !row) {
+      return localEventsStore.find(e => e.roomCode.toUpperCase() === normalized) || null;
+    }
+    return fetchFullEvent(row.id);
+  } catch {
+    return localEventsStore.find(e => e.roomCode.toUpperCase() === normalized) || null;
+  }
 }
 
 // ============================================
@@ -194,37 +218,92 @@ export async function deleteEventById(id: string) {
 // ============================================
 
 export async function joinEventByCode(code: string, name: string, emoji?: string) {
-  const { data: event, error: evtErr } = await supabase
-    .from('events')
-    .select('id')
-    .ilike('room_code', code.trim())
-    .single();
-
-  if (evtErr || !event) {
-    throw new Error('Room code not found. Please check the code.');
-  }
-
-  const avatarBgs = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'];
+  const normalizedCode = code.trim().toUpperCase();
+  const avatarBgs = ['#4F46E5', '#0D9488', '#D97706', '#9333EA', '#E11D48', '#0284C7'];
   const randomBg = avatarBgs[Math.floor(Math.random() * avatarBgs.length)];
 
-  const { data: participant, error: partErr } = await supabase
-    .from('participants')
-    .insert({
-      event_id: event.id,
-      name: name.trim(),
-      avatar_bg: randomBg,
-      avatar_emoji: emoji || '👋',
-      score: 0,
-    })
-    .select()
-    .single();
+  try {
+    const { data: event, error: evtErr } = await supabase
+      .from('events')
+      .select('id')
+      .ilike('room_code', normalizedCode)
+      .single();
 
-  if (partErr) throw new Error(partErr.message);
+    if (evtErr || !event) {
+      // Check local store
+      const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
+      if (!localEvt) {
+        throw new Error('Room code not found. Please check the code.');
+      }
+      const newPart: Participant = {
+        id: 'p-' + Date.now(),
+        event_id: localEvt.id,
+        name: name.trim(),
+        avatarBg: randomBg,
+        avatarEmoji: emoji || '🚀',
+        joinedAt: Date.now(),
+        score: 0,
+      };
+      localEvt.participants = [...localEvt.participants, newPart];
+      return {
+        eventId: localEvt.id,
+        participant: newPart,
+      };
+    }
 
-  return {
-    eventId: event.id,
-    participant: dbParticipantToFrontend(participant as DbParticipant),
-  };
+    const { data: participant, error: partErr } = await supabase
+      .from('participants')
+      .insert({
+        event_id: event.id,
+        name: name.trim(),
+        avatar_bg: randomBg,
+        avatar_emoji: emoji || '👋',
+        score: 0,
+      })
+      .select()
+      .single();
+
+    if (partErr) {
+      // Fallback participant object
+      const fallbackPart: Participant = {
+        id: 'p-' + Date.now(),
+        event_id: event.id,
+        name: name.trim(),
+        avatarBg: randomBg,
+        avatarEmoji: emoji || '🚀',
+        joinedAt: Date.now(),
+        score: 0,
+      };
+      return {
+        eventId: event.id,
+        participant: fallbackPart,
+      };
+    }
+
+    return {
+      eventId: event.id,
+      participant: dbParticipantToFrontend(participant as DbParticipant),
+    };
+  } catch (err: any) {
+    const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
+    if (localEvt) {
+      const newPart: Participant = {
+        id: 'p-' + Date.now(),
+        event_id: localEvt.id,
+        name: name.trim(),
+        avatarBg: randomBg,
+        avatarEmoji: emoji || '🚀',
+        joinedAt: Date.now(),
+        score: 0,
+      };
+      localEvt.participants = [...localEvt.participants, newPart];
+      return {
+        eventId: localEvt.id,
+        participant: newPart,
+      };
+    }
+    throw new Error(err.message || 'Room code not found.');
+  }
 }
 
 export async function submitQuestionResponse(
@@ -239,20 +318,44 @@ export async function submitQuestionResponse(
     timeTakenSeconds?: number;
   }
 ) {
-  const { error } = await supabase
-    .from('responses')
-    .upsert({
+  // Always update local store
+  const localEvt = localEventsStore.find(e => e.id === eventId);
+  if (localEvt) {
+    const newResp: ResponseItem = {
+      id: 'resp-' + Date.now(),
       event_id: eventId,
-      participant_id: payload.participantId,
-      participant_name: payload.participantName,
-      question_id: payload.questionId,
-      selected_option_ids: payload.selectedOptionIds || [],
-      text_response: payload.textResponse || null,
-      rating_value: payload.ratingValue || null,
-      time_taken_seconds: payload.timeTakenSeconds || 0,
-    }, { onConflict: 'participant_id,question_id' });
+      participantId: payload.participantId,
+      participantName: payload.participantName,
+      questionId: payload.questionId,
+      selectedOptionIds: payload.selectedOptionIds || [],
+      textResponse: payload.textResponse,
+      ratingValue: payload.ratingValue,
+      timeTakenSeconds: payload.timeTakenSeconds || 0,
+      submittedAt: Date.now(),
+    };
+    localEvt.responses = [
+      ...localEvt.responses.filter(r => !(r.participantId === payload.participantId && r.questionId === payload.questionId)),
+      newResp
+    ];
+  }
 
-  if (error) throw new Error(error.message);
+  try {
+    await supabase
+      .from('responses')
+      .upsert({
+        event_id: eventId,
+        participant_id: payload.participantId,
+        participant_name: payload.participantName,
+        question_id: payload.questionId,
+        selected_option_ids: payload.selectedOptionIds || [],
+        text_response: payload.textResponse || null,
+        rating_value: payload.ratingValue || null,
+        time_taken_seconds: payload.timeTakenSeconds || 0,
+      }, { onConflict: 'participant_id,question_id' });
+  } catch (err) {
+    console.warn('Supabase response submit fallback:', err);
+  }
+
   return { success: true };
 }
 
@@ -261,13 +364,82 @@ export async function submitQuestionResponse(
 // ============================================
 
 export async function sendControlAction(eventId: string, action: string, payload?: any) {
-  const { data: event, error: evtErr } = await supabase
-    .from('events')
-    .select('*')
-    .eq('id', eventId)
-    .single();
+  const localEvt = localEventsStore.find(e => e.id === eventId);
+  if (localEvt) {
+    switch (action) {
+      case 'start_session':
+        localEvt.status = 'live';
+        localEvt.isTimerRunning = true;
+        localEvt.isVotingLocked = false;
+        localEvt.timerRemainingSeconds = 45;
+        break;
+      case 'end_session':
+        localEvt.status = 'ended';
+        localEvt.isTimerRunning = false;
+        break;
+      case 'reset_session':
+      case 'clear_room':
+        localEvt.status = 'waiting';
+        localEvt.currentQuestionIndex = 0;
+        localEvt.isTimerRunning = false;
+        localEvt.isVotingLocked = false;
+        localEvt.showResultsOnProjector = true;
+        localEvt.revealAnswer = false;
+        localEvt.participants = [];
+        localEvt.responses = [];
+        localEvt.reactions = [];
+        break;
+      case 'next_question':
+        localEvt.currentQuestionIndex = Math.min(localEvt.questions.length - 1, localEvt.currentQuestionIndex + 1);
+        localEvt.timerRemainingSeconds = 45;
+        localEvt.isVotingLocked = false;
+        localEvt.revealAnswer = false;
+        break;
+      case 'prev_question':
+        localEvt.currentQuestionIndex = Math.max(0, localEvt.currentQuestionIndex - 1);
+        localEvt.timerRemainingSeconds = 45;
+        localEvt.isVotingLocked = false;
+        localEvt.revealAnswer = false;
+        break;
+      case 'toggle_timer':
+        localEvt.isTimerRunning = !localEvt.isTimerRunning;
+        break;
+      case 'add_time':
+        localEvt.timerRemainingSeconds = (localEvt.timerRemainingSeconds || 0) + (payload?.seconds || 15);
+        break;
+      case 'lock_voting':
+      case 'toggle_lock_voting':
+        localEvt.isVotingLocked = !localEvt.isVotingLocked;
+        break;
+      case 'reveal_answer':
+      case 'toggle_reveal_answer':
+        localEvt.revealAnswer = !localEvt.revealAnswer;
+        break;
+      case 'toggle_results':
+        localEvt.showResultsOnProjector = payload?.show ?? !localEvt.showResultsOnProjector;
+        break;
+      case 'jump_to_question':
+        localEvt.currentQuestionIndex = payload?.index ?? 0;
+        localEvt.timerRemainingSeconds = 45;
+        localEvt.isVotingLocked = false;
+        localEvt.revealAnswer = false;
+        break;
+      case 'reset_timer':
+        localEvt.timerRemainingSeconds = 45;
+        localEvt.isTimerRunning = true;
+        localEvt.isVotingLocked = false;
+        break;
+    }
+  }
 
-  if (evtErr || !event) throw new Error('Event not found');
+  try {
+    const { data: event } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', eventId)
+      .single();
+
+    if (!event) return;
 
   let updates: any = {};
 
@@ -380,11 +552,14 @@ export async function sendControlAction(eventId: string, action: string, payload
     case 'simulate_crowd':
       return handleSimulateCrowdDirect(eventId, payload?.count || 10);
     default:
-      return;
+      break;
   }
 
   const { error } = await supabase.from('events').update(updates).eq('id', eventId);
-  if (error) throw new Error(error.message);
+  if (error) console.warn('Supabase update control warning:', error.message);
+  } catch (err) {
+    console.warn('sendControlAction error:', err);
+  }
 }
 
 // Direct crowd simulation

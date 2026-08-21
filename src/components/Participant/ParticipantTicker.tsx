@@ -11,11 +11,10 @@ export const ParticipantTicker: React.FC = () => {
   const totalReactions = currentEvent?.reactions?.length || 0;
 
   const tickerItems = [
-    { icon: <Users className="w-3.5 h-3.5 text-indigo-500" />, text: `${participantsCount} connected globally` },
-    { icon: <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />, text: `${responsesCount} votes cast in this session` },
-    { icon: <Heart className="w-3.5 h-3.5 text-rose-500" />, text: `${totalReactions} total reactions` },
-    { icon: <Zap className="w-3.5 h-3.5 text-amber-500" />, text: `Live engagement is trending high 🔥` },
-    { icon: <Activity className="w-3.5 h-3.5 text-violet-500" />, text: `Analyzing real-time interactions...` },
+    { icon: <Users className="w-3.5 h-3.5 text-indigo-600" />, text: `${participantsCount} connected live` },
+    { icon: <MessageSquare className="w-3.5 h-3.5 text-teal-600" />, text: `${responsesCount} votes recorded` },
+    { icon: <Heart className="w-3.5 h-3.5 text-rose-500" />, text: `${totalReactions} stage cheers` },
+    { icon: <Zap className="w-3.5 h-3.5 text-amber-500" />, text: `Interactive live session 🔥` },
   ];
 
   useEffect(() => {
@@ -26,9 +25,9 @@ export const ParticipantTicker: React.FC = () => {
   }, [tickerItems.length]);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-10 bg-slate-50/95 backdrop-blur-sm border-t border-slate-200/60 flex items-center justify-center overflow-hidden pointer-events-none shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
+    <div className="w-full py-2 px-4 bg-slate-100/80 border-t border-slate-200/80 flex items-center justify-center shrink-0">
       <div 
-        className="flex items-center space-x-2 text-[11px] font-semibold text-slate-600 uppercase tracking-wider animate-slide-up-fade"
+        className="flex items-center space-x-1.5 text-[11px] font-semibold text-slate-600 animate-slide-up-fade"
         key={tickerIndex}
       >
         {tickerItems[tickerIndex].icon}

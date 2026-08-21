@@ -8,19 +8,19 @@ export const ParticipantWaiting: React.FC = () => {
   const reactionEmojis = ['👏', '🔥', '❤️', '💡', '🚀', '✨', '🎉'];
 
   return (
-    <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col justify-between min-h-[calc(100vh-6rem)]">
+    <div className="w-full max-w-md mx-auto px-3 py-4 sm:p-6 flex flex-col justify-between flex-1 gap-4">
       
-      {/* Top Participant Status */}
-      <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-sm">
+      {/* Top Participant Status Pill */}
+      <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-2xs">
         <div className="flex items-center space-x-2.5">
           <div 
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-base font-bold text-white shadow-xs"
-            style={{ backgroundColor: currentParticipant?.avatarBg || '#2563EB' }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white shadow-2xs"
+            style={{ backgroundColor: currentParticipant?.avatarBg || '#4F46E5' }}
           >
             {currentParticipant?.avatarEmoji || '👋'}
           </div>
           <div>
-            <div className="text-xs font-bold text-slate-800 flex items-center space-x-1">
+            <div className="text-xs font-bold text-slate-900 flex items-center space-x-1">
               <span>{currentParticipant?.name || 'Attendee'}</span>
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 inline" />
             </div>
@@ -32,7 +32,7 @@ export const ParticipantWaiting: React.FC = () => {
 
         <button
           onClick={leaveRoom}
-          className="text-xs text-slate-400 hover:text-rose-600 flex items-center space-x-1 font-medium transition-colors"
+          className="text-xs text-slate-400 hover:text-rose-600 flex items-center space-x-1 font-semibold transition-colors px-2 py-1 rounded-md hover:bg-slate-50 cursor-pointer"
           title="Leave Room"
         >
           <LogOut className="w-3.5 h-3.5" />
@@ -41,51 +41,51 @@ export const ParticipantWaiting: React.FC = () => {
       </div>
 
       {/* Main Waiting Card */}
-      <div className="my-auto py-8 text-center bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+      <div className="my-auto py-6 sm:py-8 text-center bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs relative overflow-hidden">
         
         {/* Pulsing Animated Wave Radar */}
-        <div className="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-indigo-400/20 animate-ping opacity-75" />
-          <div className="absolute inset-2 rounded-full bg-indigo-200/40 animate-pulse" />
-          <div className="relative w-16 h-16 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm font-bold text-2xl">
-            <Clock className="w-8 h-8 animate-pulse" />
+        <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-indigo-400/20 animate-ping opacity-60" />
+          <div className="absolute inset-2 rounded-full bg-indigo-100/70 animate-pulse" />
+          <div className="relative w-14 h-14 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs font-bold text-2xl">
+            <Clock className="w-7 h-7 animate-pulse" />
           </div>
         </div>
 
-        <div className="inline-block px-3 py-1 bg-slate-100 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 mb-3">
-          Waiting Room
+        <div className="inline-block px-2.5 py-0.5 bg-indigo-50 border border-indigo-100 rounded-md text-[11px] font-bold text-indigo-700 mb-2.5">
+          Lobby Waiting Room
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 mb-2 leading-snug">
-          {currentEvent?.title || 'Waiting for Session to Begin'}
+        <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 mb-1.5 leading-snug font-display">
+          {currentEvent?.title || 'Waiting for Presenter to Begin'}
         </h2>
 
-        <p className="text-sm text-slate-500 max-w-xs mx-auto mb-6">
-          The moderator will start the interactive questions shortly. Keep this screen open!
+        <p className="text-xs sm:text-sm text-slate-500 max-w-xs mx-auto mb-5">
+          Questions will appear here automatically when the host starts the session.
         </p>
 
         {/* Live Participant Counter */}
-        <div className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-600">
-          <Users className="w-4 h-4 text-slate-500" />
-          <span className="font-mono-numbers font-semibold text-slate-800">
+        <div className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-600">
+          <Users className="w-3.5 h-3.5 text-indigo-600" />
+          <span className="font-mono-numbers font-bold text-slate-900">
             {currentEvent?.participants.length || 1}
           </span>
-          <span className="text-slate-500">participants in the room</span>
+          <span className="text-slate-500">participants connected</span>
         </div>
       </div>
 
       {/* Tap to Cheer / Live Reactions Dock */}
-      <div className="bg-white/90 backdrop-blur-xs border border-slate-200 rounded-xl p-4 text-center shadow-sm">
-        <div className="text-xs font-semibold text-slate-600 mb-2.5 flex items-center justify-center space-x-1">
-          <Sparkles className="w-3.5 h-3.5 text-slate-400" />
-          <span>Tap to send reactions to the main stage</span>
+      <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-2xs">
+        <div className="text-[11px] font-bold text-slate-500 mb-2 flex items-center justify-center space-x-1">
+          <Sparkles className="w-3 h-3 text-indigo-600" />
+          <span>Tap to cheer the live stage</span>
         </div>
-        <div className="flex items-center justify-center gap-2 sm:gap-3">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
           {reactionEmojis.map((emoji) => (
             <button
               key={emoji}
               onClick={() => sendReaction(emoji)}
-              className="w-10 h-10 rounded-lg bg-slate-50 hover:bg-slate-100 active:scale-125 hover:scale-110 transition-all text-xl flex items-center justify-center shadow-sm border border-slate-200"
+              className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-125 hover:scale-105 transition-all text-xl flex items-center justify-center shadow-2xs border border-slate-200/80 cursor-pointer"
             >
               {emoji}
             </button>
