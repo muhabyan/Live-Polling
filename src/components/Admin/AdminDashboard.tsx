@@ -571,6 +571,8 @@ export const AdminDashboard: React.FC = () => {
                               <option value={30}>30s</option>
                               <option value={45}>45s</option>
                               <option value={60}>60s</option>
+                              <option value={90}>90s</option>
+                              <option value={120}>120s</option>
                             </select>
                           </div>
                           <button

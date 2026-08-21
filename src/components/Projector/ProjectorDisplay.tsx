@@ -428,9 +428,14 @@ export const ProjectorDisplay: React.FC = () => {
 
         {/* Live Timer Badge */}
         <div className="flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700/80">
-          <Clock className={`w-4 h-4 ${currentEvent.timerRemainingSeconds! <= 5 ? 'text-rose-400 animate-spin' : 'text-slate-400'}`} />
+          <Clock className={`w-4 h-4 ${(currentEvent.timerRemainingSeconds ?? 45) <= 5 && currentEvent.isTimerRunning ? 'text-rose-400 animate-spin' : 'text-slate-400'}`} />
           <span className="text-lg sm:text-xl font-bold font-mono-numbers tracking-wider text-white">
-            00:{currentEvent.timerRemainingSeconds! < 10 ? `0${currentEvent.timerRemainingSeconds}` : currentEvent.timerRemainingSeconds}
+            {(() => {
+              const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
+              const mins = Math.floor(remaining / 60);
+              const secs = remaining % 60;
+              return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            })()}
           </span>
         </div>
       </footer>

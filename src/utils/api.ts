@@ -469,13 +469,21 @@ export async function submitQuestionResponse(
 
 export async function sendControlAction(eventId: string, action: string, payload?: any) {
   const localEvt = localEventsStore.find(e => e.id === eventId);
+  
+  const getQuestionTimer = (index: number) => {
+    if (!localEvt || !localEvt.questions || !localEvt.questions[index]) return 45;
+    return localEvt.questions[index].timerSeconds || 45;
+  };
+
   if (localEvt) {
+    const qIdx = localEvt.currentQuestionIndex ?? 0;
+
     switch (action) {
       case 'start_session':
         localEvt.status = 'live';
         localEvt.isTimerRunning = true;
         localEvt.isVotingLocked = false;
-        localEvt.timerRemainingSeconds = 45;
+        localEvt.timerRemainingSeconds = localEvt.timerRemainingSeconds ?? getQuestionTimer(qIdx);
         break;
       case 'end_session':
         localEvt.status = 'ended';
@@ -489,27 +497,41 @@ export async function sendControlAction(eventId: string, action: string, payload
         localEvt.isVotingLocked = false;
         localEvt.showResultsOnProjector = true;
         localEvt.revealAnswer = false;
+        localEvt.timerRemainingSeconds = getQuestionTimer(0);
         localEvt.participants = [];
         localEvt.responses = [];
         localEvt.reactions = [];
         break;
-      case 'next_question':
-        localEvt.currentQuestionIndex = Math.min(localEvt.questions.length - 1, localEvt.currentQuestionIndex + 1);
-        localEvt.timerRemainingSeconds = 45;
+      case 'next_question': {
+        const nextIdx = Math.min(localEvt.questions.length - 1, qIdx + 1);
+        localEvt.currentQuestionIndex = nextIdx;
+        localEvt.timerRemainingSeconds = getQuestionTimer(nextIdx);
+        localEvt.isTimerRunning = false; // Stopped so presenter can introduce question
         localEvt.isVotingLocked = false;
         localEvt.revealAnswer = false;
         break;
-      case 'prev_question':
-        localEvt.currentQuestionIndex = Math.max(0, localEvt.currentQuestionIndex - 1);
-        localEvt.timerRemainingSeconds = 45;
+      }
+      case 'prev_question': {
+        const prevIdx = Math.max(0, qIdx - 1);
+        localEvt.currentQuestionIndex = prevIdx;
+        localEvt.timerRemainingSeconds = getQuestionTimer(prevIdx);
+        localEvt.isTimerRunning = false;
         localEvt.isVotingLocked = false;
         localEvt.revealAnswer = false;
         break;
+      }
       case 'toggle_timer':
         localEvt.isTimerRunning = !localEvt.isTimerRunning;
         break;
+      case 'start_timer':
+        localEvt.isTimerRunning = true;
+        break;
+      case 'stop_timer':
+      case 'pause_timer':
+        localEvt.isTimerRunning = false;
+        break;
       case 'add_time':
-        localEvt.timerRemainingSeconds = (localEvt.timerRemainingSeconds || 0) + (payload?.seconds || 15);
+        localEvt.timerRemainingSeconds = (localEvt.timerRemainingSeconds || getQuestionTimer(qIdx)) + (payload?.seconds || 15);
         break;
       case 'lock_voting':
       case 'toggle_lock_voting':
@@ -522,15 +544,18 @@ export async function sendControlAction(eventId: string, action: string, payload
       case 'toggle_results':
         localEvt.showResultsOnProjector = payload?.show ?? !localEvt.showResultsOnProjector;
         break;
-      case 'jump_to_question':
-        localEvt.currentQuestionIndex = payload?.index ?? 0;
-        localEvt.timerRemainingSeconds = 45;
+      case 'jump_to_question': {
+        const jumpIdx = Math.max(0, Math.min(localEvt.questions.length - 1, payload?.index ?? 0));
+        localEvt.currentQuestionIndex = jumpIdx;
+        localEvt.timerRemainingSeconds = getQuestionTimer(jumpIdx);
+        localEvt.isTimerRunning = false;
         localEvt.isVotingLocked = false;
         localEvt.revealAnswer = false;
         break;
+      }
       case 'reset_timer':
-        localEvt.timerRemainingSeconds = 45;
-        localEvt.isTimerRunning = true;
+        localEvt.timerRemainingSeconds = getQuestionTimer(qIdx);
+        localEvt.isTimerRunning = false; // STOPPED until presenter hits Start Timer
         localEvt.isVotingLocked = false;
         break;
     }
@@ -545,122 +570,130 @@ export async function sendControlAction(eventId: string, action: string, payload
 
     if (!event) return;
 
-  let updates: any = {};
+    let updates: any = {};
+    const qIdx = event.current_question_index ?? 0;
+    const currentQTimer = getQuestionTimer(qIdx);
 
-  switch (action) {
-    case 'start_session':
-      updates = {
-        status: 'live',
-        is_timer_running: true,
-        question_started_at: new Date().toISOString(),
-        timer_remaining_seconds: event.timer_remaining_seconds || 45,
-        is_voting_locked: false,
-      };
-      break;
-    case 'end_session':
-      updates = { status: 'ended', is_timer_running: false };
-      break;
-    case 'reset_session':
-    case 'clear_room':
-      updates = {
-        status: 'waiting',
-        current_question_index: 0,
-        is_timer_running: false,
-        is_voting_locked: false,
-        show_results_on_projector: true,
-        reveal_answer: false,
-        timer_remaining_seconds: 45,
-      };
-      await Promise.all([
-        supabase.from('responses').delete().eq('event_id', eventId),
-        supabase.from('participants').delete().eq('event_id', eventId),
-        supabase.from('reactions').delete().eq('event_id', eventId),
-      ]);
-      break;
-    case 'next_question':
-      updates = {
-        current_question_index: event.current_question_index + 1,
-        is_timer_running: true,
-        question_started_at: new Date().toISOString(),
-        timer_remaining_seconds: 45,
-        is_voting_locked: false,
-        show_results_on_projector: true,
-        reveal_answer: false,
-      };
-      break;
-    case 'prev_question':
-      updates = {
-        current_question_index: Math.max(0, event.current_question_index - 1),
-        is_timer_running: true,
-        question_started_at: new Date().toISOString(),
-        timer_remaining_seconds: 45,
-        is_voting_locked: false,
-        show_results_on_projector: true,
-        reveal_answer: false,
-      };
-      break;
-    case 'toggle_timer':
-      updates = {
-        is_timer_running: !event.is_timer_running,
-        question_started_at: !event.is_timer_running ? new Date().toISOString() : event.question_started_at,
-      };
-      break;
-    case 'start_timer':
-      updates = {
-        is_timer_running: true,
-        question_started_at: new Date().toISOString(),
-      };
-      break;
-    case 'stop_timer':
-      updates = { is_timer_running: false };
-      break;
-    case 'add_time':
-      updates = { timer_remaining_seconds: (event.timer_remaining_seconds || 0) + (payload?.seconds || 15) };
-      break;
-    case 'lock_voting':
-    case 'toggle_lock_voting':
-      updates = { is_voting_locked: !event.is_voting_locked, is_timer_running: event.is_voting_locked };
-      break;
-    case 'unlock_voting':
-      updates = { is_voting_locked: false, is_timer_running: true };
-      break;
-    case 'toggle_results':
-      updates = { show_results_on_projector: payload?.show ?? !event.show_results_on_projector };
-      break;
-    case 'reveal_answer':
-    case 'toggle_reveal_answer':
-      updates = { reveal_answer: !event.reveal_answer, show_results_on_projector: true };
-      break;
-    case 'reset_timer':
-      updates = {
-        timer_remaining_seconds: 45,
-        question_started_at: new Date().toISOString(),
-        is_timer_running: true,
-        is_voting_locked: false,
-      };
-      break;
-    case 'jump_to_question':
-      updates = {
-        current_question_index: payload?.index ?? 0,
-        is_timer_running: true,
-        question_started_at: new Date().toISOString(),
-        timer_remaining_seconds: 45,
-        is_voting_locked: false,
-        show_results_on_projector: true,
-        reveal_answer: false,
-      };
-      break;
-    case 'update_room_code':
-      updates = { room_code: payload?.roomCode?.trim()?.toUpperCase() };
-      break;
-    case 'simulate_crowd':
-      return handleSimulateCrowdDirect(eventId, payload?.count || 10);
-    default:
-      break;
-  }
+    switch (action) {
+      case 'start_session':
+        updates = {
+          status: 'live',
+          is_timer_running: true,
+          question_started_at: new Date().toISOString(),
+          timer_remaining_seconds: event.timer_remaining_seconds || currentQTimer,
+          is_voting_locked: false,
+        };
+        break;
+      case 'end_session':
+        updates = { status: 'ended', is_timer_running: false };
+        break;
+      case 'reset_session':
+      case 'clear_room':
+        updates = {
+          status: 'waiting',
+          current_question_index: 0,
+          is_timer_running: false,
+          is_voting_locked: false,
+          show_results_on_projector: true,
+          reveal_answer: false,
+          timer_remaining_seconds: getQuestionTimer(0),
+        };
+        await Promise.all([
+          supabase.from('responses').delete().eq('event_id', eventId),
+          supabase.from('participants').delete().eq('event_id', eventId),
+          supabase.from('reactions').delete().eq('event_id', eventId),
+        ]);
+        break;
+      case 'next_question': {
+        const nextIdx = qIdx + 1;
+        updates = {
+          current_question_index: nextIdx,
+          is_timer_running: false,
+          question_started_at: new Date().toISOString(),
+          timer_remaining_seconds: getQuestionTimer(nextIdx),
+          is_voting_locked: false,
+          show_results_on_projector: true,
+          reveal_answer: false,
+        };
+        break;
+      }
+      case 'prev_question': {
+        const prevIdx = Math.max(0, qIdx - 1);
+        updates = {
+          current_question_index: prevIdx,
+          is_timer_running: false,
+          question_started_at: new Date().toISOString(),
+          timer_remaining_seconds: getQuestionTimer(prevIdx),
+          is_voting_locked: false,
+          show_results_on_projector: true,
+          reveal_answer: false,
+        };
+        break;
+      }
+      case 'jump_to_question': {
+        const jumpIdx = payload?.index ?? 0;
+        updates = {
+          current_question_index: jumpIdx,
+          is_timer_running: false,
+          question_started_at: new Date().toISOString(),
+          timer_remaining_seconds: getQuestionTimer(jumpIdx),
+          is_voting_locked: false,
+          show_results_on_projector: true,
+          reveal_answer: false,
+        };
+        break;
+      }
+      case 'toggle_timer':
+        updates = {
+          is_timer_running: !event.is_timer_running,
+          question_started_at: !event.is_timer_running ? new Date().toISOString() : event.question_started_at,
+        };
+        break;
+      case 'start_timer':
+        updates = {
+          is_timer_running: true,
+          question_started_at: new Date().toISOString(),
+        };
+        break;
+      case 'stop_timer':
+      case 'pause_timer':
+        updates = { is_timer_running: false };
+        break;
+      case 'add_time':
+        updates = { timer_remaining_seconds: (event.timer_remaining_seconds || currentQTimer) + (payload?.seconds || 15) };
+        break;
+      case 'lock_voting':
+      case 'toggle_lock_voting':
+        updates = { is_voting_locked: !event.is_voting_locked, is_timer_running: event.is_voting_locked };
+        break;
+      case 'unlock_voting':
+        updates = { is_voting_locked: false, is_timer_running: false };
+        break;
+      case 'toggle_results':
+        updates = { show_results_on_projector: payload?.show ?? !event.show_results_on_projector };
+        break;
+      case 'reveal_answer':
+      case 'toggle_reveal_answer':
+        updates = { reveal_answer: !event.reveal_answer, show_results_on_projector: true };
+        break;
+      case 'reset_timer':
+        updates = {
+          timer_remaining_seconds: currentQTimer,
+          question_started_at: new Date().toISOString(),
+          is_timer_running: false, // STOPPED
+          is_voting_locked: false,
+        };
+        break;
+      case 'simulate_crowd':
+        return handleSimulateCrowdDirect(eventId, payload?.count || 10);
+      default:
+        break;
+    }
 
-  const { error } = await supabase.from('events').update(updates).eq('id', eventId);
-  if (error) console.warn('Supabase update control warning:', error.message);
+    if (Object.keys(updates).length > 0) {
+      const { error } = await supabase.from('events').update(updates).eq('id', eventId);
+      if (error) console.warn('Supabase update control warning:', error.message);
+    }
   } catch (err) {
     console.warn('sendControlAction error:', err);
   }

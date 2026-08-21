@@ -189,7 +189,12 @@ export const PresenterControl: React.FC = () => {
               <div className="flex items-center space-x-1.5 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
                 <Clock className={`w-3.5 h-3.5 ${currentEvent.isTimerRunning ? 'text-indigo-600 animate-spin' : 'text-slate-400'}`} />
                 <span className="font-mono-numbers text-sm font-bold text-slate-900">
-                  00:{currentEvent.timerRemainingSeconds! < 10 ? `0${currentEvent.timerRemainingSeconds}` : currentEvent.timerRemainingSeconds}
+                  {(() => {
+                    const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                  })()}
                 </span>
               </div>
             </div>

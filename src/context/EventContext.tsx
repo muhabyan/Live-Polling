@@ -382,7 +382,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setEvents(prev =>
         prev.map(evt => {
           if (evt.id !== currentEvent.id) return evt;
-          const currentRemaining = evt.timerRemainingSeconds ?? 45;
+          const currentQ = evt.questions[evt.currentQuestionIndex];
+          const defaultDuration = currentQ?.timerSeconds || 45;
+          const currentRemaining = evt.timerRemainingSeconds ?? defaultDuration;
           if (currentRemaining <= 1) {
             return {
               ...evt,
@@ -459,26 +461,127 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const sendModeratorAction = async (action: string, payload?: any) => {
     if (!currentEvent) return;
-    if (action === 'reset_session' || action === 'clear_room') {
-      setEvents(prev =>
-        prev.map(evt => {
-          if (evt.id !== currentEvent.id) return evt;
-          return {
-            ...evt,
-            status: 'waiting',
-            currentQuestionIndex: 0,
-            isTimerRunning: false,
-            isVotingLocked: false,
-            showResultsOnProjector: true,
-            revealAnswer: false,
-            timerRemainingSeconds: 45,
-            participants: [],
-            responses: [],
-            reactions: [],
-          };
-        })
-      );
-    }
+
+    setEvents(prev =>
+      prev.map(evt => {
+        if (evt.id !== currentEvent.id) return evt;
+        const qIdx = evt.currentQuestionIndex ?? 0;
+        const getQTimer = (idx: number) => evt.questions[idx]?.timerSeconds || 45;
+
+        switch (action) {
+          case 'start_session':
+            return {
+              ...evt,
+              status: 'live',
+              isTimerRunning: true,
+              isVotingLocked: false,
+              timerRemainingSeconds: evt.timerRemainingSeconds ?? getQTimer(qIdx),
+            };
+          case 'end_session':
+            return {
+              ...evt,
+              status: 'ended',
+              isTimerRunning: false,
+            };
+          case 'reset_session':
+          case 'clear_room':
+            return {
+              ...evt,
+              status: 'waiting',
+              currentQuestionIndex: 0,
+              isTimerRunning: false,
+              isVotingLocked: false,
+              showResultsOnProjector: true,
+              revealAnswer: false,
+              timerRemainingSeconds: getQTimer(0),
+              participants: [],
+              responses: [],
+              reactions: [],
+            };
+          case 'next_question': {
+            const nextIdx = Math.min(evt.questions.length - 1, qIdx + 1);
+            return {
+              ...evt,
+              currentQuestionIndex: nextIdx,
+              timerRemainingSeconds: getQTimer(nextIdx),
+              isTimerRunning: false, // Paused so presenter can introduce question
+              isVotingLocked: false,
+              revealAnswer: false,
+            };
+          }
+          case 'prev_question': {
+            const prevIdx = Math.max(0, qIdx - 1);
+            return {
+              ...evt,
+              currentQuestionIndex: prevIdx,
+              timerRemainingSeconds: getQTimer(prevIdx),
+              isTimerRunning: false,
+              isVotingLocked: false,
+              revealAnswer: false,
+            };
+          }
+          case 'jump_to_question': {
+            const jumpIdx = Math.max(0, Math.min(evt.questions.length - 1, payload?.index ?? 0));
+            return {
+              ...evt,
+              currentQuestionIndex: jumpIdx,
+              timerRemainingSeconds: getQTimer(jumpIdx),
+              isTimerRunning: false,
+              isVotingLocked: false,
+              revealAnswer: false,
+            };
+          }
+          case 'reset_timer':
+            return {
+              ...evt,
+              timerRemainingSeconds: getQTimer(qIdx),
+              isTimerRunning: false, // STOPPED until presenter clicks Start Timer!
+              isVotingLocked: false,
+            };
+          case 'toggle_timer':
+            return {
+              ...evt,
+              isTimerRunning: !evt.isTimerRunning,
+            };
+          case 'start_timer':
+            return {
+              ...evt,
+              isTimerRunning: true,
+            };
+          case 'stop_timer':
+          case 'pause_timer':
+            return {
+              ...evt,
+              isTimerRunning: false,
+            };
+          case 'add_time':
+            return {
+              ...evt,
+              timerRemainingSeconds: (evt.timerRemainingSeconds ?? getQTimer(qIdx)) + (payload?.seconds || 15),
+            };
+          case 'lock_voting':
+          case 'toggle_lock_voting':
+            return {
+              ...evt,
+              isVotingLocked: !evt.isVotingLocked,
+            };
+          case 'reveal_answer':
+          case 'toggle_reveal_answer':
+            return {
+              ...evt,
+              revealAnswer: !evt.revealAnswer,
+            };
+          case 'toggle_results':
+            return {
+              ...evt,
+              showResultsOnProjector: payload?.show ?? !evt.showResultsOnProjector,
+            };
+          default:
+            return evt;
+        }
+      })
+    );
+
     try {
       await api.sendControlAction(currentEvent.id, action, payload);
     } catch (err: any) {

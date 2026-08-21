@@ -41,7 +41,7 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
     setIsSubmitting(false);
   }, [question.id]);
 
-  const timerRemaining = currentEvent?.timerRemainingSeconds ?? 30;
+  const timerRemaining = currentEvent?.timerRemainingSeconds ?? (question.timerSeconds || 45);
   const isLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
 
   const optionLetterMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
