@@ -191,7 +191,9 @@ export function dbEventToFrontend(
     status: row.status,
     currentQuestionIndex: row.current_question_index,
     questionStartedAt: row.question_started_at ? new Date(row.question_started_at).getTime() : undefined,
-    timerRemainingSeconds: row.timer_remaining_seconds,
+    timerRemainingSeconds: row.timer_remaining_seconds !== null && row.timer_remaining_seconds !== undefined
+      ? row.timer_remaining_seconds
+      : (questions[row.current_question_index]?.timerSeconds || 45),
     isTimerRunning: row.is_timer_running,
     showResultsOnProjector: row.show_results_on_projector,
     isVotingLocked: row.is_voting_locked,

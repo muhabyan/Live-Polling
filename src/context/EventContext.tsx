@@ -582,8 +582,32 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       })
     );
 
+    const qIdx = currentEvent.currentQuestionIndex ?? 0;
+    const getQTimer = (idx: number) => currentEvent.questions[idx]?.timerSeconds || 45;
+    let targetTimerSeconds: number | undefined;
+
+    if (action === 'reset_timer') {
+      targetTimerSeconds = getQTimer(qIdx);
+    } else if (action === 'next_question') {
+      const nextIdx = Math.min(currentEvent.questions.length - 1, qIdx + 1);
+      targetTimerSeconds = getQTimer(nextIdx);
+    } else if (action === 'prev_question') {
+      const prevIdx = Math.max(0, qIdx - 1);
+      targetTimerSeconds = getQTimer(prevIdx);
+    } else if (action === 'jump_to_question') {
+      const jumpIdx = Math.max(0, Math.min(currentEvent.questions.length - 1, payload?.index ?? 0));
+      targetTimerSeconds = getQTimer(jumpIdx);
+    } else if (action === 'start_session' || action === 'reset_session') {
+      targetTimerSeconds = getQTimer(0);
+    }
+
+    const enrichedPayload = {
+      ...payload,
+      timerSeconds: targetTimerSeconds ?? payload?.timerSeconds,
+    };
+
     try {
-      await api.sendControlAction(currentEvent.id, action, payload);
+      await api.sendControlAction(currentEvent.id, action, enrichedPayload);
     } catch (err: any) {
       setError(err.message || 'Moderator action failed');
     }

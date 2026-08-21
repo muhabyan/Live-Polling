@@ -51,7 +51,9 @@ export async function fetchFullEvent(eventId: string): Promise<EventData | null>
     const responses = (responsesRes.data || []).map((r: DbResponse) => dbResponseToFrontend(r));
     const reactions = (reactionsRes.data || []).map((r: DbReaction) => dbReactionToFrontend(r));
 
-    return dbEventToFrontend(eventRow as DbEvent, questions, participants, responses, reactions);
+    const fullEvt = dbEventToFrontend(eventRow as DbEvent, questions, participants, responses, reactions);
+    localEventsStore = [fullEvt, ...localEventsStore.filter(e => e.id !== eventId)];
+    return fullEvt;
   } catch {
     return localEventsStore.find(e => e.id === eventId) || null;
   }
@@ -82,6 +84,7 @@ export async function fetchAllEvents(): Promise<EventData[]> {
 
       results.push(dbEventToFrontend(row as DbEvent, questions, participants, responses, []));
     }
+    localEventsStore = results;
     return results;
   } catch {
     return localEventsStore;
@@ -164,6 +167,8 @@ export async function createNewEvent(eventData: {
     allowMultiple: q.allowMultiple || false,
   }));
 
+  const initialDuration = formattedQuestions[0]?.timerSeconds || 45;
+
   const localNewEvent: EventData = {
     id: newId,
     roomCode,
@@ -175,7 +180,7 @@ export async function createNewEvent(eventData: {
     status: 'waiting',
     currentQuestionIndex: 0,
     questionStartedAt: 0,
-    timerRemainingSeconds: 45,
+    timerRemainingSeconds: initialDuration,
     isTimerRunning: false,
     showResultsOnProjector: true,
     isVotingLocked: false,
@@ -200,7 +205,7 @@ export async function createNewEvent(eventData: {
         organizer_name: eventData.organizerName || 'Moderator',
         organizer_id: session?.user?.id || null,
         status: 'waiting',
-        timer_remaining_seconds: 45,
+        timer_remaining_seconds: initialDuration,
         is_timer_running: false,
         show_results_on_projector: true,
         is_voting_locked: false,
