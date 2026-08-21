@@ -123,7 +123,7 @@ export const EventSummaryExport: React.FC = () => {
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">
-            {currentEvent.title} — Analytics & Export
+            {currentEvent.title} | Analytics & Export
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Organized by <strong>{currentEvent.organizerName}</strong> • {new Date(currentEvent.createdAt).toLocaleDateString()}

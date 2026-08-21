@@ -174,7 +174,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
           className="mt-3 p-3 bg-indigo-50/70 hover:bg-indigo-50 border border-indigo-100/90 rounded-xl text-center cursor-pointer transition-colors group"
         >
           <p className="text-xs text-slate-600">
-            Active demo session: <strong className="text-indigo-700 font-mono font-bold group-hover:underline">{currentEvent.roomCode}</strong> — tap to join
+            Active session: <strong className="text-indigo-700 font-mono font-bold group-hover:underline">{currentEvent.roomCode}</strong> (klik untuk join)
           </p>
         </div>
       )}
