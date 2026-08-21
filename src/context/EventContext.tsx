@@ -5,6 +5,7 @@ import { dbQuestionToFrontend, dbParticipantToFrontend, dbResponseToFrontend, db
 import type { DbQuestion, DbParticipant, DbResponse, DbReaction, DbEvent } from '../types';
 import { dbEventToFrontend } from '../types';
 import * as api from '../utils/api';
+import { initLocalSync, broadcastLocalSync } from '../utils/localSync';
 import confetti from 'canvas-confetti';
 import type { Session, User } from '@supabase/supabase-js';
 
@@ -164,6 +165,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       const data = await api.fetchAllEvents();
       setEvents(data);
+      broadcastLocalSync({ type: 'SYNC_ALL_EVENTS', events: data });
       if (data.length > 0) {
         setCurrentEventIdState(prev => {
           const stillExists = data.some(e => e.id === prev);
@@ -202,6 +204,64 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Current event derived
   const currentEvent = events.find(e => e.id === currentEventId) || events[0] || null;
+
+  // ============================================
+  // LOCAL REALTIME SYNC (Phone <-> Laptop <-> Projector)
+  // ============================================
+  useEffect(() => {
+    const unsubscribe = initLocalSync((msg) => {
+      if (msg.type === 'INIT_STATE' || msg.type === 'ALL_EVENTS_UPDATED') {
+        if (msg.events && msg.events.length > 0) {
+          setEvents(msg.events);
+          setCurrentEventIdState((prev) => {
+            const exists = msg.events.some((e: EventData) => e.id === prev);
+            return exists ? prev : msg.events[0].id;
+          });
+        }
+      } else if (msg.type === 'PARTICIPANT_JOINED') {
+        setEvents((prev) =>
+          prev.map((evt) => {
+            if (evt.id !== msg.eventId && evt.roomCode.toUpperCase() !== msg.roomCode?.toUpperCase()) return evt;
+            if (evt.participants.some((p) => p.id === msg.participant.id)) return evt;
+            return { ...evt, participants: [...evt.participants, msg.participant] };
+          })
+        );
+      } else if (msg.type === 'RESPONSE_SUBMITTED') {
+        setEvents((prev) =>
+          prev.map((evt) => {
+            if (evt.id !== msg.eventId) return evt;
+            const filtered = evt.responses.filter(
+              (r) => !(r.participantId === msg.response.participantId && r.questionId === msg.response.questionId)
+            );
+            return { ...evt, responses: [...filtered, msg.response] };
+          })
+        );
+      } else if (msg.type === 'MODERATOR_ACTION_BROADCAST') {
+        setEvents((prev) =>
+          prev.map((evt) => {
+            if (evt.id !== msg.eventId) return evt;
+            return { ...evt, ...msg.updatedFields };
+          })
+        );
+      } else if (msg.type === 'REACTION_SENT') {
+        const newReaction: LiveReaction = {
+          id: 'r-' + Date.now(),
+          event_id: msg.eventId,
+          emoji: msg.emoji,
+          senderName: msg.name || 'Attendee',
+          timestamp: Date.now(),
+        };
+        setEvents((prev) =>
+          prev.map((evt) => {
+            if (evt.id !== msg.eventId) return evt;
+            return { ...evt, reactions: [newReaction, ...evt.reactions].slice(0, 25) };
+          })
+        );
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // ============================================
   // SUPABASE REALTIME SUBSCRIPTIONS
@@ -434,6 +494,14 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const res = await api.joinEventByCode(code, name, emoji);
       setCurrentParticipant(res.participant);
       localStorage.setItem('pulselive_participant', JSON.stringify(res.participant));
+      // Broadcast to all devices locally in real-time
+      broadcastLocalSync({
+        type: 'PARTICIPANT_JOINED',
+        eventId: res.eventId,
+        roomCode: code.toUpperCase(),
+        participant: res.participant,
+      });
+
       if (res.eventId) {
         setCurrentEventIdState(res.eventId);
         const fullEvent = await api.fetchFullEvent(res.eventId);
@@ -493,6 +561,13 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         };
       })
     );
+
+    // Broadcast submission to Laptop, Projector, and other devices in real-time
+    broadcastLocalSync({
+      type: 'RESPONSE_SUBMITTED',
+      eventId: currentEvent.id,
+      response: optimisticResp,
+    });
 
     try {
       await api.submitQuestionResponse(currentEvent.id, {
@@ -653,6 +728,17 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       timerSeconds: targetTimerSeconds ?? payload?.timerSeconds,
     };
 
+    // Broadcast updated state to all connected devices locally
+    const updatedEvt = events.find(e => e.id === currentEvent.id);
+    if (updatedEvt) {
+      broadcastLocalSync({
+        type: 'MODERATOR_ACTION_BROADCAST',
+        eventId: currentEvent.id,
+        action,
+        updatedFields: { ...updatedEvt, timerRemainingSeconds: targetTimerSeconds ?? updatedEvt.timerRemainingSeconds },
+      });
+    }
+
     try {
       await api.sendControlAction(currentEvent.id, action, enrichedPayload);
     } catch (err: any) {
@@ -663,6 +749,12 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const sendReaction = (emoji: string) => {
     if (!currentEvent) return;
     const name = currentParticipant?.name || 'Attendee';
+    broadcastLocalSync({
+      type: 'REACTION_SENT',
+      eventId: currentEvent.id,
+      emoji,
+      name,
+    });
     api.sendReactionDirect(currentEvent.id, emoji, name);
   };
 
