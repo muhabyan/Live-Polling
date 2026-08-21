@@ -21,6 +21,19 @@ export function initLocalSync(onMessage: SyncListener) {
 function connect() {
   if (typeof window === 'undefined') return;
 
+  // Only connect to local dev server WebSocket when running locally (localhost, 127.0.0.1, 192.168.x.x)
+  const isLocalDev = 
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' || 
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.') ||
+    window.location.hostname.endsWith('.local');
+
+  if (!isLocalDev) {
+    // In production deployments (e.g. Vercel), Supabase Realtime is the sole cloud sync channel
+    return;
+  }
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const wsUrl = `${protocol}//${window.location.host}/live-sync`;
 

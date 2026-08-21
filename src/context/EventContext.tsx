@@ -305,10 +305,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'UPDATE',
           schema: 'public',
           table: 'events',
-          filter: `id=eq.${currentEventId}`,
         },
         (payload) => {
           const updatedRow = payload.new as DbEvent;
+          if (updatedRow.id !== currentEventId) return;
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
@@ -335,10 +335,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'INSERT',
           schema: 'public',
           table: 'participants',
-          filter: `event_id=eq.${currentEventId}`,
         },
         (payload) => {
-          const newParticipant = dbParticipantToFrontend(payload.new as DbParticipant);
+          const row = payload.new as DbParticipant;
+          if (row.event_id !== currentEventId) return;
+          const newParticipant = dbParticipantToFrontend(row);
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
@@ -354,10 +355,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'INSERT',
           schema: 'public',
           table: 'responses',
-          filter: `event_id=eq.${currentEventId}`,
         },
         (payload) => {
-          const newResponse = dbResponseToFrontend(payload.new as DbResponse);
+          const row = payload.new as DbResponse;
+          if (row.event_id !== currentEventId) return;
+          const newResponse = dbResponseToFrontend(row);
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
@@ -375,10 +377,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'UPDATE',
           schema: 'public',
           table: 'participants',
-          filter: `event_id=eq.${currentEventId}`,
         },
         (payload) => {
-          const updated = dbParticipantToFrontend(payload.new as DbParticipant);
+          const row = payload.new as DbParticipant;
+          if (row.event_id !== currentEventId) return;
+          const updated = dbParticipantToFrontend(row);
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
@@ -396,10 +399,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'INSERT',
           schema: 'public',
           table: 'reactions',
-          filter: `event_id=eq.${currentEventId}`,
         },
         (payload) => {
-          const newReaction = dbReactionToFrontend(payload.new as DbReaction);
+          const row = payload.new as DbReaction;
+          if (row.event_id !== currentEventId) return;
+          const newReaction = dbReactionToFrontend(row);
           setEvents(prev =>
             prev.map(evt => {
               if (evt.id !== currentEventId) return evt;
@@ -414,9 +418,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'DELETE',
           schema: 'public',
           table: 'responses',
-          filter: `event_id=eq.${currentEventId}`,
         },
-        () => {
+        (payload) => {
+          if (payload.old && (payload.old as any).event_id && (payload.old as any).event_id !== currentEventId) return;
           refreshEvent();
         }
       )
@@ -426,9 +430,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           event: 'DELETE',
           schema: 'public',
           table: 'participants',
-          filter: `event_id=eq.${currentEventId}`,
         },
-        () => {
+        (payload) => {
+          if (payload.old && (payload.old as any).event_id && (payload.old as any).event_id !== currentEventId) return;
           refreshEvent();
         }
       )
