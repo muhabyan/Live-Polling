@@ -263,18 +263,18 @@ export const ProjectorDisplay: React.FC = () => {
       theme === 'light' ? 'bg-stage-mesh-light text-slate-900' : 'bg-stage-mesh text-white'
     }`}>
       
-      {/* Floating Ambient Motion Elements in Background */}
+      {/* Floating Ambient Motion Elements in Safe Open Margins (No overlap with buttons) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-        <div className="absolute top-16 left-12 animate-badge-float opacity-30 text-2xl" style={{ animationDuration: '6s' }}>
+        <div className="absolute top-1/3 left-6 sm:left-12 animate-badge-float opacity-30 text-2xl" style={{ animationDuration: '6s' }}>
           ⭐
         </div>
-        <div className="absolute top-24 right-20 animate-ambient-drift opacity-25 text-3xl" style={{ animationDuration: '8s' }}>
+        <div className="absolute top-1/3 right-6 sm:right-12 animate-ambient-drift opacity-30 text-2xl" style={{ animationDuration: '8s' }}>
           ✨
         </div>
-        <div className="absolute bottom-20 left-16 animate-ambient-drift-reverse opacity-20 text-2xl" style={{ animationDuration: '7s' }}>
+        <div className="absolute bottom-16 left-8 sm:left-16 animate-ambient-drift-reverse opacity-25 text-2xl" style={{ animationDuration: '7s' }}>
           🎉
         </div>
-        <div className="absolute bottom-24 right-16 animate-badge-float opacity-25 text-2xl" style={{ animationDuration: '5s' }}>
+        <div className="absolute bottom-16 right-8 sm:right-16 animate-badge-float opacity-25 text-2xl" style={{ animationDuration: '5s' }}>
           💫
         </div>
       </div>
@@ -290,27 +290,27 @@ export const ProjectorDisplay: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <span className={`text-[11px] font-bold uppercase tracking-widest ${
-                theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                theme === 'light' ? 'text-slate-700' : 'text-slate-400'
               }`}>
                 {currentEvent.title}
               </span>
               {currentEvent.status === 'live' ? (
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
+                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                   theme === 'light' ? 'bg-slate-200 text-slate-800' : 'bg-slate-800 text-slate-300'
                 }`}>
                   Q {currentEvent.currentQuestionIndex + 1} / {currentEvent.questions.length}
                 </span>
               ) : currentEvent.status === 'ended' ? (
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 dark:text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-[10px] font-bold">
                   Grand Finale
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
                   Lobby
                 </span>
               )}
             </div>
-            <div className={`text-xs font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-500'}`}>
+            <div className={`text-xs font-semibold ${theme === 'light' ? 'text-slate-500' : 'text-slate-500'}`}>
               Live Interactive Screen
             </div>
           </div>
@@ -321,11 +321,11 @@ export const ProjectorDisplay: React.FC = () => {
               ? 'bg-white border border-slate-200 text-slate-800'
               : 'bg-slate-800/90 border border-slate-700/80 text-slate-200'
           }`}>
-            <Users className="w-3.5 h-3.5 text-indigo-500" />
+            <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span className={`font-mono-numbers font-bold text-sm ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
               {currentEvent.participants.length}
             </span>
-            <span className="text-slate-400 text-xs hidden sm:inline">joined</span>
+            <span className="text-slate-500 text-xs hidden sm:inline font-medium">joined</span>
           </div>
         </div>
 
@@ -338,12 +338,12 @@ export const ProjectorDisplay: React.FC = () => {
           }`}>
             <div>
               <div className={`text-[10px] uppercase font-bold tracking-wider ${
-                theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                theme === 'light' ? 'text-slate-600' : 'text-slate-400'
               }`}>
-                Join at <strong className="text-indigo-600 dark:text-indigo-400 normal-case">{window.location.host}</strong>
+                Join at <strong className="text-indigo-600 dark:text-indigo-400 normal-case font-bold">{window.location.host}</strong>
               </div>
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs text-slate-400">PIN:</span>
+                <span className={`text-xs font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>PIN:</span>
                 <span className={`text-xl sm:text-2xl font-black font-mono-numbers tracking-widest ${
                   theme === 'light' ? 'text-slate-900' : 'text-white'
                 }`}>
@@ -393,7 +393,7 @@ export const ProjectorDisplay: React.FC = () => {
           }`}>
             
             {/* Header Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 rounded-full text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
               <Radio className="w-3.5 h-3.5" />
               <span>Live Room Open • Scan & Join</span>
             </div>
@@ -408,7 +408,7 @@ export const ProjectorDisplay: React.FC = () => {
             </div>
 
             <p className={`text-xs sm:text-sm max-w-lg mx-auto mb-6 ${
-              theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+              theme === 'light' ? 'text-slate-600 font-medium' : 'text-slate-400'
             }`}>
               Join the live interaction from your phone. Polling will begin shortly.
             </p>
@@ -426,7 +426,7 @@ export const ProjectorDisplay: React.FC = () => {
                     : 'bg-slate-800/80 border-slate-700/80'
                 }`}>
                   <div className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${
-                    theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                    theme === 'light' ? 'text-slate-600' : 'text-slate-400'
                   }`}>
                     1. Open on your mobile
                   </div>
@@ -441,7 +441,7 @@ export const ProjectorDisplay: React.FC = () => {
                     : 'bg-slate-800/80 border-slate-700/80'
                 }`}>
                   <div className={`text-[11px] uppercase font-bold tracking-wider mb-0.5 ${
-                    theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                    theme === 'light' ? 'text-slate-600' : 'text-slate-400'
                   }`}>
                     2. Enter Room PIN
                   </div>
@@ -459,10 +459,10 @@ export const ProjectorDisplay: React.FC = () => {
               theme === 'light' ? 'border-slate-100' : 'border-slate-800'
             }`}>
               <div className={`flex items-center space-x-2 text-xs sm:text-sm font-bold mb-2.5 ${
-                theme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                theme === 'light' ? 'text-slate-800' : 'text-slate-300'
               }`}>
-                <Users className="w-4 h-4 text-indigo-500" />
-                <span className={`text-sm sm:text-base font-mono-numbers ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
+                <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span className={`text-sm sm:text-base font-mono-numbers font-extrabold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                   {currentEvent.participants.length}
                 </span>
                 <span>attendees ready in lobby</span>
@@ -475,19 +475,19 @@ export const ProjectorDisplay: React.FC = () => {
                       key={p.id}
                       className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs animate-in fade-in zoom-in-95 ${
                         theme === 'light'
-                          ? 'bg-white border border-slate-200 text-slate-800 shadow-2xs'
-                          : 'bg-slate-800/90 border border-slate-700 text-slate-200'
+                          ? 'bg-white border border-slate-200 text-slate-800 shadow-2xs font-semibold'
+                          : 'bg-slate-800/90 border border-slate-700 text-slate-200 font-semibold'
                       }`}
                     >
                       <span className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px]" style={{ backgroundColor: p.avatarBg }}>
                         {p.avatarEmoji || '👋'}
                       </span>
-                      <span className="font-semibold">{p.name}</span>
+                      <span>{p.name}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">Scan QR code above with your camera to join instantly.</p>
+                <p className="text-xs text-slate-500 font-medium">Scan QR code above with your camera to join instantly.</p>
               )}
             </div>
 
@@ -505,8 +505,12 @@ export const ProjectorDisplay: React.FC = () => {
           <div className="text-center mb-8">
             <div className="flex flex-col items-center justify-center mb-3">
               <PulseBotMascot theme={theme} size="lg" mood="celebrating" />
-              <span className="inline-flex items-center space-x-1.5 px-3.5 py-1 bg-amber-500/15 border border-amber-500/30 rounded-full text-[11px] font-extrabold text-amber-600 dark:text-amber-300 uppercase tracking-widest mt-4 shadow-xs">
-                <Sparkles className="w-3 h-3 text-amber-500" />
+              <span className={`inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest mt-4 shadow-xs border ${
+                theme === 'light'
+                  ? 'bg-amber-50 text-amber-800 border-amber-300'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+              }`}>
+                <Sparkles className={`w-3 h-3 ${theme === 'light' ? 'text-amber-700' : 'text-amber-400'}`} />
                 <span>Session Concluded</span>
               </span>
             </div>
@@ -525,25 +529,31 @@ export const ProjectorDisplay: React.FC = () => {
                 }`}>
                   {currentEvent.participants.length}
                 </span>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Peserta</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest ${
+                  theme === 'light' ? 'text-indigo-700' : 'text-indigo-400'
+                }`}>Peserta</span>
               </div>
-              <div className={`w-px h-10 ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'}`} />
+              <div className={`w-px h-10 ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-800'}`} />
               <div>
                 <span className={`block text-3xl sm:text-5xl font-black font-mono-numbers tracking-tight ${
                   theme === 'light' ? 'text-slate-900' : 'text-white'
                 }`}>
                   {currentEvent.responses.length}
                 </span>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Respon</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest ${
+                  theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'
+                }`}>Respon</span>
               </div>
-              <div className={`w-px h-10 ${theme === 'light' ? 'bg-slate-200' : 'bg-slate-800'}`} />
+              <div className={`w-px h-10 ${theme === 'light' ? 'bg-slate-300' : 'bg-slate-800'}`} />
               <div>
                 <span className={`block text-3xl sm:text-5xl font-black font-mono-numbers tracking-tight ${
                   theme === 'light' ? 'text-slate-900' : 'text-white'
                 }`}>
                   {currentEvent.questions.length}/{currentEvent.questions.length}
                 </span>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400">Soal Selesai</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest ${
+                  theme === 'light' ? 'text-amber-700' : 'text-amber-400'
+                }`}>Soal Selesai</span>
               </div>
             </div>
           </div>
@@ -558,7 +568,9 @@ export const ProjectorDisplay: React.FC = () => {
                 <div key={q.id} className={`border-b pb-5 ${theme === 'light' ? 'border-slate-200' : 'border-slate-800/80'}`}>
                   <div className="flex items-baseline justify-between gap-4 mb-2.5">
                     <div className="flex items-baseline space-x-2.5 min-w-0">
-                      <span className="text-xs font-mono font-black text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <span className={`text-xs font-mono font-black shrink-0 ${
+                        theme === 'light' ? 'text-indigo-700' : 'text-indigo-400'
+                      }`}>
                         0{qIdx + 1}
                       </span>
                       <h3 className={`text-base sm:text-lg font-bold tracking-tight truncate ${
@@ -567,8 +579,8 @@ export const ProjectorDisplay: React.FC = () => {
                         {q.title}
                       </h3>
                     </div>
-                    <span className={`text-xs font-mono shrink-0 ${
-                      theme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                    <span className={`text-xs font-mono font-semibold shrink-0 ${
+                      theme === 'light' ? 'text-slate-600' : 'text-slate-400'
                     }`}>
                       {totalQResponses} respon
                     </span>
@@ -598,13 +610,13 @@ export const ProjectorDisplay: React.FC = () => {
                           />
                         </div>
                         <div className="text-sm font-bold shrink-0 flex items-center space-x-2">
-                          <span className={theme === 'light' ? 'text-slate-800' : 'text-white'}>{topOpt.text}</span>
-                          <span className={`font-mono font-black ${theme === 'light' ? 'text-emerald-600' : 'text-emerald-400'}`}>{topPct}%</span>
-                          <span className="text-xs text-slate-400 font-mono">({topCount} suara)</span>
+                          <span className={theme === 'light' ? 'text-slate-900 font-bold' : 'text-white font-bold'}>{topOpt.text}</span>
+                          <span className={`font-mono font-black ${theme === 'light' ? 'text-emerald-700' : 'text-emerald-400'}`}>{topPct}%</span>
+                          <span className={`text-xs font-mono font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>({topCount} suara)</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-xs text-slate-400 italic">Belum ada jawaban.</div>
+                      <div className="text-xs text-slate-500 italic">Belum ada jawaban.</div>
                     );
                   })()}
 
@@ -627,8 +639,8 @@ export const ProjectorDisplay: React.FC = () => {
                         </div>
                         <div className="text-sm font-bold shrink-0 flex items-center space-x-2">
                           <span className={theme === 'light' ? 'text-slate-700' : 'text-slate-300'}>Skor:</span>
-                          <span className={`font-mono font-black ${theme === 'light' ? 'text-amber-600' : 'text-amber-400'}`}>{avg}</span>
-                          <span className="text-xs text-slate-400">/ {q.ratingMax || 5}.0</span>
+                          <span className={`font-mono font-black ${theme === 'light' ? 'text-amber-700' : 'text-amber-400'}`}>{avg}</span>
+                          <span className={`text-xs font-mono font-medium ${theme === 'light' ? 'text-slate-500' : 'text-slate-400'}`}>/ {q.ratingMax || 5}.0</span>
                         </div>
                       </div>
                     );
@@ -656,7 +668,7 @@ export const ProjectorDisplay: React.FC = () => {
                             </span>
                           ))
                         ) : (
-                          <div className="text-xs text-slate-400 italic">Belum ada kata.</div>
+                          <div className="text-xs text-slate-500 italic">Belum ada kata.</div>
                         )}
                       </div>
                     );
@@ -664,7 +676,7 @@ export const ProjectorDisplay: React.FC = () => {
 
                   {/* 4. Open Text */}
                   {q.type === 'open_text' && (
-                    <div className={`text-sm italic ${theme === 'light' ? 'text-slate-600' : 'text-slate-300'}`}>
+                    <div className={`text-sm italic ${theme === 'light' ? 'text-slate-700 font-medium' : 'text-slate-300'}`}>
                       {totalQResponses > 0
                         ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
                         : 'Belum ada tanggapan.'}
