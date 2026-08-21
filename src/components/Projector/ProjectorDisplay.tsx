@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useEvent } from '../../context/EventContext';
 import QRCode from 'qrcode';
+import confetti from 'canvas-confetti';
 import { 
   Users, 
   Clock, 
@@ -12,7 +13,11 @@ import {
   Radio,
   Trophy,
   Crown,
-  Award
+  Award,
+  BarChart3,
+  CheckCheck,
+  Flame,
+  HelpCircle
 } from 'lucide-react';
 import { BrandLogo } from '../Shared/BrandLogo';
 
@@ -20,6 +25,7 @@ export const ProjectorDisplay: React.FC = () => {
   const { currentEvent, fireConfetti, setActiveView, isHost } = useEvent();
   const miniQrRef = useRef<HTMLCanvasElement | null>(null);
   const lobbyQrRef = useRef<HTMLCanvasElement | null>(null);
+  const hasFiredFinaleConfettiRef = useRef(false);
 
   // Press ESC to exit Projector mode anytime cleanly
   useEffect(() => {
@@ -42,24 +48,38 @@ export const ProjectorDisplay: React.FC = () => {
   const totalParticipants = Math.max(currentEvent?.participants?.length || 0, totalResponses);
   const responsePercentage = totalParticipants > 0 ? Math.round((totalResponses / totalParticipants) * 100) : 0;
 
-  // Trigger confetti when correct answer is revealed or when session ends
+  // Trigger confetti when correct answer is revealed
   useEffect(() => {
     if (currentEvent?.revealAnswer) {
       fireConfetti();
     }
   }, [currentEvent?.revealAnswer, fireConfetti]);
 
+  // Trigger celebratory corner stage cannons ONCE when session concludes
   useEffect(() => {
     if (currentEvent?.status === 'ended') {
-      fireConfetti();
-      const t1 = setTimeout(() => fireConfetti(), 900);
-      const t2 = setTimeout(() => fireConfetti(), 1800);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
+      if (!hasFiredFinaleConfettiRef.current) {
+        hasFiredFinaleConfettiRef.current = true;
+        // Fire graceful corner cannons that leave the center clear
+        confetti({
+          particleCount: 70,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0.05, y: 0.85 },
+          colors: ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#38BDF8'],
+        });
+        confetti({
+          particleCount: 70,
+          angle: 120,
+          spread: 60,
+          origin: { x: 0.95, y: 0.85 },
+          colors: ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#38BDF8'],
+        });
+      }
+    } else {
+      hasFiredFinaleConfettiRef.current = false;
     }
-  }, [currentEvent?.status, fireConfetti]);
+  }, [currentEvent?.status]);
 
   // Render QR Codes for projector (Mini top bar and Large Lobby stage)
   useEffect(() => {
@@ -303,121 +323,263 @@ export const ProjectorDisplay: React.FC = () => {
           </div>
         </main>
       ) : currentEvent.status === 'ended' ? (
-        /* GRAND FINALE / LEADERBOARD PODIUM STAGE */
-        <main className="my-auto py-6 sm:py-8 max-w-5xl mx-auto w-full text-center animate-in fade-in zoom-in-95 duration-500">
-          <div className="bg-slate-900/90 border border-slate-800/90 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        /* GRAND FINALE / RICH SESSION RECAP & PODIUM STAGE */
+        <main className="my-auto py-6 sm:py-8 max-w-6xl mx-auto w-full animate-in fade-in zoom-in-95 duration-500">
+          <div className="bg-slate-900/90 border border-slate-800/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden">
             
-            {/* Ambient Background Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient Stage Lighting Glows */}
+            <div className="absolute -top-24 left-1/4 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 right-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Header Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>Session Concluded • Grand Finale</span>
+            {/* Header Title Section */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Live Polling Concluded • Grand Finale</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-display mb-2">
+                {currentEvent.title}
+              </h1>
+              <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
+                Terima kasih atas partisipasi aktif audiens! Berikut ringkasan hasil & rekapitulasi polling hari ini.
+              </p>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight font-display mb-2">
-              {currentEvent.title}
-            </h1>
-            <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto mb-8">
-              Thank you for participating! Here is the final session summary and audience breakdown.
-            </p>
-
-            {/* 3 Metric Highlight Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
-              <div className="p-4 bg-slate-800/80 border border-slate-700/80 rounded-2xl shadow-lg">
-                <div className="flex items-center justify-center space-x-2 text-indigo-400 mb-1">
-                  <Users className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Total Attendees</span>
-                </div>
-                <div className="text-3xl sm:text-4xl font-black text-white font-mono-numbers">
-                  {currentEvent.participants.length}
-                </div>
-              </div>
-
-              <div className="p-4 bg-slate-800/80 border border-slate-700/80 rounded-2xl shadow-lg">
-                <div className="flex items-center justify-center space-x-2 text-emerald-400 mb-1">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Votes Submitted</span>
-                </div>
-                <div className="text-3xl sm:text-4xl font-black text-white font-mono-numbers">
-                  {currentEvent.responses.length}
-                </div>
-              </div>
-
-              <div className="p-4 bg-slate-800/80 border border-slate-700/80 rounded-2xl shadow-lg">
-                <div className="flex items-center justify-center space-x-2 text-amber-400 mb-1">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Questions Done</span>
-                </div>
-                <div className="text-3xl sm:text-4xl font-black text-white font-mono-numbers">
-                  {currentEvent.questions.length} / {currentEvent.questions.length}
-                </div>
-              </div>
-            </div>
-
-            {/* Top Participants / Leaderboard Podium or Active Attendees Grid */}
-            {currentEvent.participants.length > 0 && (() => {
-              const hasQuizScoring = currentEvent.isQuizMode || currentEvent.questions.some(q => (q.points || 0) > 0 || (q.options || []).some(o => o.isCorrect));
-              const sortedParticipants = [...currentEvent.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
-
-              return (
-                <div className="p-6 bg-slate-950/60 border border-slate-800 rounded-2xl max-w-3xl mx-auto mb-4">
-                  <div className="flex items-center justify-center space-x-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
-                    {hasQuizScoring ? (
-                      <>
-                        <Crown className="w-4 h-4 text-amber-400" />
-                        <span>Quiz Leaderboard Podium</span>
-                      </>
-                    ) : (
-                      <>
-                        <Users className="w-4 h-4 text-indigo-400" />
-                        <span>Active Attendees & Audience Roll Call</span>
-                      </>
-                    )}
+            {/* 2-Column Balanced Layout (No more big empty voids) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              {/* LEFT COLUMN: Stat Cards & Audience Roll Call / Podium (5 cols) */}
+              <div className="lg:col-span-5 space-y-4">
+                
+                {/* 3 Metric Cards */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl text-center shadow-sm">
+                    <div className="flex items-center justify-center space-x-1 text-indigo-400 mb-1">
+                      <Users className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-bold uppercase">Peserta</span>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-white font-mono-numbers">
+                      {currentEvent.participants.length}
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    {sortedParticipants.slice(0, 16).map((p, idx) => {
-                      const participantResponses = currentEvent.responses.filter(r => r.participantId === p.id).length;
+                  <div className="p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl text-center shadow-sm">
+                    <div className="flex items-center justify-center space-x-1 text-emerald-400 mb-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-bold uppercase">Respon</span>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-white font-mono-numbers">
+                      {currentEvent.responses.length}
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl text-center shadow-sm">
+                    <div className="flex items-center justify-center space-x-1 text-amber-400 mb-1">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-bold uppercase">Selesai</span>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-white font-mono-numbers">
+                      {currentEvent.questions.length}/{currentEvent.questions.length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Audience Roll Call / Leaderboard Podium */}
+                {(() => {
+                  const hasQuizScoring = currentEvent.isQuizMode || currentEvent.questions.some(q => (q.points || 0) > 0 || (q.options || []).some(o => o.isCorrect));
+                  const sortedParticipants = [...currentEvent.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+                  return (
+                    <div className="p-5 bg-slate-950/70 border border-slate-800 rounded-2xl">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">
+                        <span className="flex items-center space-x-1.5">
+                          {hasQuizScoring ? <Crown className="w-4 h-4 text-amber-400" /> : <Users className="w-4 h-4 text-indigo-400" />}
+                          <span>{hasQuizScoring ? 'Quiz Leaderboard' : 'Daftar Partisipan Audiens'}</span>
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {currentEvent.participants.length} Terhubung
+                        </span>
+                      </div>
+
+                      {sortedParticipants.length > 0 ? (
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-none">
+                          {sortedParticipants.map((p, idx) => {
+                            const pResponses = currentEvent.responses.filter(r => r.participantId === p.id).length;
+                            return (
+                              <div
+                                key={p.id}
+                                className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                                  hasQuizScoring && idx === 0
+                                    ? 'bg-amber-500/15 border-amber-400/60 text-amber-200 shadow-sm'
+                                    : hasQuizScoring && idx === 1
+                                    ? 'bg-slate-300/15 border-slate-400/50 text-slate-200'
+                                    : hasQuizScoring && idx === 2
+                                    ? 'bg-amber-700/15 border-amber-600/50 text-amber-300'
+                                    : 'bg-slate-800/80 border-slate-700/70 text-slate-200'
+                                }`}
+                              >
+                                <div className="flex items-center space-x-2.5 min-w-0 pr-2">
+                                  <span className="w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0" style={{ backgroundColor: p.avatarBg }}>
+                                    {hasQuizScoring ? (idx === 0 ? '👑' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : p.avatarEmoji || '👋') : (p.avatarEmoji || '👋')}
+                                  </span>
+                                  <span className="font-bold truncate text-white">{p.name}</span>
+                                </div>
+
+                                {hasQuizScoring && p.score !== undefined && p.score > 0 ? (
+                                  <span className="px-2 py-0.5 bg-slate-900/80 rounded-md text-xs font-bold text-amber-300 font-mono shrink-0">
+                                    {p.score} pts
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/30 rounded-md text-[11px] font-bold text-indigo-300 font-mono shrink-0">
+                                    {pResponses}/{currentEvent.questions.length} dijawab
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-500 text-center py-6">Tidak ada peserta yang terdaftar.</p>
+                      )}
+                    </div>
+                  );
+                })()}
+
+              </div>
+
+              {/* RIGHT COLUMN: Question-by-Question Highlights Recap (7 cols) */}
+              <div className="lg:col-span-7 space-y-3">
+                <div className="p-5 bg-slate-950/70 border border-slate-800 rounded-2xl">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider mb-3.5">
+                    <span className="flex items-center space-x-1.5">
+                      <BarChart3 className="w-4 h-4 text-emerald-400" />
+                      <span>Ringkasan Hasil per Pertanyaan</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500">Pilihan Terbanyak</span>
+                  </div>
+
+                  <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1 scrollbar-none">
+                    {currentEvent.questions.map((q, qIdx) => {
+                      const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
+                      const totalQResponses = qResponses.length;
+
                       return (
                         <div
-                          key={p.id}
-                          className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
-                            hasQuizScoring && idx === 0
-                              ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-200 ring-2 ring-amber-500/20'
-                              : hasQuizScoring && idx === 1
-                              ? 'bg-slate-300/20 border-2 border-slate-300 text-slate-200'
-                              : hasQuizScoring && idx === 2
-                              ? 'bg-amber-700/20 border-2 border-amber-600 text-amber-300'
-                              : 'bg-slate-800 border border-slate-700 text-slate-300'
-                          }`}
+                          key={q.id}
+                          className="p-3.5 bg-slate-800/80 border border-slate-700/70 rounded-xl space-y-2 shadow-xs"
                         >
-                          <span className="text-sm">
-                            {hasQuizScoring ? (idx === 0 ? '👑' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : p.avatarEmoji || '👋') : (p.avatarEmoji || '👋')}
-                          </span>
-                          <span>{p.name}</span>
-                          {hasQuizScoring && p.score !== undefined && p.score > 0 ? (
-                            <span className="px-1.5 py-0.5 bg-slate-900/60 rounded-md text-[10px] text-amber-300 font-mono">
-                              {p.score} pts
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 font-mono block mb-0.5">
+                                Soal {qIdx + 1} • {q.type.replace('_', ' ').toUpperCase()}
+                              </span>
+                              <h4 className="text-sm font-bold text-white leading-snug">
+                                {q.title}
+                              </h4>
+                            </div>
+                            <span className="text-[11px] font-mono font-bold text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded-md border border-slate-700/60 shrink-0">
+                              {totalQResponses} respon
                             </span>
-                          ) : (
-                            <span className="px-1.5 py-0.5 bg-slate-900/60 rounded-md text-[10px] text-indigo-300 font-mono">
-                              {participantResponses}/{currentEvent.questions.length} voted
-                            </span>
+                          </div>
+
+                          {/* Highlights per Type */}
+                          {/* 1. Multiple Choice / True False: Show top choice */}
+                          {(q.type === 'multiple_choice' || q.type === 'true_false') && (() => {
+                            const counts: Record<string, number> = {};
+                            qResponses.forEach(r => {
+                              (r.selectedOptionIds || []).forEach(optId => {
+                                counts[optId] = (counts[optId] || 0) + 1;
+                              });
+                            });
+                            const topOptId = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+                            const topOpt = (q.options || []).find(o => o.id === topOptId);
+                            const topCount = topOptId ? counts[topOptId] : 0;
+                            const topPct = totalQResponses > 0 && topCount ? Math.round((topCount / totalQResponses) * 100) : 0;
+
+                            return (
+                              <div className="pt-1">
+                                {topOpt ? (
+                                  <div className="flex items-center justify-between text-xs p-2 bg-emerald-950/40 border border-emerald-500/30 rounded-lg">
+                                    <div className="flex items-center space-x-2 truncate">
+                                      <span className="px-1.5 py-0.5 bg-emerald-500 text-white rounded text-[10px] font-bold">Terbanyak</span>
+                                      <span className="font-bold text-emerald-200 truncate">{topOpt.text}</span>
+                                    </div>
+                                    <span className="font-mono font-black text-emerald-400 shrink-0 ml-2">
+                                      {topPct}% ({topCount} suara)
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="text-xs text-slate-500 italic">Belum ada jawaban terkumpul.</div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {/* 2. Rating Scale: Show average */}
+                          {q.type === 'rating' && (() => {
+                            const avg = totalQResponses > 0
+                              ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalQResponses).toFixed(1)
+                              : '0.0';
+                            return (
+                              <div className="flex items-center justify-between text-xs p-2 bg-amber-950/40 border border-amber-500/30 rounded-lg">
+                                <span className="font-bold text-amber-200">
+                                  Skor Rata-Rata: <strong className="text-amber-400 font-mono text-sm">{avg}</strong> / {q.ratingMax || 5}.0
+                                </span>
+                                <span className="text-[11px] text-amber-300/80">
+                                  {q.ratingMinLabel || 'Rendah'} ➔ {q.ratingMaxLabel || 'Tinggi'}
+                                </span>
+                              </div>
+                            );
+                          })()}
+
+                          {/* 3. Word Cloud: Show top words */}
+                          {q.type === 'word_cloud' && (() => {
+                            const wordMap: Record<string, number> = {};
+                            qResponses.forEach(r => {
+                              const w = (r.textResponse || '').trim().toLowerCase();
+                              if (w) wordMap[w] = (wordMap[w] || 0) + 1;
+                            });
+                            const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 3);
+
+                            return (
+                              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                {topWords.length > 0 ? (
+                                  topWords.map((word, i) => (
+                                    <span key={word} className="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 rounded-lg text-xs font-bold text-indigo-200">
+                                      #{i + 1} {word} ({wordMap[word]})
+                                    </span>
+                                  ))
+                                ) : (
+                                  <div className="text-xs text-slate-500 italic">Belum ada kata terkumpul.</div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {/* 4. Open Text */}
+                          {q.type === 'open_text' && (
+                            <div className="text-xs text-slate-400 italic pt-1">
+                              {totalQResponses > 0
+                                ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
+                                : 'Belum ada tanggapan terbuka.'}
+                            </div>
                           )}
+
                         </div>
                       );
                     })}
                   </div>
                 </div>
-              );
-            })()}
+              </div>
 
-            {/* Host message / restart guide */}
-            <p className="text-xs text-slate-500 mt-4">
-              Live polling session completed. The presenter can reset or start another session anytime.
-            </p>
+            </div>
+
+            {/* Bottom Footer Note */}
+            <div className="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+              <span>Sesi selesai • Presenter dapat mengekspor laporan atau memulai sesi baru dari Admin Studio</span>
+              <span className="font-mono text-indigo-400 font-bold">PulseLive Interactive Stage</span>
+            </div>
 
           </div>
         </main>
