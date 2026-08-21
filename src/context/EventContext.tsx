@@ -188,7 +188,24 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (updated) {
         setEvents(prev => {
           const exists = prev.some(e => e.id === updated.id);
-          if (exists) return prev.map(e => e.id === updated.id ? updated : e);
+          if (exists) {
+            return prev.map(e => {
+              if (e.id !== updated.id) return e;
+              // Preserve local timer state while it is actively ticking so the
+              // 3-second heartbeat poll does not reset the countdown to the
+              // original duration stored in the Supabase DB column.
+              const preserveTimer = e.isTimerRunning && updated.isTimerRunning;
+              return {
+                ...updated,
+                timerRemainingSeconds: preserveTimer
+                  ? e.timerRemainingSeconds
+                  : updated.timerRemainingSeconds,
+                isTimerRunning: preserveTimer
+                  ? e.isTimerRunning
+                  : updated.isTimerRunning,
+              };
+            });
+          }
           return [updated, ...prev];
         });
       }
