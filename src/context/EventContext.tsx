@@ -197,8 +197,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [currentEventId]);
 
-  // Initial load
+  // Initial load & health check
   useEffect(() => {
+    api.checkSupabaseStatus();
     refreshAllEvents();
   }, [refreshAllEvents]);
 

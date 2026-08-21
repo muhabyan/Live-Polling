@@ -24,6 +24,45 @@ import { INITIAL_EVENTS } from '../data/initialEvents';
 let localEventsStore: EventData[] = [...INITIAL_EVENTS];
 
 // ============================================
+// 0. SUPABASE HEALTH & DIAGNOSTIC CHECK
+// ============================================
+
+export async function checkSupabaseStatus(): Promise<{
+  connected: boolean;
+  error?: string;
+  tables?: { events: boolean; questions: boolean; participants: boolean; responses: boolean };
+}> {
+  try {
+    const { data: eData, error: eErr } = await supabase.from('events').select('id').limit(1);
+    if (eErr) {
+      console.warn('❌ [Supabase Diagnostic] Events table check failed:', eErr.message);
+      return { connected: false, error: eErr.message };
+    }
+
+    const [qTest, pTest, rTest] = await Promise.all([
+      supabase.from('questions').select('id').limit(1),
+      supabase.from('participants').select('id').limit(1),
+      supabase.from('responses').select('id').limit(1),
+    ]);
+
+    const status = {
+      connected: true,
+      tables: {
+        events: !eErr,
+        questions: !qTest.error,
+        participants: !pTest.error,
+        responses: !rTest.error,
+      },
+    };
+    console.log('✅ [Supabase Diagnostic] Cloud Database Connected:', status);
+    return status;
+  } catch (err: any) {
+    console.warn('❌ [Supabase Diagnostic] Connection failed:', err.message);
+    return { connected: false, error: err.message || 'Network unreachable' };
+  }
+}
+
+// ============================================
 // 1. SUPABASE QUERIES (Fetch operations)
 // ============================================
 
@@ -373,6 +412,7 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       .single();
 
     if (partErr) {
+      console.warn('⚠️ [Supabase] Participant insert error:', partErr.message, partErr);
       // Fallback participant object
       const fallbackPart: Participant = {
         id: 'p-' + Date.now(),
