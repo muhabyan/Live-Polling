@@ -665,7 +665,7 @@ export async function sendControlAction(eventId: string, action: string, payload
         const nextIdx = qIdx + 1;
         updates = {
           current_question_index: nextIdx,
-          is_timer_running: false,
+          is_timer_running: true, // AUTO-START TIMER LIKE KAHOOT
           question_started_at: new Date().toISOString(),
           timer_remaining_seconds: qTimerFromDb(nextIdx),
           is_voting_locked: false,
@@ -678,7 +678,7 @@ export async function sendControlAction(eventId: string, action: string, payload
         const prevIdx = Math.max(0, qIdx - 1);
         updates = {
           current_question_index: prevIdx,
-          is_timer_running: false,
+          is_timer_running: true, // AUTO-START TIMER LIKE KAHOOT
           question_started_at: new Date().toISOString(),
           timer_remaining_seconds: qTimerFromDb(prevIdx),
           is_voting_locked: false,
@@ -691,7 +691,7 @@ export async function sendControlAction(eventId: string, action: string, payload
         const jumpIdx = payload?.index ?? 0;
         updates = {
           current_question_index: jumpIdx,
-          is_timer_running: false,
+          is_timer_running: true, // AUTO-START TIMER LIKE KAHOOT
           question_started_at: new Date().toISOString(),
           timer_remaining_seconds: qTimerFromDb(jumpIdx),
           is_voting_locked: false,

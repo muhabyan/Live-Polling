@@ -336,16 +336,25 @@ export const PresenterControl: React.FC = () => {
                 <span>+15 Sec</span>
               </button>
 
-              {/* Next Question */}
-              <button
-                id="presenter-next-q-btn"
-                onClick={() => sendModeratorAction('next_question')}
-                disabled={currentQIndex >= currentEvent.questions.length - 1}
-                className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-              >
-                <span>Next</span>
-                <SkipForward className="w-3.5 h-3.5" />
-              </button>
+              {/* Next Question or Finish Session on Last Question */}
+              {currentQIndex >= currentEvent.questions.length - 1 ? (
+                <button
+                  id="presenter-finish-session-btn"
+                  onClick={() => sendModeratorAction('end_session')}
+                  className="flex items-center justify-center space-x-1.5 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-pulse"
+                >
+                  <span>Finish & Finale 🏁</span>
+                </button>
+              ) : (
+                <button
+                  id="presenter-next-q-btn"
+                  onClick={() => sendModeratorAction('next_question')}
+                  className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+                >
+                  <span>Next</span>
+                  <SkipForward className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Secondary Action Controls Toolbar */}
