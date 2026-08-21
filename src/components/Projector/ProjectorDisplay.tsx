@@ -200,9 +200,19 @@ export const ProjectorDisplay: React.FC = () => {
               <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
                 {currentEvent.title}
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">
-                Q {currentEvent.currentQuestionIndex + 1} / {currentEvent.questions.length}
-              </span>
+              {currentEvent.status === 'live' ? (
+                <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">
+                  Q {currentEvent.currentQuestionIndex + 1} / {currentEvent.questions.length}
+                </span>
+              ) : currentEvent.status === 'ended' ? (
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                  Grand Finale
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">
+                  Lobby
+                </span>
+              )}
             </div>
             <div className="text-xs text-slate-500 font-medium">
               Live Interactive Screen
@@ -746,37 +756,39 @@ export const ProjectorDisplay: React.FC = () => {
         </main>
       )}
 
-      {/* Bottom Status Bar: Response Rate & Big Countdown */}
-      <footer className="flex items-center justify-between pt-4 sm:pt-6 border-t border-slate-800/80 text-sm">
-        
-        {/* Total Responses Badge */}
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-slate-800/90 border border-slate-700/80 rounded-xl font-semibold text-slate-200 text-xs sm:text-sm">
-            <Users className="w-4 h-4 text-indigo-400" />
-            <span className="font-mono-numbers text-sm sm:text-base font-bold text-white">{totalResponses}</span>
-            <span className="text-slate-400">/ {totalParticipants} answered ({responsePercentage}%)</span>
+      {/* Bottom Status Bar: Response Rate & Big Countdown (Only rendered during live active polling) */}
+      {currentEvent.status === 'live' && (
+        <footer className="flex items-center justify-between pt-4 sm:pt-6 border-t border-slate-800/80 text-sm">
+          
+          {/* Total Responses Badge */}
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-slate-800/90 border border-slate-700/80 rounded-xl font-semibold text-slate-200 text-xs sm:text-sm">
+              <Users className="w-4 h-4 text-indigo-400" />
+              <span className="font-mono-numbers text-sm sm:text-base font-bold text-white">{totalResponses}</span>
+              <span className="text-slate-400">/ {totalParticipants} answered ({responsePercentage}%)</span>
+            </div>
+
+            {currentEvent.isVotingLocked && (
+              <span className="px-2.5 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-lg text-xs font-bold">
+                Voting Closed
+              </span>
+            )}
           </div>
 
-          {currentEvent.isVotingLocked && (
-            <span className="px-2.5 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-lg text-xs font-bold">
-              Voting Closed
+          {/* Live Timer Badge */}
+          <div className="flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700/80">
+            <Clock className={`w-4 h-4 ${(currentEvent.timerRemainingSeconds ?? 45) <= 5 && currentEvent.isTimerRunning ? 'text-rose-400 animate-spin' : 'text-slate-400'}`} />
+            <span className="text-lg sm:text-xl font-bold font-mono-numbers tracking-wider text-white">
+              {(() => {
+                const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+              })()}
             </span>
-          )}
-        </div>
-
-        {/* Live Timer Badge */}
-        <div className="flex items-center space-x-2 px-4 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700/80">
-          <Clock className={`w-4 h-4 ${(currentEvent.timerRemainingSeconds ?? 45) <= 5 && currentEvent.isTimerRunning ? 'text-rose-400 animate-spin' : 'text-slate-400'}`} />
-          <span className="text-lg sm:text-xl font-bold font-mono-numbers tracking-wider text-white">
-            {(() => {
-              const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
-              const mins = Math.floor(remaining / 60);
-              const secs = remaining % 60;
-              return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            })()}
-          </span>
-        </div>
-      </footer>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
