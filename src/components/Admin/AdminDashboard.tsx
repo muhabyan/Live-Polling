@@ -620,6 +620,57 @@ export const AdminDashboard: React.FC = () => {
                           ))}
                         </div>
                       )}
+
+                      {/* Rating Scale Customization */}
+                      {q.type === 'rating' && (
+                        <div className="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2 text-xs">
+                          <div className="flex items-center justify-between gap-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Tampilan Skala:</label>
+                            <select
+                              value={q.ratingStyle || 'numeric'}
+                              onChange={(e) => {
+                                const style = e.target.value as any;
+                                setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingStyle: style } : item));
+                              }}
+                              className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold"
+                            >
+                              <option value="numeric">🔢 Skala Angka (1-5 / 1-10)</option>
+                              <option value="likert">📝 Skala Likert (Kata-kata)</option>
+                              <option value="stars">⭐ Bintang Rating (1-5)</option>
+                              <option value="emoji">😊 Emotikon Sentimen (1-5)</option>
+                            </select>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-400 block mb-0.5">Label Nilai Minimum (1):</label>
+                              <input
+                                type="text"
+                                value={q.ratingMinLabel || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingMinLabel: val } : item));
+                                }}
+                                placeholder="e.g. Kurang Yakin / Ragu"
+                                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[11px]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-bold text-slate-400 block mb-0.5">Label Nilai Maksimum (5/10):</label>
+                              <input
+                                type="text"
+                                value={q.ratingMaxLabel || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingMaxLabel: val } : item));
+                                }}
+                                placeholder="e.g. Sangat Yakin"
+                                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[11px]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

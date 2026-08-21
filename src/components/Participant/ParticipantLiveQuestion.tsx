@@ -292,43 +292,156 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
           </div>
         )}
 
-        {/* TYPE 4: RATING SCALE */}
-        {question.type === 'rating' && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs">
-            <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
-              <span>{question.ratingMinLabel || '1 (Low)'}</span>
-              <span>{question.ratingMaxLabel || '5 (High)'}</span>
-            </div>
+        {/* TYPE 4: RATING SCALE (Numeric, Stars, Likert, Emoji) */}
+        {question.type === 'rating' && (() => {
+          const style = question.ratingStyle || 'numeric';
+          const maxVal = question.ratingMax || 5;
+          const minVal = question.ratingMin || 1;
+          const range = Array.from({ length: maxVal - minVal + 1 }, (_, i) => minVal + i);
+          const emojis = ['😡', '🙁', '😐', '😊', '🤩'];
+          const likertDefaults = ['Sangat Tidak Setuju', 'Tidak Setuju', 'Netral', 'Setuju', 'Sangat Setuju'];
 
-            <div className="grid grid-cols-5 gap-2">
-              {[1, 2, 3, 4, 5].map((num) => {
-                const isSelected = ratingValue === num;
-                return (
-                  <button
-                    key={num}
-                    type="button"
-                    disabled={isLocked}
-                    onClick={() => setRatingValue(num)}
-                    className={`py-3.5 sm:py-4 rounded-xl border font-bold text-lg sm:text-xl flex flex-col items-center justify-center transition-all cursor-pointer shadow-2xs ${
-                      isSelected
-                        ? 'border-indigo-600 bg-indigo-600 text-white scale-105 shadow-xs'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
-                    } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
-                  >
-                    <span>{num}</span>
-                    <Star className={`w-3.5 h-3.5 mt-1 ${isSelected ? 'fill-white text-white' : 'text-slate-300'}`} />
-                  </button>
-                );
-              })}
-            </div>
-
-            {ratingValue && (
-              <div className="text-center mt-3 text-xs font-bold text-indigo-700 bg-indigo-50 py-1.5 rounded-lg border border-indigo-100 animate-in fade-in">
-                Selected rating: {ratingValue} / 5
+          return (
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs space-y-4">
+              
+              {/* Header Label (Min & Max descriptors) */}
+              <div className="flex justify-between items-center text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
+                <span className="text-slate-600">{question.ratingMinLabel || `${minVal} (Rendah)`}</span>
+                <span className="text-indigo-600">{question.ratingMaxLabel || `${maxVal} (Tinggi)`}</span>
               </div>
-            )}
-          </div>
-        )}
+
+              {/* 1. Star Rating Style */}
+              {style === 'stars' && (
+                <div className="flex items-center justify-center space-x-2 py-2">
+                  {range.map((num) => {
+                    const isSelected = (ratingValue || 0) >= num;
+                    return (
+                      <button
+                        key={num}
+                        type="button"
+                        disabled={isLocked}
+                        onClick={() => setRatingValue(num)}
+                        className={`p-2 rounded-xl transition-transform cursor-pointer ${
+                          isSelected ? 'scale-110' : 'hover:scale-105'
+                        } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                      >
+                        <Star
+                          className={`w-9 h-9 sm:w-11 sm:h-11 transition-colors ${
+                            isSelected
+                              ? 'fill-amber-400 text-amber-400 drop-shadow-sm'
+                              : 'text-slate-200 hover:text-slate-300'
+                          }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* 2. Emoji Mood Style */}
+              {style === 'emoji' && (
+                <div className="grid grid-cols-5 gap-2">
+                  {range.map((num, i) => {
+                    const isSelected = ratingValue === num;
+                    const emoji = emojis[i] || '🙂';
+                    return (
+                      <button
+                        key={num}
+                        type="button"
+                        disabled={isLocked}
+                        onClick={() => setRatingValue(num)}
+                        className={`py-3 sm:py-4 rounded-xl border text-2xl sm:text-3xl flex flex-col items-center justify-center transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-indigo-600 bg-indigo-50 ring-2 ring-indigo-600/30 scale-105 shadow-xs'
+                            : 'border-slate-200 bg-white hover:bg-slate-50'
+                        } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                      >
+                        <span>{emoji}</span>
+                        <span className="text-[10px] font-bold text-slate-400 mt-1 font-mono">{num}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* 3. Likert Verbal Options Style */}
+              {style === 'likert' && (
+                <div className="space-y-2">
+                  {range.map((num, i) => {
+                    const isSelected = ratingValue === num;
+                    const labelText = question.ratingLabels?.[i] || likertDefaults[i] || `Tingkat ${num}`;
+                    return (
+                      <button
+                        key={num}
+                        type="button"
+                        disabled={isLocked}
+                        onClick={() => setRatingValue(num)}
+                        className={`w-full p-3 sm:p-3.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+                          isSelected
+                            ? 'border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-600/30 shadow-xs'
+                            : 'border-slate-200 bg-white hover:bg-slate-50'
+                        } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.99]'}`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold font-mono ${
+                            isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {num}
+                          </span>
+                          <span className={`text-sm font-semibold ${isSelected ? 'text-indigo-950 font-bold' : 'text-slate-800'}`}>
+                            {labelText}
+                          </span>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'
+                        }`}>
+                          {isSelected && <span className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* 4. Numeric Scale (Default - Clean & Professional) */}
+              {style === 'numeric' && (
+                <div className="space-y-2">
+                  <div className={`grid gap-2 ${range.length > 5 ? 'grid-cols-5 sm:grid-cols-10' : 'grid-cols-5'}`}>
+                    {range.map((num) => {
+                      const isSelected = ratingValue === num;
+                      return (
+                        <button
+                          key={num}
+                          type="button"
+                          disabled={isLocked}
+                          onClick={() => setRatingValue(num)}
+                          className={`py-3.5 sm:py-4 rounded-xl border font-bold text-lg sm:text-xl flex items-center justify-center transition-all cursor-pointer font-mono-numbers shadow-2xs ${
+                            isSelected
+                              ? 'border-indigo-600 bg-indigo-600 text-white scale-105 shadow-md'
+                              : 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-800'
+                          } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                        >
+                          {num}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected Value Badge */}
+              {ratingValue !== undefined && ratingValue !== null && (
+                <div className="text-center pt-2 text-xs font-bold text-indigo-700 bg-indigo-50/80 py-2 rounded-xl border border-indigo-100 animate-in fade-in">
+                  Pilihan kamu: <span className="font-extrabold text-sm">{ratingValue}</span> / {maxVal}
+                  {question.ratingLabels?.[(ratingValue || minVal) - minVal] && (
+                    <span className="ml-1 text-slate-500 font-normal">({question.ratingLabels[(ratingValue || minVal) - minVal]})</span>
+                  )}
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
 
         {/* TYPE 5: OPEN TEXT */}
         {question.type === 'open_text' && (

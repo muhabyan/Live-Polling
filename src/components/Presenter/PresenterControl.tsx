@@ -252,9 +252,11 @@ export const PresenterControl: React.FC = () => {
 
               {currentQ?.type === 'rating' && (
                 <div className="flex items-center justify-between text-xs text-slate-700">
-                  <span>Scale: 1 to 5 Stars</span>
-                  <span className="font-bold text-indigo-700">
-                    Average: {totalResponses > 0 ? (responses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalResponses).toFixed(1) : '0.0'} / 5.0
+                  <span>
+                    Skala: {currentQ.ratingMinLabel || '1 (Rendah)'} ➔ {currentQ.ratingMaxLabel || '5 (Tinggi)'}
+                  </span>
+                  <span className="font-bold text-indigo-700 font-mono-numbers">
+                    Average: {totalResponses > 0 ? (responses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalResponses).toFixed(1) : '0.0'} / {currentQ.ratingMax || 5}.0
                   </span>
                 </div>
               )}

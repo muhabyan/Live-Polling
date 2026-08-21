@@ -357,39 +357,62 @@ export const ProjectorDisplay: React.FC = () => {
             </div>
 
             {/* Top Participants / Leaderboard Podium or Active Attendees Grid */}
-            {currentEvent.participants.length > 0 && (
-              <div className="p-6 bg-slate-950/60 border border-slate-800 rounded-2xl max-w-3xl mx-auto mb-4">
-                <div className="flex items-center justify-center space-x-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
-                  <Crown className="w-4 h-4 text-amber-400" />
-                  <span>Audience Hall of Fame & Participants</span>
-                </div>
+            {currentEvent.participants.length > 0 && (() => {
+              const hasQuizScoring = currentEvent.isQuizMode || currentEvent.questions.some(q => (q.points || 0) > 0 || (q.options || []).some(o => o.isCorrect));
+              const sortedParticipants = [...currentEvent.participants].sort((a, b) => (b.score || 0) - (a.score || 0));
 
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {currentEvent.participants.slice(0, 16).map((p, idx) => (
-                    <div
-                      key={p.id}
-                      className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
-                        idx === 0
-                          ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-200 ring-2 ring-amber-500/20'
-                          : idx === 1
-                          ? 'bg-slate-300/20 border-2 border-slate-300 text-slate-200'
-                          : idx === 2
-                          ? 'bg-amber-700/20 border-2 border-amber-600 text-amber-300'
-                          : 'bg-slate-800 border border-slate-700 text-slate-300'
-                      }`}
-                    >
-                      <span className="text-sm">{idx === 0 ? '👑' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : p.avatarEmoji || '👋'}</span>
-                      <span>{p.name}</span>
-                      {p.score !== undefined && p.score > 0 && (
-                        <span className="px-1.5 py-0.5 bg-slate-900/60 rounded-md text-[10px] text-amber-300 font-mono">
-                          {p.score} pts
-                        </span>
-                      )}
-                    </div>
-                  ))}
+              return (
+                <div className="p-6 bg-slate-950/60 border border-slate-800 rounded-2xl max-w-3xl mx-auto mb-4">
+                  <div className="flex items-center justify-center space-x-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                    {hasQuizScoring ? (
+                      <>
+                        <Crown className="w-4 h-4 text-amber-400" />
+                        <span>Quiz Leaderboard Podium</span>
+                      </>
+                    ) : (
+                      <>
+                        <Users className="w-4 h-4 text-indigo-400" />
+                        <span>Active Attendees & Audience Roll Call</span>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    {sortedParticipants.slice(0, 16).map((p, idx) => {
+                      const participantResponses = currentEvent.responses.filter(r => r.participantId === p.id).length;
+                      return (
+                        <div
+                          key={p.id}
+                          className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
+                            hasQuizScoring && idx === 0
+                              ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-200 ring-2 ring-amber-500/20'
+                              : hasQuizScoring && idx === 1
+                              ? 'bg-slate-300/20 border-2 border-slate-300 text-slate-200'
+                              : hasQuizScoring && idx === 2
+                              ? 'bg-amber-700/20 border-2 border-amber-600 text-amber-300'
+                              : 'bg-slate-800 border border-slate-700 text-slate-300'
+                          }`}
+                        >
+                          <span className="text-sm">
+                            {hasQuizScoring ? (idx === 0 ? '👑' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : p.avatarEmoji || '👋') : (p.avatarEmoji || '👋')}
+                          </span>
+                          <span>{p.name}</span>
+                          {hasQuizScoring && p.score !== undefined && p.score > 0 ? (
+                            <span className="px-1.5 py-0.5 bg-slate-900/60 rounded-md text-[10px] text-amber-300 font-mono">
+                              {p.score} pts
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 bg-slate-900/60 rounded-md text-[10px] text-indigo-300 font-mono">
+                              {participantResponses}/{currentEvent.questions.length} voted
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Host message / restart guide */}
             <p className="text-xs text-slate-500 mt-4">
@@ -506,41 +529,83 @@ export const ProjectorDisplay: React.FC = () => {
             </div>
           )}
 
-          {/* 3. 5-STAR RATING VISUALIZER */}
-          {currentQ && currentQ.type === 'rating' && (
-            <div className="max-w-3xl mx-auto bg-slate-800/60 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center backdrop-blur-md">
-              <div className="text-4xl sm:text-6xl font-black font-mono-numbers text-amber-400 mb-2">
-                {ratingStats.avg} <span className="text-lg sm:text-2xl text-slate-400">/ 5.0</span>
-              </div>
-              <div className="flex items-center justify-center space-x-1 mb-6 text-amber-400">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className={`w-7 h-7 sm:w-9 sm:h-9 ${
-                      s <= Math.round(Number(ratingStats.avg)) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
-                    }`}
-                  />
-                ))}
-              </div>
+          {/* 3. VERSATILE RATING & OPINION SCALE VISUALIZER */}
+          {currentQ && currentQ.type === 'rating' && (() => {
+            const style = currentQ.ratingStyle || 'numeric';
+            const maxVal = currentQ.ratingMax || 5;
+            const minVal = currentQ.ratingMin || 1;
+            const range = Array.from({ length: maxVal - minVal + 1 }, (_, i) => maxVal - i); // Descending for chart
+            const emojis = ['😡', '🙁', '😐', '😊', '🤩'];
+            const likertDefaults = ['Sangat Tidak Setuju', 'Tidak Setuju', 'Netral', 'Setuju', 'Sangat Setuju'];
 
-              {/* Breakdown Bars per Star Rating */}
-              <div className="space-y-2 max-w-md mx-auto">
-                {[5, 4, 3, 2, 1].map((starNum) => {
-                  const count = ratingStats.counts[starNum - 1] || 0;
-                  const pct = ratingStats.totalRatings > 0 ? Math.round((count / ratingStats.totalRatings) * 100) : 0;
-                  return (
-                    <div key={starNum} className="flex items-center space-x-3 text-xs font-semibold text-slate-300">
-                      <span className="w-12 text-right">{starNum} Stars</span>
-                      <div className="flex-1 bg-slate-700 h-3 rounded-full overflow-hidden">
-                        <div className="bg-amber-400 h-full rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+            const getStepLabel = (val: number) => {
+              const idx = val - minVal;
+              if (currentQ.ratingLabels?.[idx]) return currentQ.ratingLabels[idx];
+              if (style === 'likert') return likertDefaults[idx] || `Tingkat ${val}`;
+              if (val === minVal && currentQ.ratingMinLabel) return currentQ.ratingMinLabel;
+              if (val === maxVal && currentQ.ratingMaxLabel) return currentQ.ratingMaxLabel;
+              return `Skala ${val}`;
+            };
+
+            return (
+              <div className="max-w-3xl mx-auto bg-slate-800/60 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center backdrop-blur-md">
+                
+                {/* Main Average Score Display */}
+                <div className="mb-6">
+                  <div className="text-5xl sm:text-7xl font-black font-mono-numbers text-amber-400 mb-1 drop-shadow-md">
+                    {ratingStats.avg} <span className="text-xl sm:text-3xl text-slate-400 font-semibold">/ {maxVal}.0</span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+                    {currentQ.ratingMinLabel && currentQ.ratingMaxLabel ? (
+                      <span>{currentQ.ratingMinLabel} ➔ {currentQ.ratingMaxLabel}</span>
+                    ) : (
+                      <span>Rata-Rata Respon Audiens</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Star visualizer only when style is stars */}
+                {style === 'stars' && (
+                  <div className="flex items-center justify-center space-x-1.5 mb-6 text-amber-400">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={`w-7 h-7 sm:w-9 sm:h-9 ${
+                          s <= Math.round(Number(ratingStats.avg)) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Breakdown Bars per Rating Step */}
+                <div className="space-y-2.5 max-w-lg mx-auto">
+                  {range.map((stepVal) => {
+                    const count = ratingStats.counts[stepVal - 1] || 0;
+                    const pct = ratingStats.totalRatings > 0 ? Math.round((count / ratingStats.totalRatings) * 100) : 0;
+                    const stepLabel = getStepLabel(stepVal);
+
+                    return (
+                      <div key={stepVal} className="flex items-center space-x-3 text-xs sm:text-sm font-semibold text-slate-300">
+                        <span className="w-28 sm:w-36 text-right truncate text-slate-300 font-bold" title={stepLabel}>
+                          {style === 'emoji' ? emojis[stepVal - 1] || stepVal : `${stepVal} • ${stepLabel}`}
+                        </span>
+                        <div className="flex-1 bg-slate-700/80 h-3.5 rounded-full overflow-hidden p-0.5">
+                          <div
+                            className="bg-amber-400 h-full rounded-full transition-all duration-700 shadow-sm"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="w-14 text-left font-mono-numbers text-xs text-slate-300">
+                          {pct}% <span className="text-slate-500">({count})</span>
+                        </span>
                       </div>
-                      <span className="w-12 text-left font-mono-numbers">{pct}% ({count})</span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* 4. OPEN TEXT WATERFALL */}
           {currentQ && currentQ.type === 'open_text' && (

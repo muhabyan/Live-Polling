@@ -41,6 +41,9 @@ export const ParticipantView: React.FC = () => {
 
     // 3. Event is ended -> Summary screen
     if (currentEvent.status === 'ended') {
+      const hasQuizScoring = currentEvent.isQuizMode || currentEvent.questions.some(q => (q.points || 0) > 0 || (q.options || []).some(o => o.isCorrect));
+      const myAnswersCount = currentEvent.responses.filter(r => r.participantId === currentParticipant.id).length;
+
       return (
         <div className="w-full max-w-md mx-auto p-4 sm:p-6 text-center flex flex-col justify-center my-auto">
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
@@ -48,21 +51,35 @@ export const ParticipantView: React.FC = () => {
               <Trophy className="w-8 h-8" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2 font-display">
-              Session Completed!
+              Session Selesai!
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mb-5">
-              Thank you for participating in <strong className="text-slate-800">{currentEvent.title}</strong>.
+              Terima kasih telah berpartisipasi dalam <strong className="text-slate-800">{currentEvent.title}</strong>.
             </p>
-            <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-5">
-              <div className="text-[10px] text-amber-800 font-bold uppercase tracking-wider mb-1">
-                Your Total Score
+            
+            {hasQuizScoring ? (
+              <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-5">
+                <div className="text-[10px] text-amber-800 font-bold uppercase tracking-wider mb-1">
+                  Skor Quiz Kamu
+                </div>
+                <div className="text-3xl font-extrabold text-amber-600 font-mono-numbers">
+                  {currentParticipant.score || 0} pts
+                </div>
               </div>
-              <div className="text-3xl font-extrabold text-amber-600 font-mono-numbers">
-                {currentParticipant.score || 100} pts
+            ) : (
+              <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl mb-5">
+                <div className="text-[10px] text-indigo-800 font-bold uppercase tracking-wider mb-1">
+                  Kontribusi Partisipasi Kamu
+                </div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 font-mono-numbers">
+                  {myAnswersCount} / {currentEvent.questions.length} Soal Terjawab
+                </div>
+                <p className="text-[11px] text-indigo-500 mt-1">✓ Jawaban kamu tersimpan & terhitung secara live</p>
               </div>
-            </div>
+            )}
+
             <p className="text-xs text-slate-400">
-              The presentation has concluded. You may now close this tab.
+              Sesi presentasi telah berakhir. Kamu dapat menutup tab ini.
             </p>
           </div>
         </div>

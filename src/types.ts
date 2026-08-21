@@ -13,6 +13,8 @@ export interface QuestionOption {
   colorIndex?: number;
 }
 
+export type RatingStyle = 'numeric' | 'stars' | 'likert' | 'emoji';
+
 export interface Question {
   id: string;
   event_id?: string;
@@ -25,6 +27,8 @@ export interface Question {
   ratingMax?: number;
   ratingMinLabel?: string;
   ratingMaxLabel?: string;
+  ratingStyle?: RatingStyle;
+  ratingLabels?: string[];
   timerSeconds: number;
   allowMultiple?: boolean;
   maxWordCount?: number;
@@ -80,6 +84,7 @@ export interface EventData {
   showResultsOnProjector: boolean;
   isVotingLocked: boolean;
   revealAnswer: boolean;
+  isQuizMode?: boolean;
   questions: Question[];
   participants: Participant[];
   responses: ResponseItem[];
