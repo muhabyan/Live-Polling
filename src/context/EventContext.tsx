@@ -474,16 +474,24 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ============================================
 
   useEffect(() => {
-    if (!currentEvent?.id || !currentEvent.isTimerRunning) return;
+    if (!currentEvent?.id || !currentEvent.isTimerRunning || !currentEvent.questionStartedAt) return;
 
-    const timer = setInterval(() => {
+    const eventId = currentEvent.id;
+    const startedAt = currentEvent.questionStartedAt;
+    const totalSeconds = currentEvent.questions[currentEvent.currentQuestionIndex]?.timerSeconds
+      || currentEvent.timerRemainingSeconds
+      || 45;
+
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const remaining = Math.max(0, totalSeconds - elapsed);
+
       setEvents(prev =>
         prev.map(evt => {
-          if (evt.id !== currentEvent.id) return evt;
-          const currentQ = evt.questions[evt.currentQuestionIndex];
-          const defaultDuration = currentQ?.timerSeconds || 45;
-          const currentRemaining = evt.timerRemainingSeconds ?? defaultDuration;
-          if (currentRemaining <= 1) {
+          if (evt.id !== eventId) return evt;
+          if (remaining <= 0) {
+            // Timer expired: lock voting, freeze at 0.
+            // Do NOT auto-reset — presenter must advance manually.
             return {
               ...evt,
               timerRemainingSeconds: 0,
@@ -493,14 +501,16 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
           return {
             ...evt,
-            timerRemainingSeconds: currentRemaining - 1,
+            timerRemainingSeconds: remaining,
           };
         })
       );
-    }, 1000);
+    };
 
+    tick(); // immediate first tick
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [currentEvent?.id, currentEvent?.isTimerRunning]);
+  }, [currentEvent?.id, currentEvent?.isTimerRunning, currentEvent?.questionStartedAt]);
 
   // ============================================
   // USER ACTIONS
