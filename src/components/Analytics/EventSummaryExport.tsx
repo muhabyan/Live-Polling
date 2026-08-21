@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const EventSummaryExport: React.FC = () => {
-  const { currentEvent, sendModeratorAction, setActiveView } = useEvent();
+  const { currentEvent, sendModeratorAction, setActiveView, clearAllParticipants } = useEvent();
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [showCleanupModal, setShowCleanupModal] = useState(false);
 
@@ -103,6 +103,7 @@ export const EventSummaryExport: React.FC = () => {
   };
 
   const handleResetData = async () => {
+    await clearAllParticipants();
     await sendModeratorAction('reset_session');
     setShowCleanupModal(false);
   };

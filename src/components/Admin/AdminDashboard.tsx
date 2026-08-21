@@ -27,7 +27,8 @@ export const AdminDashboard: React.FC = () => {
     events, 
     setCurrentEventId, 
     setActiveView, 
-    refreshAllEvents 
+    refreshAllEvents,
+    deleteEvent
   } = useEvent();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -125,12 +126,11 @@ export const AdminDashboard: React.FC = () => {
 
   const handleDeleteEvent = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this event?')) {
+    if (confirm('Are you sure you want to delete this event session?')) {
       try {
-        await api.deleteEventById(id);
-        await refreshAllEvents();
+        await deleteEvent(id);
       } catch (err) {
-        console.error(err);
+        console.error('Delete event error:', err);
       }
     }
   };

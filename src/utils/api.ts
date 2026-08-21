@@ -146,71 +146,175 @@ export async function createNewEvent(eventData: {
 }) {
   const session = await getSession();
   const roomCode = eventData.roomCode?.trim()?.toUpperCase() || Math.random().toString(36).substring(2, 8).toUpperCase();
+  const newId = 'evt-' + Date.now();
 
-  const { data: event, error: evtErr } = await supabase
-    .from('events')
-    .insert({
-      room_code: roomCode,
-      title: eventData.title,
-      description: eventData.description || '',
-      category: eventData.category || 'General Session',
-      organizer_name: eventData.organizerName || 'Moderator',
-      organizer_id: session?.user?.id || null,
-      status: 'waiting',
-      timer_remaining_seconds: 45,
-      is_timer_running: false,
-      show_results_on_projector: true,
-      is_voting_locked: false,
-      reveal_answer: false,
-    })
-    .select()
-    .single();
+  const formattedQuestions: Question[] = (eventData.questions || []).map((q, i) => ({
+    id: q.id || `q-${newId}-${i + 1}`,
+    type: q.type || 'multiple_choice',
+    title: q.title || 'Question Title',
+    subtitle: q.subtitle || '',
+    timerSeconds: q.timerSeconds || 45,
+    points: q.points || (q.type === 'multiple_choice' || q.type === 'true_false' ? 100 : undefined),
+    options: q.options || [],
+    ratingMin: q.ratingMin || (q.type === 'rating' ? 1 : undefined),
+    ratingMax: q.ratingMax || (q.type === 'rating' ? 5 : undefined),
+    ratingMinLabel: q.ratingMinLabel || (q.type === 'rating' ? 'Low' : undefined),
+    ratingMaxLabel: q.ratingMaxLabel || (q.type === 'rating' ? 'High' : undefined),
+    maxWordCount: q.maxWordCount || (q.type === 'word_cloud' ? 2 : undefined),
+    allowMultiple: q.allowMultiple || false,
+  }));
 
-  if (evtErr) throw new Error(evtErr.message);
+  const localNewEvent: EventData = {
+    id: newId,
+    roomCode,
+    title: eventData.title,
+    description: eventData.description || '',
+    category: eventData.category || 'General Session',
+    organizerName: eventData.organizerName || 'Moderator',
+    createdAt: Date.now(),
+    status: 'waiting',
+    currentQuestionIndex: 0,
+    questionStartedAt: 0,
+    timerRemainingSeconds: 45,
+    isTimerRunning: false,
+    showResultsOnProjector: true,
+    isVotingLocked: false,
+    revealAnswer: false,
+    questions: formattedQuestions,
+    participants: [],
+    responses: [],
+    reactions: [],
+  };
 
-  if (eventData.questions && eventData.questions.length > 0) {
-    const qInserts = eventData.questions.map((q, i) => ({
-      event_id: event.id,
-      type: q.type || 'multiple_choice',
-      title: q.title || 'Question Title',
-      subtitle: q.subtitle || '',
-      sort_order: i,
-      timer_seconds: q.timerSeconds || 45,
-      options: q.options || [],
-      rating_min: q.ratingMin || 1,
-      rating_max: q.ratingMax || 5,
-      rating_min_label: q.ratingMinLabel || 'Low',
-      rating_max_label: q.ratingMaxLabel || 'High',
-      max_word_count: q.maxWordCount || 2,
-      allow_multiple: q.allowMultiple || false,
-    }));
-    const { error: qErr } = await supabase.from('questions').insert(qInserts);
-    if (qErr) console.warn('Questions insert warning:', qErr);
+  // Add to local store first
+  localEventsStore = [localNewEvent, ...localEventsStore];
+
+  try {
+    const { data: event, error: evtErr } = await supabase
+      .from('events')
+      .insert({
+        room_code: roomCode,
+        title: eventData.title,
+        description: eventData.description || '',
+        category: eventData.category || 'General Session',
+        organizer_name: eventData.organizerName || 'Moderator',
+        organizer_id: session?.user?.id || null,
+        status: 'waiting',
+        timer_remaining_seconds: 45,
+        is_timer_running: false,
+        show_results_on_projector: true,
+        is_voting_locked: false,
+        reveal_answer: false,
+      })
+      .select()
+      .single();
+
+    if (!evtErr && event) {
+      localNewEvent.id = event.id;
+      if (eventData.questions && eventData.questions.length > 0) {
+        const qInserts = eventData.questions.map((q, i) => ({
+          event_id: event.id,
+          type: q.type || 'multiple_choice',
+          title: q.title || 'Question Title',
+          subtitle: q.subtitle || '',
+          sort_order: i,
+          timer_seconds: q.timerSeconds || 45,
+          options: q.options || [],
+          rating_min: q.ratingMin || 1,
+          rating_max: q.ratingMax || 5,
+          rating_min_label: q.ratingMinLabel || 'Low',
+          rating_max_label: q.ratingMaxLabel || 'High',
+          max_word_count: q.maxWordCount || 2,
+          allow_multiple: q.allowMultiple || false,
+        }));
+        await supabase.from('questions').insert(qInserts);
+      }
+      return event;
+    }
+  } catch (err) {
+    console.warn('Supabase create event fallback to local store:', err);
   }
 
-  return event;
+  return localNewEvent;
 }
 
 export async function updateExistingEvent(id: string, eventData: Partial<EventData>) {
-  const { data, error } = await supabase
-    .from('events')
-    .update(eventData)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return data;
+  const localEvt = localEventsStore.find(e => e.id === id);
+  if (localEvt) {
+    Object.assign(localEvt, eventData);
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .update(eventData)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) console.warn('Supabase updateExistingEvent warning:', error.message);
+    return data || localEvt;
+  } catch {
+    return localEvt;
+  }
 }
 
 export async function deleteEventById(id: string) {
-  await Promise.all([
-    supabase.from('responses').delete().eq('event_id', id),
-    supabase.from('participants').delete().eq('event_id', id),
-    supabase.from('reactions').delete().eq('event_id', id),
-    supabase.from('questions').delete().eq('event_id', id),
-  ]);
-  const { error } = await supabase.from('events').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  // 1. Immediately delete from local store
+  localEventsStore = localEventsStore.filter(e => e.id !== id);
+
+  // 2. Cascade delete from Supabase
+  try {
+    await Promise.allSettled([
+      supabase.from('responses').delete().eq('event_id', id),
+      supabase.from('participants').delete().eq('event_id', id),
+      supabase.from('reactions').delete().eq('event_id', id),
+      supabase.from('questions').delete().eq('event_id', id),
+    ]);
+    const { error } = await supabase.from('events').delete().eq('id', id);
+    if (error) console.warn('Supabase delete event notice:', error.message);
+  } catch (err) {
+    console.warn('Supabase delete event fallback:', err);
+  }
+}
+
+export async function deleteParticipantById(eventId: string, participantId: string) {
+  // 1. Remove from local store
+  const localEvt = localEventsStore.find(e => e.id === eventId);
+  if (localEvt) {
+    localEvt.participants = localEvt.participants.filter(p => p.id !== participantId);
+    localEvt.responses = localEvt.responses.filter(r => r.participantId !== participantId);
+  }
+
+  // 2. Remove from Supabase
+  try {
+    await Promise.allSettled([
+      supabase.from('responses').delete().eq('participant_id', participantId),
+      supabase.from('participants').delete().eq('id', participantId),
+    ]);
+  } catch (err) {
+    console.warn('Supabase delete participant warning:', err);
+  }
+}
+
+export async function clearAllParticipantsAndResponses(eventId: string) {
+  // 1. Clear in local store
+  const localEvt = localEventsStore.find(e => e.id === eventId);
+  if (localEvt) {
+    localEvt.participants = [];
+    localEvt.responses = [];
+    localEvt.reactions = [];
+  }
+
+  // 2. Clear in Supabase
+  try {
+    await Promise.allSettled([
+      supabase.from('responses').delete().eq('event_id', eventId),
+      supabase.from('participants').delete().eq('event_id', eventId),
+      supabase.from('reactions').delete().eq('event_id', eventId),
+    ]);
+  } catch (err) {
+    console.warn('Supabase clear participants warning:', err);
+  }
 }
 
 // ============================================

@@ -42,6 +42,9 @@ interface EventContextType {
     timeTakenSeconds?: number;
   }) => Promise<void>;
   sendModeratorAction: (action: string, payload?: any) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  deleteParticipant: (participantId: string) => Promise<void>;
+  clearAllParticipants: () => Promise<void>;
   sendReaction: (emoji: string) => void;
   simulateAudienceVotes: (count?: number) => Promise<void>;
   fireConfetti: () => void;
@@ -488,6 +491,46 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     api.sendReactionDirect(currentEvent.id, emoji, name);
   };
 
+  const deleteEvent = async (id: string) => {
+    setEvents(prev => prev.filter(e => e.id !== id));
+    setCurrentEventIdState(prev => {
+      const remaining = events.filter(e => e.id !== id);
+      return remaining.length > 0 ? remaining[0].id : '';
+    });
+    await api.deleteEventById(id);
+  };
+
+  const deleteParticipant = async (participantId: string) => {
+    if (!currentEvent) return;
+    setEvents(prev =>
+      prev.map(e => {
+        if (e.id !== currentEvent.id) return e;
+        return {
+          ...e,
+          participants: e.participants.filter(p => p.id !== participantId),
+          responses: e.responses.filter(r => r.participantId !== participantId),
+        };
+      })
+    );
+    await api.deleteParticipantById(currentEvent.id, participantId);
+  };
+
+  const clearAllParticipants = async () => {
+    if (!currentEvent) return;
+    setEvents(prev =>
+      prev.map(e => {
+        if (e.id !== currentEvent.id) return e;
+        return {
+          ...e,
+          participants: [],
+          responses: [],
+          reactions: [],
+        };
+      })
+    );
+    await api.clearAllParticipantsAndResponses(currentEvent.id);
+  };
+
   const simulateAudienceVotes = async (count: number = 10) => {
     if (!currentEvent) return;
     setIsSimulatingCrowd(true);
@@ -534,6 +577,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         leaveRoom,
         submitAnswer,
         sendModeratorAction,
+        deleteEvent,
+        deleteParticipant,
+        clearAllParticipants,
         sendReaction,
         simulateAudienceVotes,
         fireConfetti,

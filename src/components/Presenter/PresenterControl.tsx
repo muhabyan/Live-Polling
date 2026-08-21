@@ -34,7 +34,9 @@ export const PresenterControl: React.FC = () => {
     simulateAudienceVotes, 
     isSimulatingCrowd,
     setActiveView,
-    refreshEvent
+    refreshEvent,
+    deleteParticipant,
+    clearAllParticipants
   } = useEvent();
 
   const [isSummarizingAI, setIsSummarizingAI] = useState(false);
@@ -544,8 +546,8 @@ export const PresenterControl: React.FC = () => {
                   <button
                     onClick={async () => {
                       if (window.confirm(`Clear all ${currentEvent.participants.length} connected participants and reset votes?`)) {
+                        await clearAllParticipants();
                         await sendModeratorAction('reset_session');
-                        await refreshEvent();
                       }
                     }}
                     className="text-xs text-rose-600 hover:text-rose-700 font-semibold hover:underline flex items-center space-x-1 cursor-pointer"
@@ -565,7 +567,7 @@ export const PresenterControl: React.FC = () => {
                 currentEvent.participants.slice(-8).reverse().map((p) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 text-xs"
+                    className="flex items-center justify-between p-2 bg-slate-50 hover:bg-slate-100/80 transition-colors rounded-xl border border-slate-100 text-xs group"
                   >
                     <div className="flex items-center space-x-2">
                       <div
@@ -576,9 +578,18 @@ export const PresenterControl: React.FC = () => {
                       </div>
                       <span className="font-semibold text-slate-800">{p.name}</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono-numbers">
-                      {p.score ? `${p.score} pts` : 'Active'}
-                    </span>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-[10px] text-slate-400 font-mono-numbers">
+                        {p.score ? `${p.score} pts` : 'Active'}
+                      </span>
+                      <button
+                        onClick={() => deleteParticipant(p.id)}
+                        className="p-1 text-slate-300 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                        title="Remove participant"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
