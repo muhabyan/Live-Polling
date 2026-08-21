@@ -475,9 +475,12 @@ export async function submitQuestionResponse(
 export async function sendControlAction(eventId: string, action: string, payload?: any) {
   const localEvt = localEventsStore.find(e => e.id === eventId);
   
+  // Use enriched timerSeconds from payload (sent by EventContext) as primary source,
+  // fall back to localEventsStore questions, then default 45
   const getQuestionTimer = (index: number) => {
-    if (!localEvt || !localEvt.questions || !localEvt.questions[index]) return 45;
-    return localEvt.questions[index].timerSeconds || 45;
+    if (payload?.timerSeconds) return payload.timerSeconds;
+    if (localEvt?.questions?.[index]?.timerSeconds) return localEvt.questions[index].timerSeconds;
+    return 45;
   };
 
   if (localEvt) {
@@ -567,17 +570,25 @@ export async function sendControlAction(eventId: string, action: string, payload
   }
 
   try {
-    const { data: event } = await supabase
-      .from('events')
-      .select('*')
-      .eq('id', eventId)
-      .single();
+    const [{ data: event }, { data: dbQuestions }] = await Promise.all([
+      supabase.from('events').select('*').eq('id', eventId).single(),
+      supabase.from('questions').select('*').eq('event_id', eventId).order('sort_order'),
+    ]);
 
     if (!event) return;
 
+    // Build a reliable timer lookup from actual DB questions
+    const qTimerFromDb = (idx: number) => {
+      if (payload?.timerSeconds) return payload.timerSeconds;
+      const q = dbQuestions?.[idx];
+      if (q?.timer_seconds) return q.timer_seconds;
+      if (localEvt?.questions?.[idx]?.timerSeconds) return localEvt.questions[idx].timerSeconds;
+      return 45;
+    };
+
     let updates: any = {};
     const qIdx = event.current_question_index ?? 0;
-    const currentQTimer = getQuestionTimer(qIdx);
+    const currentQTimer = qTimerFromDb(qIdx);
 
     switch (action) {
       case 'start_session':
@@ -585,7 +596,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           status: 'live',
           is_timer_running: true,
           question_started_at: new Date().toISOString(),
-          timer_remaining_seconds: event.timer_remaining_seconds || currentQTimer,
+          timer_remaining_seconds: event.timer_remaining_seconds || qTimerFromDb(0),
           is_voting_locked: false,
         };
         break;
@@ -601,7 +612,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           is_voting_locked: false,
           show_results_on_projector: true,
           reveal_answer: false,
-          timer_remaining_seconds: getQuestionTimer(0),
+          timer_remaining_seconds: qTimerFromDb(0),
         };
         await Promise.all([
           supabase.from('responses').delete().eq('event_id', eventId),
@@ -615,7 +626,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           current_question_index: nextIdx,
           is_timer_running: false,
           question_started_at: new Date().toISOString(),
-          timer_remaining_seconds: getQuestionTimer(nextIdx),
+          timer_remaining_seconds: qTimerFromDb(nextIdx),
           is_voting_locked: false,
           show_results_on_projector: true,
           reveal_answer: false,
@@ -628,7 +639,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           current_question_index: prevIdx,
           is_timer_running: false,
           question_started_at: new Date().toISOString(),
-          timer_remaining_seconds: getQuestionTimer(prevIdx),
+          timer_remaining_seconds: qTimerFromDb(prevIdx),
           is_voting_locked: false,
           show_results_on_projector: true,
           reveal_answer: false,
@@ -641,7 +652,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           current_question_index: jumpIdx,
           is_timer_running: false,
           question_started_at: new Date().toISOString(),
-          timer_remaining_seconds: getQuestionTimer(jumpIdx),
+          timer_remaining_seconds: qTimerFromDb(jumpIdx),
           is_voting_locked: false,
           show_results_on_projector: true,
           reveal_answer: false,

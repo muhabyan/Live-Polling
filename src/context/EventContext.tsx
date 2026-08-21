@@ -207,13 +207,20 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // SUPABASE REALTIME SUBSCRIPTIONS
   // ============================================
 
-  // 1. Global subscription for all events changes
+  // 1. Global subscription for new/deleted events only (NOT updates — those are handled per-event)
   useEffect(() => {
     const globalChannel = supabase
       .channel('global-events-sync')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'events' },
+        { event: 'INSERT', schema: 'public', table: 'events' },
+        () => {
+          refreshAllEvents();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'events' },
         () => {
           refreshAllEvents();
         }
@@ -371,6 +378,15 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [currentEventId, refreshEvent]);
 
+  // 3. Periodic lightweight heartbeat polling (ensures participants & responses stay 100% in sync even if websockets drop)
+  useEffect(() => {
+    if (!currentEventId) return;
+    const interval = setInterval(() => {
+      refreshEvent();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [currentEventId, refreshEvent]);
+
   // ============================================
   // SYNCHRONIZED COUNTDOWN TIMER TICKER
   // ============================================
@@ -422,6 +438,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setCurrentEventIdState(res.eventId);
         const fullEvent = await api.fetchFullEvent(res.eventId);
         if (fullEvent) {
+          if (!fullEvent.participants.some(p => p.id === res.participant.id)) {
+            fullEvent.participants = [...fullEvent.participants, res.participant];
+          }
           setEvents(prev => {
             const exists = prev.some(e => e.id === fullEvent.id);
             return exists ? prev.map(e => e.id === fullEvent.id ? fullEvent : e) : [fullEvent, ...prev];
@@ -447,6 +466,34 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     timeTakenSeconds?: number;
   }) => {
     if (!currentEvent || !currentParticipant) return;
+
+    // Optimistically insert response into state so participant UI immediately confirms
+    const optimisticResp: ResponseItem = {
+      id: 'resp-' + Date.now(),
+      event_id: currentEvent.id,
+      participantId: currentParticipant.id,
+      participantName: currentParticipant.name,
+      questionId: payload.questionId,
+      selectedOptionIds: payload.selectedOptionIds || [],
+      textResponse: payload.textResponse,
+      ratingValue: payload.ratingValue,
+      timeTakenSeconds: payload.timeTakenSeconds || 0,
+      submittedAt: Date.now(),
+    };
+
+    setEvents(prev =>
+      prev.map(evt => {
+        if (evt.id !== currentEvent.id) return evt;
+        const filtered = evt.responses.filter(
+          r => !(r.participantId === currentParticipant.id && r.questionId === payload.questionId)
+        );
+        return {
+          ...evt,
+          responses: [...filtered, optimisticResp],
+        };
+      })
+    );
+
     try {
       await api.submitQuestionResponse(currentEvent.id, {
         participantId: currentParticipant.id,
