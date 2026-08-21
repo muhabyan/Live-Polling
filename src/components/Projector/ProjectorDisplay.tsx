@@ -147,8 +147,8 @@ export const ProjectorDisplay: React.FC = () => {
       {/* Top Projector Stage Bar */}
       <header className="flex items-center justify-between pb-4 sm:pb-6 border-b border-slate-800/80 gap-3">
         
-        {/* Left: Branding & Session Progress */}
-        <div className="flex items-center space-x-3">
+        {/* Left: Branding & Session Progress & Live Participants */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <BrandLogo size="sm" showText={false} theme="dark" />
           <div>
             <div className="flex items-center space-x-2">
@@ -162,6 +162,15 @@ export const ProjectorDisplay: React.FC = () => {
             <div className="text-xs text-slate-500 font-medium">
               Live Interactive Screen
             </div>
+          </div>
+
+          {/* Connected Participants Counter Badge on Projector */}
+          <div className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/90 border border-slate-700/80 rounded-xl text-xs font-semibold text-slate-200 shadow-sm">
+            <Users className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="font-mono-numbers font-bold text-white text-sm">
+              {currentEvent.participants.length}
+            </span>
+            <span className="text-slate-400 text-xs hidden sm:inline">joined</span>
           </div>
         </div>
 
