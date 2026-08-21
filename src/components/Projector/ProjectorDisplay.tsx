@@ -525,6 +525,7 @@ export const ProjectorDisplay: React.FC = () => {
                 const color = colors[idx % colors.length];
                 const isCorrect = opt.isCorrect;
                 const isRevealed = currentEvent.revealAnswer;
+                const showResults = currentEvent.showResultsOnProjector;
 
                 return (
                   <div
@@ -537,12 +538,12 @@ export const ProjectorDisplay: React.FC = () => {
                         : 'border-slate-700/80 bg-slate-800/60 shadow-lg'
                     }`}
                   >
-                    {/* Real-time Percentage Bar Fill */}
+                    {/* Real-time Percentage Bar Fill (Only expands when showResults is true) */}
                     <div
                       className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out opacity-25 ${
                         isRevealed && isCorrect ? 'bg-emerald-400' : color.bg
                       }`}
-                      style={{ width: `${pct}%` }}
+                      style={{ width: showResults ? `${pct}%` : '0%' }}
                     />
 
                     {/* Option Content */}
@@ -560,7 +561,7 @@ export const ProjectorDisplay: React.FC = () => {
 
                       {/* Vote Count & Percent */}
                       <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-                        {currentEvent.showResultsOnProjector && (
+                        {showResults ? (
                           <>
                             <span className="text-xl sm:text-3xl font-black font-mono-numbers tracking-tight text-white">
                               {pct}%
@@ -569,6 +570,10 @@ export const ProjectorDisplay: React.FC = () => {
                               ({count})
                             </span>
                           </>
+                        ) : (
+                          <span className="text-xs font-mono font-semibold text-slate-500 bg-slate-900/60 px-2.5 py-1 rounded-md">
+                            ●●●
+                          </span>
                         )}
                       </div>
                     </div>
@@ -581,7 +586,13 @@ export const ProjectorDisplay: React.FC = () => {
           {/* 2. WORD CLOUD VISUALIZER */}
           {currentQ && currentQ.type === 'word_cloud' && (
             <div className="max-w-4xl mx-auto min-h-[300px] flex flex-wrap items-center justify-center gap-3 sm:gap-5 p-6 bg-slate-800/40 rounded-3xl border border-slate-700/60 backdrop-blur-md">
-              {wordCloudWords.length === 0 ? (
+              {!currentEvent.showResultsOnProjector ? (
+                <div className="text-center text-slate-400 py-12">
+                  <MessageSquare className="w-10 h-10 text-indigo-400 mx-auto mb-2 animate-pulse" />
+                  <p className="text-lg font-bold text-white">Word Cloud sedang dikumpulkan</p>
+                  <p className="text-xs text-slate-400 mt-1">{totalResponses} kata masuk • Hasil disembunyikan oleh presenter</p>
+                </div>
+              ) : wordCloudWords.length === 0 ? (
                 <div className="text-center text-slate-500 py-12">
                   <Sparkles className="w-10 h-10 text-indigo-400 mx-auto mb-2 animate-bounce" />
                   <p className="text-lg font-bold text-slate-300">Audience Word Cloud Active</p>
@@ -629,59 +640,70 @@ export const ProjectorDisplay: React.FC = () => {
             return (
               <div className="max-w-3xl mx-auto bg-slate-800/60 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center backdrop-blur-md">
                 
-                {/* Main Average Score Display */}
-                <div className="mb-6">
-                  <div className="text-5xl sm:text-7xl font-black font-mono-numbers text-amber-400 mb-1 drop-shadow-md">
-                    {ratingStats.avg} <span className="text-xl sm:text-3xl text-slate-400 font-semibold">/ {maxVal}.0</span>
+                {!currentEvent.showResultsOnProjector ? (
+                  <div className="py-8">
+                    <Star className="w-12 h-12 text-amber-400 mx-auto mb-2 animate-pulse" />
+                    <h3 className="text-xl font-bold text-white mb-1">Voting Rating Berlangsung</h3>
+                    <p className="text-xs text-slate-400">{totalResponses} audiens telah memberi nilai • Hasil disembunyikan</p>
                   </div>
-                  <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">
-                    {currentQ.ratingMinLabel && currentQ.ratingMaxLabel ? (
-                      <span>{currentQ.ratingMinLabel} ➔ {currentQ.ratingMaxLabel}</span>
-                    ) : (
-                      <span>Rata-Rata Respon Audiens</span>
-                    )}
-                  </div>
-                </div>
+                ) : (
+                  <>
+                    {/* Main Average Score Display */}
+                    <div className="mb-6">
+                      <div className="text-5xl sm:text-7xl font-black font-mono-numbers text-amber-400 mb-1 drop-shadow-md">
+                        {ratingStats.avg} <span className="text-xl sm:text-3xl text-slate-400 font-semibold">/ {maxVal}.0</span>
+                      </div>
+                      <div className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">
+                        {currentQ.ratingMinLabel && currentQ.ratingMaxLabel ? (
+                          <span>{currentQ.ratingMinLabel} ➔ {currentQ.ratingMaxLabel}</span>
+                        ) : (
+                          <span>Rata-Rata Respon Audiens</span>
+                        )}
+                      </div>
+                    </div>
 
-                {/* Star visualizer only when style is stars */}
-                {style === 'stars' && (
-                  <div className="flex items-center justify-center space-x-1.5 mb-6 text-amber-400">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
-                        key={s}
-                        className={`w-7 h-7 sm:w-9 sm:h-9 ${
-                          s <= Math.round(Number(ratingStats.avg)) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
-                        }`}
-                      />
-                    ))}
-                  </div>
+                    {/* Star visualizer only when style is stars */}
+                    {style === 'stars' && (
+                      <div className="flex items-center justify-center space-x-1.5 mb-6 text-amber-400">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`w-7 h-7 sm:w-9 sm:h-9 ${
+                              s <= Math.round(Number(ratingStats.avg)) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Breakdown Bars per Rating Step */}
+                    <div className="space-y-2.5 max-w-lg mx-auto">
+                      {range.map((stepVal) => {
+                        const count = ratingStats.counts[stepVal - 1] || 0;
+                        const pct = ratingStats.totalRatings > 0 ? Math.round((count / ratingStats.totalRatings) * 100) : 0;
+                        const stepLabel = getStepLabel(stepVal);
+
+                        return (
+                          <div key={stepVal} className="flex items-center space-x-3 text-xs sm:text-sm font-semibold text-slate-300">
+                            <span className="w-28 sm:w-36 text-right truncate text-slate-300 font-bold" title={stepLabel}>
+                              {style === 'emoji' ? emojis[stepVal - 1] || stepVal : `${stepVal} • ${stepLabel}`}
+                            </span>
+                            <div className="flex-1 bg-slate-700/80 h-3.5 rounded-full overflow-hidden p-0.5">
+                              <div
+                                className="bg-amber-400 h-full rounded-full transition-all duration-700 shadow-sm"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="w-14 text-left font-mono-numbers text-xs text-slate-300">
+                              {pct}% <span className="text-slate-500">({count})</span>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
                 )}
 
-                {/* Breakdown Bars per Rating Step */}
-                <div className="space-y-2.5 max-w-lg mx-auto">
-                  {range.map((stepVal) => {
-                    const count = ratingStats.counts[stepVal - 1] || 0;
-                    const pct = ratingStats.totalRatings > 0 ? Math.round((count / ratingStats.totalRatings) * 100) : 0;
-                    const stepLabel = getStepLabel(stepVal);
-
-                    return (
-                      <div key={stepVal} className="flex items-center space-x-3 text-xs sm:text-sm font-semibold text-slate-300">
-                        <span className="w-28 sm:w-36 text-right truncate text-slate-300 font-bold" title={stepLabel}>
-                          {style === 'emoji' ? emojis[stepVal - 1] || stepVal : `${stepVal} • ${stepLabel}`}
-                        </span>
-                        <div className="flex-1 bg-slate-700/80 h-3.5 rounded-full overflow-hidden p-0.5">
-                          <div
-                            className="bg-amber-400 h-full rounded-full transition-all duration-700 shadow-sm"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <span className="w-14 text-left font-mono-numbers text-xs text-slate-300">
-                          {pct}% <span className="text-slate-500">({count})</span>
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
             );
           })()}
@@ -689,7 +711,13 @@ export const ProjectorDisplay: React.FC = () => {
           {/* 4. OPEN TEXT WATERFALL */}
           {currentQ && currentQ.type === 'open_text' && (
             <div className="max-w-3xl mx-auto">
-              {responses.length === 0 ? (
+              {!currentEvent.showResultsOnProjector ? (
+                <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-8 text-center text-slate-400">
+                  <MessageSquare className="w-10 h-10 text-indigo-400 mx-auto mb-2.5 animate-pulse" />
+                  <p className="text-lg font-bold text-white">Tanggapan Terbuka Sedang Dikumpulkan</p>
+                  <p className="text-xs text-slate-400 mt-1">{responses.length} tanggapan masuk • Hasil disembunyikan oleh presenter</p>
+                </div>
+              ) : responses.length === 0 ? (
                 <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-8 text-center text-slate-400">
                   <MessageSquare className="w-10 h-10 text-slate-600 mx-auto mb-2.5 animate-pulse" />
                   <p className="text-lg font-bold">Waiting for open audience submissions...</p>
@@ -700,7 +728,7 @@ export const ProjectorDisplay: React.FC = () => {
                   {responses.map((r) => (
                     <div
                       key={r.id}
-                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 shadow-sm flex flex-col justify-between"
+                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 shadow-sm flex flex-col justify-between animate-in fade-in"
                     >
                       <p className="text-sm sm:text-base font-semibold text-white leading-relaxed mb-2">
                         "{r.textResponse}"
