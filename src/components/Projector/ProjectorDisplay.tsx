@@ -16,6 +16,7 @@ import { BrandLogo } from '../Shared/BrandLogo';
 export const ProjectorDisplay: React.FC = () => {
   const { currentEvent, fireConfetti, setActiveView, isHost } = useEvent();
   const miniQrRef = useRef<HTMLCanvasElement | null>(null);
+  const lobbyQrRef = useRef<HTMLCanvasElement | null>(null);
 
   // Press ESC to exit Projector mode anytime cleanly
   useEffect(() => {
@@ -45,17 +46,26 @@ export const ProjectorDisplay: React.FC = () => {
     }
   }, [currentEvent?.revealAnswer, fireConfetti]);
 
-  // Render Mini QR Code for projector top corner
+  // Render QR Codes for projector (Mini top bar and Large Lobby stage)
   useEffect(() => {
-    if (currentEvent && miniQrRef.current) {
+    if (currentEvent) {
       const joinUrl = `${window.location.origin}/?code=${currentEvent.roomCode}`;
-      QRCode.toCanvas(miniQrRef.current, joinUrl, {
-        width: 72,
-        margin: 1,
-        color: { dark: '#0F172A', light: '#FFFFFF' },
-      });
+      if (miniQrRef.current) {
+        QRCode.toCanvas(miniQrRef.current, joinUrl, {
+          width: 72,
+          margin: 1,
+          color: { dark: '#0F172A', light: '#FFFFFF' },
+        });
+      }
+      if (lobbyQrRef.current) {
+        QRCode.toCanvas(lobbyQrRef.current, joinUrl, {
+          width: 200,
+          margin: 1,
+          color: { dark: '#0F172A', light: '#FFFFFF' },
+        });
+      }
     }
-  }, [currentEvent]);
+  }, [currentEvent, currentEvent?.status]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -203,219 +213,255 @@ export const ProjectorDisplay: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Question & Live Results Visualizer */}
-      <main className="my-auto py-6 sm:py-8 max-w-5xl mx-auto w-full">
-        
-        {/* Large Distance-Readable Question Title */}
-        <div className="mb-6 sm:mb-10 text-center">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto font-display drop-shadow-sm">
-            {currentQ.title}
-          </h2>
-          {currentQ.subtitle && (
-            <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-2xl mx-auto">
-              {currentQ.subtitle}
+      {/* 0. LOBBY WAITING STAGE (When session is in lobby waiting to start) */}
+      {currentEvent.status === 'waiting' ? (
+        <main className="my-auto py-6 sm:py-8 max-w-4xl mx-auto w-full text-center">
+          <div className="bg-slate-900/80 border border-slate-800/90 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            
+            {/* Header Badge */}
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 rounded-full text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
+              <Radio className="w-3.5 h-3.5" />
+              <span>Live Room Open • Scan & Join</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-display mb-2">
+              {currentEvent.title}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mb-6">
+              Join the live interaction from your phone. Polling will begin shortly.
             </p>
-          )}
-        </div>
 
-        {/* 1. MULTIPLE CHOICE & TRUE/FALSE VISUALIZER */}
-        {(currentQ.type === 'multiple_choice' || currentQ.type === 'true_false') && (
-          <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
-            {(currentQ.options || []).map((opt, idx) => {
-              const count = optionStats[opt.id] || 0;
-              const pct = totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0;
-              const color = colors[idx % colors.length];
-              const isCorrect = opt.isCorrect;
-              const isRevealed = currentEvent.revealAnswer;
+            {/* Giant QR & PIN Display */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 my-4">
+              <div className="bg-white p-3 rounded-2xl shadow-xl">
+                <canvas ref={lobbyQrRef} className="w-44 h-44 sm:w-52 sm:h-52" />
+              </div>
 
-              return (
-                <div
-                  key={opt.id}
-                  className={`relative overflow-hidden rounded-2xl border transition-all duration-300 p-4 sm:p-5 ${
-                    isRevealed && isCorrect
-                      ? 'border-emerald-400 bg-emerald-950/60 ring-2 ring-emerald-500/30'
-                      : isRevealed && !isCorrect
-                      ? 'border-slate-800/80 bg-slate-900/40 opacity-40'
-                      : 'border-slate-700/80 bg-slate-800/60 shadow-lg'
-                  }`}
-                >
-                  {/* Real-time Percentage Bar Fill */}
-                  <div
-                    className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out opacity-25 ${
-                      isRevealed && isCorrect ? 'bg-emerald-400' : color.bg
-                    }`}
-                    style={{ width: `${pct}%` }}
-                  />
-
-                  {/* Option Content */}
-                  <div className="relative z-10 flex items-center justify-between gap-3">
-                    <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 pr-2">
-                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 shadow-xs ${
-                        isRevealed && isCorrect ? 'bg-emerald-500 text-white' : `${color.bg} ${color.text}`
-                      }`}>
-                        {['A', 'B', 'C', 'D', 'E', 'F'][idx] || idx + 1}
-                      </div>
-                      <span className="text-base sm:text-xl font-bold text-white tracking-wide truncate">
-                        {opt.text}
-                      </span>
-                      {isRevealed && isCorrect && (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-500/40 shrink-0">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Correct</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Percentage & Vote Count */}
-                    <div className="text-right shrink-0">
-                      <div className="text-xl sm:text-2xl font-black font-mono-numbers text-white">
-                        {pct}%
-                      </div>
-                      <div className="text-[11px] text-slate-400 font-semibold font-mono-numbers">
-                        {count} {count === 1 ? 'vote' : 'votes'}
-                      </div>
-                    </div>
+              <div className="text-left space-y-3">
+                <div className="p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl">
+                  <div className="text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">
+                    1. Open on your mobile
+                  </div>
+                  <div className="text-base sm:text-lg font-bold text-indigo-400 font-mono">
+                    {window.location.host}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
 
-        {/* 2. WORD CLOUD VISUALIZER */}
-        {currentQ.type === 'word_cloud' && (
-          <div className="bg-slate-800/50 border border-slate-700/80 rounded-3xl p-6 sm:p-10 min-h-[320px] flex flex-wrap items-center justify-center gap-3 sm:gap-5 shadow-lg relative overflow-hidden">
-            {wordCloudWords.length === 0 ? (
-              <div className="text-center text-slate-500 py-10">
-                <Sparkles className="w-10 h-10 text-indigo-400 mx-auto mb-2.5 animate-pulse" />
-                <p className="text-lg font-bold text-slate-300">Waiting for word cloud submissions...</p>
-                <p className="text-xs text-slate-500 mt-1">Submit keywords on your mobile device.</p>
+                <div className="p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl">
+                  <div className="text-[11px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">
+                    2. Enter Room PIN
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white font-mono-numbers tracking-widest">
+                    {currentEvent.roomCode}
+                  </div>
+                </div>
               </div>
-            ) : (
-              wordCloudWords.map((item, idx) => {
-                const sizeWeight = (item.count / maxWordCount);
-                const fontSize = Math.max(16, Math.min(52, 16 + sizeWeight * 36));
-                const wordColors = [
-                  'text-indigo-200 bg-indigo-500/20 border-indigo-500/30',
-                  'text-teal-200 bg-teal-500/20 border-teal-500/30',
-                  'text-purple-200 bg-purple-500/20 border-purple-500/30',
-                  'text-amber-200 bg-amber-500/20 border-amber-500/30',
-                ];
-                const colorStyle = wordColors[idx % wordColors.length];
+            </div>
+
+            {/* Connected Participants Counter & Avatar Bar */}
+            <div className="mt-6 pt-5 border-t border-slate-800 flex flex-col items-center justify-center">
+              <div className="flex items-center space-x-2 text-xs sm:text-sm font-bold text-slate-300 mb-2.5">
+                <Users className="w-4 h-4 text-indigo-400" />
+                <span className="text-white text-sm sm:text-base font-mono-numbers">{currentEvent.participants.length}</span>
+                <span>attendees ready in lobby</span>
+              </div>
+
+              {currentEvent.participants.length > 0 ? (
+                <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg max-h-20 overflow-y-auto scrollbar-none py-1">
+                  {currentEvent.participants.slice(-12).reverse().map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center space-x-1.5 px-3 py-1 bg-slate-800/90 border border-slate-700 rounded-full text-xs text-slate-200 animate-in fade-in zoom-in-95"
+                    >
+                      <span className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px]" style={{ backgroundColor: p.avatarBg }}>
+                        {p.avatarEmoji || '👋'}
+                      </span>
+                      <span className="font-semibold">{p.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">Scan QR code above with your camera to join instantly.</p>
+              )}
+            </div>
+
+          </div>
+        </main>
+      ) : (
+        /* Main Question & Live Results Visualizer */
+        <main className="my-auto py-6 sm:py-8 max-w-5xl mx-auto w-full">
+          
+          {/* Large Distance-Readable Question Title */}
+          <div className="mb-6 sm:mb-10 text-center">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto font-display drop-shadow-sm">
+              {currentQ?.title}
+            </h2>
+            {currentQ?.subtitle && (
+              <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-2xl mx-auto">
+                {currentQ.subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* 1. MULTIPLE CHOICE & TRUE/FALSE VISUALIZER */}
+          {currentQ && (currentQ.type === 'multiple_choice' || currentQ.type === 'true_false') && (
+            <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+              {(currentQ.options || []).map((opt, idx) => {
+                const count = optionStats[opt.id] || 0;
+                const pct = totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0;
+                const color = colors[idx % colors.length];
+                const isCorrect = opt.isCorrect;
+                const isRevealed = currentEvent.revealAnswer;
 
                 return (
                   <div
-                    key={item.text}
-                    className={`inline-flex items-center space-x-2 px-4 py-2 rounded-2xl border backdrop-blur-xs transition-all duration-300 hover:scale-105 shadow-xs ${colorStyle}`}
-                    style={{ fontSize: `${fontSize}px`, fontWeight: sizeWeight > 0.4 ? 800 : 600 }}
+                    key={opt.id}
+                    className={`relative overflow-hidden rounded-2xl border transition-all duration-300 p-4 sm:p-5 ${
+                      isRevealed && isCorrect
+                        ? 'border-emerald-400 bg-emerald-950/60 ring-2 ring-emerald-500/30'
+                        : isRevealed && !isCorrect
+                        ? 'border-slate-800/80 bg-slate-900/40 opacity-40'
+                        : 'border-slate-700/80 bg-slate-800/60 shadow-lg'
+                    }`}
                   >
-                    <span>{item.text}</span>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white font-mono-numbers">
-                      {item.count}
-                    </span>
+                    {/* Real-time Percentage Bar Fill */}
+                    <div
+                      className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out opacity-25 ${
+                        isRevealed && isCorrect ? 'bg-emerald-400' : color.bg
+                      }`}
+                      style={{ width: `${pct}%` }}
+                    />
+
+                    {/* Option Content */}
+                    <div className="relative z-10 flex items-center justify-between gap-3">
+                      <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 pr-2">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0 shadow-xs ${
+                          isRevealed && isCorrect ? 'bg-emerald-500 text-white' : `${color.bg} ${color.text}`
+                        }`}>
+                          {isRevealed && isCorrect ? '✓' : ['A', 'B', 'C', 'D', 'E', 'F'][idx] || idx + 1}
+                        </div>
+                        <span className="text-base sm:text-xl font-bold text-white leading-snug">
+                          {opt.text}
+                        </span>
+                      </div>
+
+                      {/* Vote Count & Percent */}
+                      <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                        {currentEvent.showResultsOnProjector && (
+                          <>
+                            <span className="text-xl sm:text-3xl font-black font-mono-numbers tracking-tight text-white">
+                              {pct}%
+                            </span>
+                            <span className="text-xs sm:text-sm text-slate-400 font-mono-numbers">
+                              ({count})
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 );
-              })
-            )}
-          </div>
-        )}
+              })}
+            </div>
+          )}
 
-        {/* 3. RATING SCALE VISUALIZER */}
-        {currentQ.type === 'rating' && (
-          <div className="max-w-3xl mx-auto bg-slate-800/60 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-6">
-              
-              {/* Average Score Display */}
-              <div className="text-center md:border-r border-slate-700 md:pr-6">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">
-                  Average Rating
+          {/* 2. WORD CLOUD VISUALIZER */}
+          {currentQ && currentQ.type === 'word_cloud' && (
+            <div className="max-w-4xl mx-auto min-h-[300px] flex flex-wrap items-center justify-center gap-3 sm:gap-5 p-6 bg-slate-800/40 rounded-3xl border border-slate-700/60 backdrop-blur-md">
+              {wordCloudWords.length === 0 ? (
+                <div className="text-center text-slate-500 py-12">
+                  <Sparkles className="w-10 h-10 text-indigo-400 mx-auto mb-2 animate-bounce" />
+                  <p className="text-lg font-bold text-slate-300">Audience Word Cloud Active</p>
+                  <p className="text-xs text-slate-500 mt-1">Submit keywords on your device to watch the cloud grow live.</p>
                 </div>
-                <div className="text-5xl sm:text-6xl font-black text-amber-400 font-mono-numbers">
-                  {ratingStats.avg}
-                </div>
-                <div className="flex items-center justify-center space-x-1 my-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-5 h-5 ${
-                        star <= Math.round(Number(ratingStats.avg))
-                          ? 'fill-amber-400 text-amber-400'
-                          : 'text-slate-600'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="text-xs text-slate-400 font-semibold font-mono-numbers">
-                  {ratingStats.totalRatings} ratings submitted
-                </div>
+              ) : (
+                wordCloudWords.map((item, idx) => {
+                  const scale = Math.max(1, (item.count / maxWordCount) * 2.8);
+                  const color = colors[idx % colors.length];
+                  return (
+                    <span
+                      key={item.text}
+                      className={`inline-block font-extrabold transition-all duration-500 rounded-2xl px-3.5 py-1.5 shadow-md ${color.bg} text-white animate-in fade-in zoom-in-75`}
+                      style={{
+                        fontSize: `${Math.min(2.5, 0.9 + scale * 0.45)}rem`,
+                        opacity: Math.max(0.65, item.count / maxWordCount),
+                      }}
+                    >
+                      {item.text} <span className="text-xs opacity-75 font-mono">({item.count})</span>
+                    </span>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* 3. 5-STAR RATING VISUALIZER */}
+          {currentQ && currentQ.type === 'rating' && (
+            <div className="max-w-3xl mx-auto bg-slate-800/60 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center backdrop-blur-md">
+              <div className="text-4xl sm:text-6xl font-black font-mono-numbers text-amber-400 mb-2">
+                {ratingStats.avg} <span className="text-lg sm:text-2xl text-slate-400">/ 5.0</span>
+              </div>
+              <div className="flex items-center justify-center space-x-1 mb-6 text-amber-400">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star
+                    key={s}
+                    className={`w-7 h-7 sm:w-9 sm:h-9 ${
+                      s <= Math.round(Number(ratingStats.avg)) ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
+                    }`}
+                  />
+                ))}
               </div>
 
-              {/* Histogram Distribution */}
-              <div className="md:col-span-2 space-y-2.5">
-                {[5, 4, 3, 2, 1].map((ratingNumber) => {
-                  const count = ratingStats.counts[ratingNumber - 1];
+              {/* Breakdown Bars per Star Rating */}
+              <div className="space-y-2 max-w-md mx-auto">
+                {[5, 4, 3, 2, 1].map((starNum) => {
+                  const count = ratingStats.counts[starNum - 1] || 0;
                   const pct = ratingStats.totalRatings > 0 ? Math.round((count / ratingStats.totalRatings) * 100) : 0;
-
                   return (
-                    <div key={ratingNumber} className="flex items-center space-x-3 text-xs sm:text-sm">
-                      <span className="w-7 font-bold text-slate-300 font-mono-numbers">
-                        {ratingNumber}★
-                      </span>
-                      <div className="flex-1 bg-slate-900/80 h-4 rounded-full overflow-hidden border border-slate-700/60">
-                        <div
-                          className="bg-amber-400 h-full rounded-full transition-all duration-700 ease-out"
-                          style={{ width: `${pct}%` }}
-                        />
+                    <div key={starNum} className="flex items-center space-x-3 text-xs font-semibold text-slate-300">
+                      <span className="w-12 text-right">{starNum} Stars</span>
+                      <div className="flex-1 bg-slate-700 h-3 rounded-full overflow-hidden">
+                        <div className="bg-amber-400 h-full rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="w-10 text-right text-xs font-bold text-slate-400 font-mono-numbers">
-                        {pct}%
-                      </span>
-                      <span className="w-10 text-right text-xs text-slate-500 font-mono-numbers">
-                        ({count})
-                      </span>
+                      <span className="w-12 text-left font-mono-numbers">{pct}% ({count})</span>
                     </div>
                   );
                 })}
               </div>
             </div>
+          )}
 
-            <div className="flex justify-between text-xs font-bold text-slate-400 border-t border-slate-700/80 pt-3">
-              <span>{currentQ.ratingMinLabel || '1 (Low)'}</span>
-              <span>{currentQ.ratingMaxLabel || '5 (High)'}</span>
-            </div>
-          </div>
-        )}
-
-        {/* 4. OPEN TEXT WATERFALL */}
-        {currentQ.type === 'open_text' && (
-          <div className="max-w-3xl mx-auto">
-            {responses.length === 0 ? (
-              <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-8 text-center text-slate-400">
-                <MessageSquare className="w-10 h-10 text-slate-600 mx-auto mb-2.5 animate-pulse" />
-                <p className="text-lg font-bold">Waiting for open audience submissions...</p>
-                <p className="text-xs text-slate-500 mt-1">Live responses will appear here as they are typed.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1 scrollbar-none">
-                {responses.map((r) => (
-                  <div
-                    key={r.id}
-                    className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 shadow-sm flex flex-col justify-between"
-                  >
-                    <p className="text-sm sm:text-base font-semibold text-white leading-relaxed mb-2">
-                      "{r.textResponse}"
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/60">
-                      <span className="font-bold text-indigo-300">{r.participantName}</span>
-                      <span>Just now</span>
+          {/* 4. OPEN TEXT WATERFALL */}
+          {currentQ && currentQ.type === 'open_text' && (
+            <div className="max-w-3xl mx-auto">
+              {responses.length === 0 ? (
+                <div className="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-8 text-center text-slate-400">
+                  <MessageSquare className="w-10 h-10 text-slate-600 mx-auto mb-2.5 animate-pulse" />
+                  <p className="text-lg font-bold">Waiting for open audience submissions...</p>
+                  <p className="text-xs text-slate-500 mt-1">Live responses will appear here as they are typed.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1 scrollbar-none">
+                  {responses.map((r) => (
+                    <div
+                      key={r.id}
+                      className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 shadow-sm flex flex-col justify-between"
+                    >
+                      <p className="text-sm sm:text-base font-semibold text-white leading-relaxed mb-2">
+                        "{r.textResponse}"
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/60">
+                        <span className="font-bold text-indigo-300">{r.participantName}</span>
+                        <span>Just now</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      )}
 
       {/* Bottom Status Bar: Response Rate & Big Countdown */}
       <footer className="flex items-center justify-between pt-4 sm:pt-6 border-t border-slate-800/80 text-sm">
