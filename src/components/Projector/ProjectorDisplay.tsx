@@ -323,18 +323,18 @@ export const ProjectorDisplay: React.FC = () => {
           </div>
         </main>
       ) : currentEvent.status === 'ended' ? (
-        /* GRAND FINALE / MODERN VIBRANT STAGE */
-        <main className="my-auto py-4 sm:py-6 max-w-6xl mx-auto w-full animate-in fade-in zoom-in-95 duration-500">
+        /* GRAND FINALE / MODERN VIBRANT STAGE WITH SUBTLE MOTION */
+        <main className="my-auto py-4 sm:py-6 max-w-6xl mx-auto w-full animate-in fade-in zoom-in-95 duration-700">
           <div className="bg-slate-900/95 border border-slate-800 rounded-3xl p-5 sm:p-7 lg:p-8 shadow-2xl backdrop-blur-2xl relative overflow-hidden">
             
-            {/* Ambient Background Lighting */}
-            <div className="absolute -top-32 left-1/3 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -top-32 right-1/4 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient Background Lighting with Gentle Drift Motion */}
+            <div className="absolute -top-32 left-1/3 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none animate-ambient-drift" />
+            <div className="absolute -top-32 right-1/4 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none animate-ambient-drift-reverse" />
 
-            {/* Clean Punchy Header */}
+            {/* Clean Punchy Header with Gentle Floating Badge */}
             <div className="text-center mb-6">
-              <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-gradient-to-r from-amber-500/20 via-indigo-500/20 to-emerald-500/20 border border-amber-500/40 rounded-full text-xs font-extrabold text-amber-300 uppercase tracking-widest mb-2 shadow-xs">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <div className="inline-flex items-center space-x-1.5 px-3.5 py-1 bg-gradient-to-r from-amber-500/20 via-indigo-500/20 to-emerald-500/20 border border-amber-500/40 rounded-full text-xs font-extrabold text-amber-300 uppercase tracking-widest mb-2.5 shadow-xs animate-badge-float">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                 <span>Polling Finale</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-display">
@@ -348,9 +348,9 @@ export const ProjectorDisplay: React.FC = () => {
               {/* LEFT COLUMN: Metric Badges & Audience Highlights (5 cols) */}
               <div className="lg:col-span-5 space-y-3.5">
                 
-                {/* 3 Bold Metric Cards */}
+                {/* 3 Bold Metric Cards with Micro-Hover Motion */}
                 <div className="grid grid-cols-3 gap-2.5">
-                  <div className="p-3 bg-gradient-to-b from-indigo-950/60 to-slate-900/90 border border-indigo-500/30 rounded-2xl text-center shadow-lg">
+                  <div className="p-3 bg-gradient-to-b from-indigo-950/60 to-slate-900/90 border border-indigo-500/30 rounded-2xl text-center shadow-lg transition-transform duration-300 hover:scale-[1.03]">
                     <div className="flex items-center justify-center space-x-1 text-indigo-400 mb-0.5">
                       <Users className="w-3.5 h-3.5" />
                       <span className="text-[10px] font-extrabold uppercase">Peserta</span>
@@ -360,7 +360,7 @@ export const ProjectorDisplay: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-3 bg-gradient-to-b from-emerald-950/60 to-slate-900/90 border border-emerald-500/30 rounded-2xl text-center shadow-lg">
+                  <div className="p-3 bg-gradient-to-b from-emerald-950/60 to-slate-900/90 border border-emerald-500/30 rounded-2xl text-center shadow-lg transition-transform duration-300 hover:scale-[1.03]">
                     <div className="flex items-center justify-center space-x-1 text-emerald-400 mb-0.5">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span className="text-[10px] font-extrabold uppercase">Respon</span>
@@ -370,7 +370,7 @@ export const ProjectorDisplay: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-3 bg-gradient-to-b from-amber-950/60 to-slate-900/90 border border-amber-500/30 rounded-2xl text-center shadow-lg">
+                  <div className="p-3 bg-gradient-to-b from-amber-950/60 to-slate-900/90 border border-amber-500/30 rounded-2xl text-center shadow-lg transition-transform duration-300 hover:scale-[1.03]">
                     <div className="flex items-center justify-center space-x-1 text-amber-400 mb-0.5">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span className="text-[10px] font-extrabold uppercase">Soal</span>
@@ -402,7 +402,7 @@ export const ProjectorDisplay: React.FC = () => {
                             return (
                               <div
                                 key={p.id}
-                                className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                                className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold transition-all hover:scale-[1.01] ${
                                   hasQuizScoring && idx === 0
                                     ? 'bg-amber-500/20 border-amber-400/80 text-amber-200 shadow-md ring-1 ring-amber-400/40'
                                     : hasQuizScoring && idx === 1
@@ -457,7 +457,7 @@ export const ProjectorDisplay: React.FC = () => {
                       return (
                         <div
                           key={q.id}
-                          className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2"
+                          className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2 transition-transform duration-200 hover:border-slate-700"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center space-x-2 min-w-0">
@@ -474,7 +474,7 @@ export const ProjectorDisplay: React.FC = () => {
                           </div>
 
                           {/* Highlights per Type */}
-                          {/* 1. Multiple Choice / True False: Show top choice with animated fill bar */}
+                          {/* 1. Multiple Choice / True False: Show top choice with animated fill bar & gentle shimmer */}
                           {(q.type === 'multiple_choice' || q.type === 'true_false') && (() => {
                             const counts: Record<string, number> = {};
                             qResponses.forEach(r => {
@@ -490,11 +490,12 @@ export const ProjectorDisplay: React.FC = () => {
                             return (
                               <div className="pt-0.5">
                                 {topOpt ? (
-                                  <div className="relative overflow-hidden rounded-lg bg-slate-800/80 border border-emerald-500/40 p-2.5 flex items-center justify-between">
+                                  <div className="relative overflow-hidden rounded-lg bg-slate-800/80 border border-emerald-500/40 p-2.5 flex items-center justify-between group">
                                     <div
-                                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500/30 to-teal-500/20 transition-all duration-700"
+                                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500/30 to-teal-500/25 transition-all duration-1000 ease-out"
                                       style={{ width: `${topPct}%` }}
                                     />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer-sweep pointer-events-none" />
                                     <span className="relative z-10 text-xs font-bold text-white truncate pr-2">
                                       ✓ {topOpt.text}
                                     </span>

@@ -96,3 +96,59 @@
     radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 40%),
     radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 40%);
 }
+
+@keyframes ambient-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(15px, -15px) scale(1.08);
+    opacity: 0.35;
+  }
+}
+
+@keyframes ambient-drift-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(-20px, 10px) scale(1.12);
+    opacity: 0.28;
+  }
+}
+
+@keyframes badge-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-ambient-drift {
+  animation: ambient-drift 12s ease-in-out infinite;
+}
+
+.animate-ambient-drift-reverse {
+  animation: ambient-drift-reverse 15s ease-in-out infinite;
+}
+
+.animate-badge-float {
+  animation: badge-float 3.5s ease-in-out infinite;
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 4s ease-in-out infinite;
+}
