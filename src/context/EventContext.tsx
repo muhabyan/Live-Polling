@@ -183,8 +183,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const refreshEvent = useCallback(async () => {
     if (!currentEventId) return;
+    console.log('🔄 [EventContext] refreshEvent called with currentEventId:', currentEventId);
     try {
       const updated = await api.fetchFullEvent(currentEventId);
+      console.log('🔄 [EventContext] refreshEvent result:', updated?.id, '| participants:', updated?.participants.length);
       if (updated) {
         setEvents(prev => {
           const exists = prev.some(e => e.id === updated.id);
@@ -497,6 +499,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setError(null);
     try {
       const res = await api.joinEventByCode(code, name, emoji);
+      console.log('👋 [EventContext joinRoom] Joined. eventId from Supabase:', res.eventId, '| participant:', res.participant);
       setCurrentParticipant(res.participant);
       localStorage.setItem('pulselive_participant', JSON.stringify(res.participant));
       // Broadcast to all devices locally in real-time
@@ -510,6 +513,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (res.eventId) {
         setCurrentEventIdState(res.eventId);
         const fullEvent = await api.fetchFullEvent(res.eventId);
+        console.log('👋 [EventContext joinRoom] fetchFullEvent result:', fullEvent?.id, '| participants:', fullEvent?.participants.length);
         if (fullEvent) {
           if (!fullEvent.participants.some(p => p.id === res.participant.id)) {
             fullEvent.participants = [...fullEvent.participants, res.participant];

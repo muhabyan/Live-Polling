@@ -371,15 +371,20 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
   const randomBg = avatarBgs[Math.floor(Math.random() * avatarBgs.length)];
 
   try {
+    console.log('🔍 [Join] Looking up room code in Supabase:', normalizedCode);
     const { data: event, error: evtErr } = await supabase
       .from('events')
-      .select('id')
+      .select('id, room_code, title')
       .ilike('room_code', normalizedCode)
       .single();
 
+    console.log('🔍 [Join] Supabase event lookup result:', { event, evtErr });
+
     if (evtErr || !event) {
+      console.warn('⚠️ [Join] Room not found in Supabase, trying local store. Error:', evtErr?.message);
       // Check local store
       const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
+      console.log('🔍 [Join] Local store lookup:', localEvt ? `found: ${localEvt.title} (${localEvt.id})` : 'NOT FOUND');
       if (!localEvt) {
         throw new Error('Room code not found. Please check the code.');
       }
@@ -399,6 +404,7 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       };
     }
 
+    console.log('🔍 [Join] Inserting participant into Supabase for event_id:', event.id);
     const { data: participant, error: partErr } = await supabase
       .from('participants')
       .insert({
@@ -410,6 +416,8 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       })
       .select()
       .single();
+
+    console.log('🔍 [Join] Participant insert result:', { participant, partErr });
 
     if (partErr) {
       console.warn('⚠️ [Supabase] Participant insert error:', partErr.message, partErr);
@@ -429,11 +437,13 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       };
     }
 
+    console.log('✅ [Join] SUCCESS - Participant saved to Supabase:', participant);
     return {
       eventId: event.id,
       participant: dbParticipantToFrontend(participant as DbParticipant),
     };
   } catch (err: any) {
+    console.error('❌ [Join] CRITICAL ERROR in joinEventByCode:', err);
     const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
     if (localEvt) {
       const newPart: Participant = {
