@@ -9,8 +9,7 @@ import {
   Maximize, 
   Star,
   MessageSquare,
-  Radio,
-  ArrowLeft
+  Radio
 } from 'lucide-react';
 import { BrandLogo } from '../Shared/BrandLogo';
 
@@ -150,14 +149,6 @@ export const ProjectorDisplay: React.FC = () => {
         
         {/* Left: Branding & Session Progress */}
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setActiveView(isHost ? 'presenter' : 'participant')}
-            className="p-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-            title="Exit Projector Mode (ESC)"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-
           <BrandLogo size="sm" showText={false} theme="dark" />
           <div>
             <div className="flex items-center space-x-2">
