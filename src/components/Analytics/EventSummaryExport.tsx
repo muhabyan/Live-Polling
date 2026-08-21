@@ -333,42 +333,69 @@ export const EventSummaryExport: React.FC = () => {
           </div>
         </div>
 
-        {/* Right 1 Col: Leaderboard & Summary */}
+        {/* Right 1 Col: Leaderboard / Engagement Summary */}
         <div className="space-y-5">
           
-          {/* Top Leaderboard */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-xs sm:text-sm font-display">
-                <Trophy className="w-4 h-4 text-amber-500" />
-                <span>Leaderboard Standings</span>
-              </div>
-              <span className="text-xs text-slate-400 font-semibold">Top 5</span>
-            </div>
+          {/* Top Leaderboard or Active Attendees */}
+          {(() => {
+            const hasQuizScoring = currentEvent.isQuizMode || currentEvent.questions.some(q => (q.points || 0) > 0 || (q.options || []).some(o => o.isCorrect));
 
-            <div className="space-y-2">
-              {leaderboard.length === 0 ? (
-                <p className="text-xs text-slate-400 py-3 text-center">No participant scores recorded.</p>
-              ) : (
-                leaderboard.map((p, idx) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
-                        idx === 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
-                      }`}>
-                        {idx + 1}
-                      </span>
-                      <span className="font-bold text-slate-800">{p.name}</span>
-                    </div>
-                    <span className="font-mono-numbers font-bold text-indigo-700">{p.score || 0} pts</span>
+            return (
+              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-xs sm:text-sm font-display">
+                    {hasQuizScoring ? (
+                      <>
+                        <Trophy className="w-4 h-4 text-amber-500" />
+                        <span>Leaderboard Standings</span>
+                      </>
+                    ) : (
+                      <>
+                        <Users className="w-4 h-4 text-indigo-600" />
+                        <span>Partisipasi Audiens</span>
+                      </>
+                    )}
                   </div>
-                ))
-              )}
-            </div>
-          </div>
+                  <span className="text-xs text-slate-400 font-semibold">{hasQuizScoring ? 'Top Ranking' : `${currentEvent.participants.length} Peserta`}</span>
+                </div>
+
+                <div className="space-y-2">
+                  {currentEvent.participants.length === 0 ? (
+                    <p className="text-xs text-slate-400 py-3 text-center">Belum ada data peserta yang terhubung.</p>
+                  ) : (
+                    [...currentEvent.participants].sort((a, b) => (b.score || 0) - (a.score || 0)).map((p, idx) => {
+                      const pResponses = currentEvent.responses.filter(r => r.participantId === p.id).length;
+                      const responseRate = currentEvent.questions.length > 0 ? Math.round((pResponses / currentEvent.questions.length) * 100) : 0;
+
+                      return (
+                        <div
+                          key={p.id}
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
+                              idx === 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
+                            }`}>
+                              {idx + 1}
+                            </span>
+                            <span className="font-bold text-slate-800">{p.name}</span>
+                          </div>
+
+                          {hasQuizScoring && p.score !== undefined && p.score > 0 ? (
+                            <span className="font-mono-numbers font-bold text-indigo-700">{p.score} pts</span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md font-mono text-[11px] font-bold">
+                              {pResponses}/{currentEvent.questions.length} soal ({responseRate}%)
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Quick Session Health Check */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs text-xs space-y-2.5">
