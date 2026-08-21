@@ -234,7 +234,7 @@ export async function createNewEvent(eventData: {
         }));
         await supabase.from('questions').insert(qInserts);
       }
-      return event;
+      return localNewEvent;
     }
   } catch (err) {
     console.warn('Supabase create event fallback to local store:', err);
