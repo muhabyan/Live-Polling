@@ -15,7 +15,7 @@ import {
 import { BrandLogo } from '../Shared/BrandLogo';
 
 export const ProjectorDisplay: React.FC = () => {
-  const { currentEvent, fireConfetti, setActiveView, session } = useEvent();
+  const { currentEvent, fireConfetti, setActiveView, isHost } = useEvent();
   const miniQrRef = useRef<HTMLCanvasElement | null>(null);
 
   // Press ESC to exit Projector mode anytime cleanly
@@ -25,12 +25,12 @@ export const ProjectorDisplay: React.FC = () => {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
-        setActiveView(session ? 'presenter' : 'participant');
+        setActiveView(isHost ? 'presenter' : 'participant');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setActiveView, session]);
+  }, [setActiveView, isHost]);
 
   const currentQIndex = currentEvent?.currentQuestionIndex ?? 0;
   const currentQ = currentEvent?.questions?.[currentQIndex];
@@ -74,7 +74,7 @@ export const ProjectorDisplay: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 font-display">No Active Presentation</h2>
           <p className="text-slate-400 mb-6 text-sm">Launch a session from Presenter Controls or Admin Studio.</p>
           <button
-            onClick={() => setActiveView(session ? 'presenter' : 'participant')}
+            onClick={() => setActiveView(isHost ? 'presenter' : 'participant')}
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all cursor-pointer"
           >
             Back to Dashboard
@@ -151,7 +151,7 @@ export const ProjectorDisplay: React.FC = () => {
         {/* Left: Branding & Session Progress */}
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setActiveView(session ? 'presenter' : 'participant')}
+            onClick={() => setActiveView(isHost ? 'presenter' : 'participant')}
             className="p-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
             title="Exit Projector Mode (ESC)"
           >

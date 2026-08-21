@@ -12,6 +12,7 @@ interface EventContextType {
   // Auth
   session: Session | null;
   user: User | null;
+  isHost: boolean;
   isAuthLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
@@ -557,6 +558,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       value={{
         session,
         user,
+        isHost: Boolean(session || isDemoHost),
         isAuthLoading,
         login,
         register,
