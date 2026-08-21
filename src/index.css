@@ -88,13 +88,23 @@
   animation: pulse-subtle 2.5s ease-in-out infinite;
 }
 
-/* Stage Gradient Grid Background for Projector */
+/* Stage Gradient Grid Background for Projector (Dark Mode) */
 .bg-stage-mesh {
   background-color: #070B14;
   background-image: 
     radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 40%),
     radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 40%);
+}
+
+/* Studio Silk / Putih Mahal Background for Projector (Light Mode) */
+.bg-stage-mesh-light {
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(at 50% -10%, rgba(99, 102, 241, 0.1) 0px, transparent 65%),
+    radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.06) 0px, transparent 45%);
 }
 
 @keyframes ambient-drift {
