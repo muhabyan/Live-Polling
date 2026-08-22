@@ -21,8 +21,32 @@ import { Groq } from 'groq-sdk';
 import { INITIAL_EVENTS } from '../data/initialEvents';
 import { validateParticipantName } from './profanityFilter';
 
-// In-memory fallback state for smooth offline / demo experience
-let localEventsStore: EventData[] = [...INITIAL_EVENTS];
+// Persistent local events store with localStorage backup so deletions/edits survive F5 refresh
+const STORAGE_KEY = 'pulselive_saved_events';
+
+function getInitialLocalEvents(): EventData[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.warn('Could not read from localStorage:', e);
+  }
+  return [...INITIAL_EVENTS];
+}
+
+let localEventsStore: EventData[] = getInitialLocalEvents();
+
+export function saveLocalEventsStore(events: EventData[]) {
+  localEventsStore = events;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+  } catch (e) {
+    console.warn('Could not write to localStorage:', e);
+  }
+}
 
 // ============================================
 // 0. SUPABASE HEALTH & DIAGNOSTIC CHECK
@@ -185,6 +209,7 @@ export async function createNewEvent(eventData: {
   description?: string;
   category?: string;
   organizerName?: string;
+  isQuizMode?: boolean;
   questions?: Partial<Question>[];
 }) {
   const session = await getSession();
@@ -197,7 +222,9 @@ export async function createNewEvent(eventData: {
     title: q.title || 'Question Title',
     subtitle: q.subtitle || '',
     timerSeconds: q.timerSeconds || 45,
-    points: q.points || (q.type === 'multiple_choice' || q.type === 'true_false' ? 100 : undefined),
+    points: eventData.isQuizMode 
+      ? (q.points || (q.type === 'multiple_choice' || q.type === 'true_false' ? 100 : undefined))
+      : undefined,
     options: q.options || [],
     ratingMin: q.ratingMin || (q.type === 'rating' ? 1 : undefined),
     ratingMax: q.ratingMax || (q.type === 'rating' ? 5 : undefined),
@@ -225,14 +252,16 @@ export async function createNewEvent(eventData: {
     showResultsOnProjector: true,
     isVotingLocked: false,
     revealAnswer: false,
+    isQuizMode: eventData.isQuizMode || false,
     questions: formattedQuestions,
     participants: [],
     responses: [],
     reactions: [],
   };
 
-  // Add to local store first
+  // Add to local store first and persist
   localEventsStore = [localNewEvent, ...localEventsStore];
+  saveLocalEventsStore(localEventsStore);
 
   try {
     const { data: event, error: evtErr } = await supabase
@@ -304,8 +333,9 @@ export async function updateExistingEvent(id: string, eventData: Partial<EventDa
 }
 
 export async function deleteEventById(id: string) {
-  // 1. Immediately delete from local store
+  // 1. Immediately delete from local store and persist to localStorage
   localEventsStore = localEventsStore.filter(e => e.id !== id);
+  saveLocalEventsStore(localEventsStore);
 
   // 2. Cascade delete from Supabase
   try {
@@ -323,11 +353,12 @@ export async function deleteEventById(id: string) {
 }
 
 export async function deleteParticipantById(eventId: string, participantId: string) {
-  // 1. Remove from local store
+  // 1. Remove from local store and persist
   const localEvt = localEventsStore.find(e => e.id === eventId);
   if (localEvt) {
     localEvt.participants = localEvt.participants.filter(p => p.id !== participantId);
     localEvt.responses = localEvt.responses.filter(r => r.participantId !== participantId);
+    saveLocalEventsStore(localEventsStore);
   }
 
   // 2. Remove from Supabase
@@ -342,12 +373,13 @@ export async function deleteParticipantById(eventId: string, participantId: stri
 }
 
 export async function clearAllParticipantsAndResponses(eventId: string) {
-  // 1. Clear in local store
+  // 1. Clear in local store and persist
   const localEvt = localEventsStore.find(e => e.id === eventId);
   if (localEvt) {
     localEvt.participants = [];
     localEvt.responses = [];
     localEvt.reactions = [];
+    saveLocalEventsStore(localEventsStore);
   }
 
   // 2. Clear in Supabase
@@ -1003,3 +1035,4 @@ export async function summarizeAudienceResponses(questionTitle: string, response
     moderatorTip: 'Highlight the highest voted option and invite a brief comment from the floor.',
   };
 }
+

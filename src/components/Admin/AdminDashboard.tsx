@@ -43,6 +43,7 @@ export const AdminDashboard: React.FC = () => {
   const [formCategory, setFormCategory] = useState('Workshop / Seminar');
   const [formOrganizer, setFormOrganizer] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formIsQuizMode, setFormIsQuizMode] = useState<boolean>(false);
   const [formQuestions, setFormQuestions] = useState<Question[]>([
     {
       id: 'q-new-1',
@@ -50,6 +51,7 @@ export const AdminDashboard: React.FC = () => {
       title: 'What is your primary goal for today’s session?',
       subtitle: 'Select one option',
       timerSeconds: 45,
+      points: 100,
       options: [
         { id: 'opt-1', text: 'Learn new practical skills & tools', isCorrect: false },
         { id: 'opt-2', text: 'Network with industry peers', isCorrect: false },
@@ -77,6 +79,7 @@ export const AdminDashboard: React.FC = () => {
     setFormCategory('Workshop / Seminar');
     setFormOrganizer('');
     setFormDescription('');
+    setFormIsQuizMode(false);
     setFormQuestions([
       {
         id: 'q-new-1',
@@ -84,6 +87,7 @@ export const AdminDashboard: React.FC = () => {
         title: 'What is your primary goal for today’s session?',
         subtitle: 'Select one option',
         timerSeconds: 45,
+        points: 100,
         options: [
           { id: 'opt-1', text: 'Learn new practical skills & tools', isCorrect: false },
           { id: 'opt-2', text: 'Network with industry peers', isCorrect: false },
@@ -112,6 +116,7 @@ export const AdminDashboard: React.FC = () => {
         category: formCategory,
         organizerName: formOrganizer.trim() || 'Moderator',
         description: formDescription.trim(),
+        isQuizMode: formIsQuizMode,
         questions: formQuestions,
       });
       await refreshAllEvents();
@@ -501,6 +506,62 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
+              {/* Mode Sesi: Polling Biasa vs Kuis Berpoin */}
+              <div className="pt-2">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Mode Sesi & Penilaian
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormIsQuizMode(false);
+                      setFormQuestions(prev => prev.map(q => ({ ...q, points: undefined })));
+                    }}
+                    className={`p-3 rounded-xl border text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
+                      !formIsQuizMode 
+                        ? 'bg-indigo-50/80 border-indigo-600 text-indigo-950 ring-2 ring-indigo-600/20 shadow-2xs' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-xl shrink-0">📊</span>
+                    <div>
+                      <div className="text-xs font-bold flex items-center space-x-1">
+                        <span>Polling & Survey</span>
+                        {!formIsQuizMode && <span className="text-[10px] text-indigo-600 font-bold">✓ Aktif</span>}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                        Murni voting opini & persentase (Tanpa Poin / Skor).
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormIsQuizMode(true);
+                      setFormQuestions(prev => prev.map(q => ({ ...q, points: q.points || 100 })));
+                    }}
+                    className={`p-3 rounded-xl border text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
+                      formIsQuizMode 
+                        ? 'bg-amber-50/80 border-amber-600 text-amber-950 ring-2 ring-amber-600/20 shadow-2xs' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className="text-xl shrink-0">🏆</span>
+                    <div>
+                      <div className="text-xs font-bold flex items-center space-x-1">
+                        <span>Kuis & Kompetisi Poin</span>
+                        {formIsQuizMode && <span className="text-[10px] text-amber-600 font-bold">✓ Aktif</span>}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                        Ada skor jawaban, kunci benar/salah, & Leaderboard.
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
               {/* Question Sequence Builder */}
               <div className="space-y-3 pt-3 border-t border-slate-100">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -553,10 +614,31 @@ export const AdminDashboard: React.FC = () => {
                   {formQuestions.map((q, idx) => (
                     <div key={q.id || idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
-                          Q{idx + 1} • {q.type.replace('_', ' ').toUpperCase()}
-                        </span>
+                        <div className="flex items-center space-x-1.5">
+                          <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            Q{idx + 1} • {q.type.replace('_', ' ').toUpperCase()}
+                          </span>
+                          {formIsQuizMode && (
+                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                              +{q.points || 100} pts
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center space-x-2">
+                          {formIsQuizMode && (
+                            <select
+                              value={q.points || 100}
+                              onChange={(e) => {
+                                const pts = Number(e.target.value);
+                                setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, points: pts } : item));
+                              }}
+                              className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-amber-700"
+                            >
+                              <option value={50}>50 pts</option>
+                              <option value={100}>100 pts</option>
+                              <option value={200}>200 pts</option>
+                            </select>
+                          )}
                           <div className="flex items-center space-x-1 text-xs text-slate-500">
                             <Clock className="w-3 h-3" />
                             <select

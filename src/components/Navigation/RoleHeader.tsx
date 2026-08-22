@@ -87,22 +87,25 @@ export const RoleHeader: React.FC = () => {
               <BrandLogo size="sm" />
             </div>
 
-            {/* Event Switcher (Only visible to Admin) */}
+            {/* Event Switcher with Integrated Status Badge (Only visible to Admin) */}
             {isHost && (
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button
                   id="event-selector-btn"
                   onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
-                  className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-colors max-w-[130px] sm:max-w-[200px] truncate cursor-pointer"
+                  className="flex items-center space-x-2 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[170px] sm:max-w-[240px] truncate cursor-pointer shadow-2xs"
                 >
-                  <span className="truncate">{currentEvent?.title || 'Select Event'}</span>
+                  <span className="truncate font-bold text-slate-800">{currentEvent?.title || 'Select Event'}</span>
+                  {currentEvent && (
+                    <span className="shrink-0">{getStatusBadge(currentEvent.status)}</span>
+                  )}
                   <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                 </button>
 
                 {isEventDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                     <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      Switch Event
+                      Switch Event Session
                     </div>
                     {events.map((evt) => (
                       <button
@@ -126,17 +129,11 @@ export const RoleHeader: React.FC = () => {
                 )}
               </div>
             )}
-
-            {currentEvent && (
-              <div className="hidden sm:inline-flex shrink-0">
-                {getStatusBadge(currentEvent.status)}
-              </div>
-            )}
           </div>
 
-          {/* Center Navigation: Shown on Desktop when Admin/Presenter logged in */}
+          {/* Center Navigation: Compact, responsive, no overlap */}
           {isHost ? (
-            <div className="hidden lg:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
+            <div className="hidden md:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shrink-0">
               {adminViews.map((v) => {
                 const isActive = activeView === v.id;
                 return (
@@ -144,16 +141,19 @@ export const RoleHeader: React.FC = () => {
                     key={v.id}
                     id={`nav-view-${v.id}`}
                     onClick={() => setActiveView(v.id)}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-white text-indigo-600 shadow-xs border border-slate-200/70'
+                        ? 'bg-white text-indigo-600 shadow-2xs border border-slate-200/70'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                     }`}
                   >
                     {v.icon}
-                    <span>{v.label}</span>
+                    <span className="hidden xl:inline">{v.label}</span>
+                    <span className="inline xl:hidden">
+                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Projector' : v.id === 'admin' ? 'Admin' : v.id === 'analytics' ? 'Report' : 'Audience'}
+                    </span>
                     {v.badge && (
-                      <span className="text-[9px] px-1 py-0.2 bg-indigo-50 text-indigo-600 rounded font-bold">
+                      <span className="text-[9px] px-1 py-0.2 bg-indigo-50 text-indigo-600 rounded font-bold hidden 2xl:inline">
                         {v.badge}
                       </span>
                     )}
