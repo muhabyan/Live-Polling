@@ -19,6 +19,7 @@ import {
 import { Groq } from 'groq-sdk';
 
 import { INITIAL_EVENTS } from '../data/initialEvents';
+import { validateParticipantName } from './profanityFilter';
 
 // In-memory fallback state for smooth offline / demo experience
 let localEventsStore: EventData[] = [...INITIAL_EVENTS];
@@ -362,6 +363,7 @@ export async function clearAllParticipantsAndResponses(eventId: string) {
 }
 
 // ============================================
+// ============================================
 // 4. PARTICIPANT ACTIONS (Direct Supabase)
 // ============================================
 
@@ -369,6 +371,13 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
   const normalizedCode = code.trim().toUpperCase();
   const avatarBgs = ['#4F46E5', '#0D9488', '#D97706', '#9333EA', '#E11D48', '#0284C7', '#EA580C', '#DB2777'];
   const finalBg = bgColor || avatarBgs[Math.floor(Math.random() * avatarBgs.length)];
+
+  // 1. Validate Name Length & Profanity Filter
+  const validation = validateParticipantName(name);
+  if (!validation.isValid) {
+    throw new Error(validation.error || 'Nama tidak valid.');
+  }
+  const cleanName = validation.sanitizedName || (emoji ? `${emoji} Attendee` : 'Attendee');
 
   try {
     const { data: event, error: evtErr } = await supabase
@@ -381,12 +390,18 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       // Check local store
       const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
       if (!localEvt) {
-        throw new Error('Room code not found. Please check the code.');
+        throw new Error('Kode room tidak ditemukan. Silakan periksa kembali PIN room.');
       }
+
+      // Check duplicate name in local store
+      if (localEvt.participants.some(p => p.name.trim().toLowerCase() === cleanName.toLowerCase())) {
+        throw new Error(`Nama "${cleanName}" sudah dipakai di room ini. Gunakan nama lengkap atau tambahkan inisial/angka.`);
+      }
+
       const newPart: Participant = {
         id: 'p-' + Date.now(),
         event_id: localEvt.id,
-        name: name.trim(),
+        name: cleanName,
         avatarBg: finalBg,
         avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),
@@ -399,11 +414,21 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       };
     }
 
+    // 2. Check duplicate name in Supabase for this specific event
+    const { data: existingParts } = await supabase
+      .from('participants')
+      .select('name')
+      .eq('event_id', event.id);
+
+    if (existingParts && existingParts.some(p => (p.name || '').trim().toLowerCase() === cleanName.toLowerCase())) {
+      throw new Error(`Nama "${cleanName}" sudah digunakan di room ini. Gunakan nama lengkap atau tambahkan angka/inisial.`);
+    }
+
     const { data: participant, error: partErr } = await supabase
       .from('participants')
       .insert({
         event_id: event.id,
-        name: name.trim(),
+        name: cleanName,
         avatar_bg: finalBg,
         avatar_emoji: emoji || '🦊',
         score: 0,
@@ -417,7 +442,7 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       const fallbackPart: Participant = {
         id: 'p-' + Date.now(),
         event_id: event.id,
-        name: name.trim(),
+        name: cleanName,
         avatarBg: finalBg,
         avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),
@@ -434,13 +459,19 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       participant: dbParticipantToFrontend(participant as DbParticipant),
     };
   } catch (err: any) {
-    console.error('❌ [Join] CRITICAL ERROR in joinEventByCode:', err);
+    console.error('❌ [Join] Error in joinEventByCode:', err.message);
+    if (err.message && (err.message.includes('sudah dipakai') || err.message.includes('sudah digunakan') || err.message.includes('tidak pantas') || err.message.includes('maksimal'))) {
+      throw err;
+    }
     const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
     if (localEvt) {
+      if (localEvt.participants.some(p => p.name.trim().toLowerCase() === cleanName.toLowerCase())) {
+        throw new Error(`Nama "${cleanName}" sudah dipakai di room ini. Gunakan nama lengkap atau tambahkan inisial/angka.`);
+      }
       const newPart: Participant = {
         id: 'p-' + Date.now(),
         event_id: localEvt.id,
-        name: name.trim(),
+        name: cleanName,
         avatarBg: finalBg,
         avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
-import { QrCode, ArrowRight, ShieldCheck, Shuffle, Sparkles, Check } from 'lucide-react';
+import { QrCode, ArrowRight, ShieldCheck, Shuffle, Sparkles, Check, AlertCircle } from 'lucide-react';
 import { ButtonSpinner } from '../Shared/Loaders';
 import { BrandLogo } from '../Shared/BrandLogo';
+import { validateParticipantName } from '../../utils/profanityFilter';
 
 export interface AvatarPersona {
   id: string;
@@ -39,6 +40,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
     return params.get('code')?.toUpperCase() || '';
   });
   const [nickname, setNickname] = useState('');
+  const [localNameError, setLocalNameError] = useState<string | null>(null);
   const [selectedPersona, setSelectedPersona] = useState<AvatarPersona>(() => AVATAR_PERSONAS[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,9 +59,25 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
     setSelectedPersona(random);
   };
 
+  const handleNicknameChange = (val: string) => {
+    setNickname(val);
+    if (localNameError) setLocalNameError(null);
+    if (error) clearError();
+  };
+
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomCode.trim()) return;
+
+    // Validate name upfront
+    if (nickname.trim()) {
+      const validation = validateParticipantName(nickname.trim());
+      if (!validation.isValid) {
+        setLocalNameError(validation.error || 'Nama tidak valid.');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       await joinRoom(
@@ -97,10 +115,18 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
       {/* Main Join Card */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-4 sm:p-6 space-y-4">
         
-        {error && (
+        {(error || localNameError) && (
           <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs font-semibold flex items-center justify-between animate-in fade-in">
-            <span>{error}</span>
-            <button onClick={clearError} className="text-rose-500 hover:text-rose-700 font-bold ml-2">✕</button>
+            <div className="flex items-center space-x-1.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <span>{localNameError || error}</span>
+            </div>
+            <button 
+              onClick={() => { clearError(); setLocalNameError(null); }} 
+              className="text-rose-500 hover:text-rose-700 font-bold ml-2 cursor-pointer"
+            >
+              ✕
+            </button>
           </div>
         )}
 
@@ -127,17 +153,24 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
 
           {/* Nickname Field */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Nama Kamu <span className="text-slate-400 font-normal lowercase">(opsional)</span>
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                Nama Kamu <span className="text-slate-400 font-normal lowercase">(opsional)</span>
+              </label>
+              <span className={`text-[10px] font-mono ${nickname.length >= 18 ? 'text-amber-600 font-bold' : 'text-slate-400'}`}>
+                {nickname.length}/20
+              </span>
+            </div>
             <input
               id="participant-name-input"
               type="text"
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder={`e.g. ${selectedPersona.name}`}
-              maxLength={24}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-50 focus:outline-none transition-all"
+              onChange={(e) => handleNicknameChange(e.target.value)}
+              placeholder={`e.g. ${selectedPersona.name} (Bebas spasi & angka)`}
+              maxLength={20}
+              className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none transition-all ${
+                localNameError ? 'border-rose-400 focus:border-rose-600 focus:ring-2 focus:ring-rose-100' : 'border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-50'
+              }`}
             />
           </div>
 
