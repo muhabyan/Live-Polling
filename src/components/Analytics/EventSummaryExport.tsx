@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useEvent } from '../../context/EventContext';
+import { Participant, Question } from '../../types';
 import { 
   Users, 
   MessageSquare, 
@@ -18,6 +19,7 @@ export const EventSummaryExport: React.FC = () => {
   const { currentEvent, sendModeratorAction, setActiveView, clearAllParticipants } = useEvent();
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [showCleanupModal, setShowCleanupModal] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 
   if (!currentEvent) {
     return (
@@ -43,11 +45,6 @@ export const EventSummaryExport: React.FC = () => {
   const totalResponses = currentEvent.responses.length;
   const totalQuestions = currentEvent.questions.length;
   const avgResponsesPerQ = totalQuestions > 0 ? (totalResponses / totalQuestions).toFixed(1) : '0';
-
-  // Calculate top scored participants
-  const leaderboard = [...currentEvent.participants]
-    .sort((a, b) => (b.score || 0) - (a.score || 0))
-    .slice(0, 5);
 
   // Generate and trigger actual CSV Download
   const handleExportCSV = () => {
@@ -106,6 +103,32 @@ export const EventSummaryExport: React.FC = () => {
     await clearAllParticipants();
     await sendModeratorAction('reset_session');
     setShowCleanupModal(false);
+  };
+
+  const getParticipantAnswerForQuestion = (pId: string, q: Question) => {
+    const resp = currentEvent.responses.find(r => r.participantId === pId && r.questionId === q.id);
+    if (!resp) return { answered: false, text: 'Tidak menjawab' };
+
+    let text = resp.textResponse || '';
+    if (q.type === 'multiple_choice' || q.type === 'true_false') {
+      const selectedOpts = (resp.selectedOptionIds || []).map(id => {
+        const opt = q.options?.find(o => o.id === id);
+        return opt ? opt.text : id;
+      });
+      text = selectedOpts.join(', ');
+    } else if (q.type === 'rating') {
+      text = `Skor ${resp.ratingValue} / ${q.ratingMax || 5}.0`;
+    }
+
+    const isCorrect = q.options?.some(o => o.isCorrect && resp.selectedOptionIds?.includes(o.id));
+
+    return {
+      answered: true,
+      text: text || 'Jawaban kosong',
+      timeTaken: resp.timeTakenSeconds,
+      submittedAt: resp.submittedAt,
+      isCorrect,
+    };
   };
 
   return (
@@ -333,7 +356,7 @@ export const EventSummaryExport: React.FC = () => {
           </div>
         </div>
 
-        {/* Right 1 Col: Leaderboard / Engagement Summary */}
+        {/* Right 1 Col: Leaderboard / Individual Participant Inspector */}
         <div className="space-y-5">
           
           {/* Top Leaderboard or Active Attendees */}
@@ -359,7 +382,11 @@ export const EventSummaryExport: React.FC = () => {
                   <span className="text-xs text-slate-400 font-semibold">{hasQuizScoring ? 'Top Ranking' : `${currentEvent.participants.length} Peserta`}</span>
                 </div>
 
-                <div className="space-y-2">
+                <p className="text-[11px] text-slate-500 mb-2.5">
+                  Klik nama peserta di bawah untuk melihat rincian jawaban per soal:
+                </p>
+
+                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                   {currentEvent.participants.length === 0 ? (
                     <p className="text-xs text-slate-400 py-3 text-center">Belum ada data peserta yang terhubung.</p>
                   ) : (
@@ -368,27 +395,30 @@ export const EventSummaryExport: React.FC = () => {
                       const responseRate = currentEvent.questions.length > 0 ? Math.round((pResponses / currentEvent.questions.length) * 100) : 0;
 
                       return (
-                        <div
+                        <button
                           key={p.id}
-                          className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs"
+                          type="button"
+                          onClick={() => setSelectedParticipant(p)}
+                          className="w-full text-left flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 border border-slate-100 hover:border-indigo-200 text-xs transition-colors cursor-pointer group"
                         >
-                          <div className="flex items-center space-x-2">
-                            <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
-                              idx === 0 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
-                            }`}>
-                              {idx + 1}
+                          <div className="flex items-center space-x-2 min-w-0 pr-2">
+                            <span 
+                              className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] text-white shrink-0 shadow-2xs"
+                              style={{ backgroundColor: p.avatarBg || '#4F46E5' }}
+                            >
+                              {p.avatarEmoji || '👋'}
                             </span>
-                            <span className="font-bold text-slate-800">{p.name}</span>
+                            <span className="font-bold text-slate-800 group-hover:text-indigo-900 truncate">{p.name}</span>
                           </div>
 
                           {hasQuizScoring && p.score !== undefined && p.score > 0 ? (
-                            <span className="font-mono-numbers font-bold text-indigo-700">{p.score} pts</span>
+                            <span className="font-mono-numbers font-bold text-indigo-700 shrink-0">{p.score} pts</span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-md font-mono text-[11px] font-bold">
-                              {pResponses}/{currentEvent.questions.length} soal ({responseRate}%)
+                            <span className="px-2 py-0.5 bg-white border border-slate-200 text-slate-700 rounded-md font-mono text-[10px] font-bold shrink-0">
+                              {pResponses}/{currentEvent.questions.length} ({responseRate}%) ➔
                             </span>
                           )}
-                        </div>
+                        </button>
                       );
                     })
                   )}
@@ -415,6 +445,88 @@ export const EventSummaryExport: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* INDIVIDUAL PARTICIPANT ANSWER INSPECTOR MODAL */}
+      {selectedParticipant && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 space-y-4 max-h-[90vh] flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b pb-3.5">
+              <div className="flex items-center space-x-3">
+                <div 
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-xs"
+                  style={{ backgroundColor: selectedParticipant.avatarBg || '#4F46E5' }}
+                >
+                  {selectedParticipant.avatarEmoji || '👋'}
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 font-display">
+                    Rincian Jawaban: {selectedParticipant.name}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Bergabung {new Date(selectedParticipant.joinedAt).toLocaleTimeString()} • {selectedParticipant.score || 0} pts
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedParticipant(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* List of Questions and Specific Participant Answer */}
+            <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+              {currentEvent.questions.map((q, idx) => {
+                const ans = getParticipantAnswerForQuestion(selectedParticipant.id, q);
+
+                return (
+                  <div key={q.id} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-indigo-700 font-mono">
+                        Soal {idx + 1} ({q.type.replace('_', ' ')})
+                      </span>
+                      {ans.answered ? (
+                        <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold border border-emerald-200">
+                          Dijawab ({ans.timeTaken || 0}s)
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 bg-slate-200/80 px-2 py-0.5 rounded-full font-semibold">
+                          Lewat
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs font-bold text-slate-900">
+                      {q.title}
+                    </p>
+
+                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs font-medium text-slate-800">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">Jawaban {selectedParticipant.name}:</span>
+                      <span className="font-semibold text-indigo-950">"{ans.text}"</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedParticipant(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DATA RESET MODAL */}
       {showCleanupModal && (
@@ -456,3 +568,4 @@ export const EventSummaryExport: React.FC = () => {
     </div>
   );
 };
+
