@@ -460,14 +460,32 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [currentEventId, refreshEvent]);
 
-  // 3. Periodic lightweight heartbeat polling (ensures participants & responses stay 100% in sync even if websockets drop)
+  // 3. Periodic lightweight heartbeat polling (Adaptive for high scale 400+ participants)
+  // - Host views (Presenter / Projector / Admin): 3-second rapid sync for real-time live graphs
+  // - Participant phones: 15-second gentle fallback (relies on instant WebSockets + tab focus refresh)
   useEffect(() => {
     if (!currentEventId) return;
+
+    const isHostScreen = ['presenter', 'projector', 'admin', 'analytics'].includes(activeView);
+    const pollInterval = isHostScreen ? 3000 : 15000;
+
     const interval = setInterval(() => {
       refreshEvent();
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [currentEventId, refreshEvent]);
+    }, pollInterval);
+
+    // Instant refresh when participant unlocks phone or switches back to the browser tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshEvent();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentEventId, activeView, refreshEvent]);
 
   // ============================================
   // SYNCHRONIZED COUNTDOWN TIMER TICKER
