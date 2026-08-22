@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
-import { Sparkles, MessageCircle, X } from 'lucide-react';
+import { Sparkles, Trophy, LogOut, CheckCircle2 } from 'lucide-react';
 
 interface ParticipantCompanionProps {
   hasSubmitted?: boolean;
 }
 
 export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasSubmitted }) => {
-  const { currentEvent, currentParticipant } = useEvent();
+  const { currentEvent, currentParticipant, leaveRoom } = useEvent();
   const [speechText, setSpeechText] = useState<string>('');
   const [isBouncing, setIsBouncing] = useState<boolean>(false);
-  const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [hasInteracted, setHasInteracted] = useState<boolean>(false);
 
   const emoji = currentParticipant?.avatarEmoji || '🦊';
@@ -27,24 +26,24 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
 
     if (status === 'waiting' || status === 'draft') {
       const waitingQuotes = [
-        `Halo ${name}! Siap-siap ya! 🚀`,
-        'Nunggu host mulai sesi... ☕',
-        'Yuk pemanasan dulu! ✨',
+        `Siap-siap ya! Sesi segera mulai 🚀`,
+        `Nunggu presenter membuka sesi... ☕`,
+        `Yuk fokus & raih skor tinggi! ✨`,
       ];
       setSpeechText(waitingQuotes[Math.floor(Math.random() * waitingQuotes.length)]);
     } else if (status === 'ended') {
-      setSpeechText(`Hebat ${name}! Sesi selesai! 🏆`);
+      setSpeechText(`Sesi selesai! Terima kasih ${name}! 🏆`);
     } else if (hasSubmitted) {
       setSpeechText('Jawabanmu terkirim! Mantap! 🎉');
     } else if (isVotingLocked) {
-      setSpeechText('Voting ditutup! Cek layar utama ya 📺');
+      setSpeechText('Voting ditutup! Cek hasil di layar 📺');
     } else if (timerRemaining <= 10 && timerRemaining > 0) {
       setSpeechText('Waktu mau habis! Ayo pilih! ⚡');
     } else {
       const liveQuotes = [
-        'Pilih yang paling tepat ya! 💡',
-        'Kira-kira apa jawabannya? 🤔',
-        'Fokus & tentukan pilihanmu! ✨',
+        'Pilih jawaban paling tepat! 💡',
+        'Kira-kira apa jawabannya ya? 🤔',
+        'Tentukan pilihanmu sekarang! ✨',
       ];
       setSpeechText(liveQuotes[Math.floor(Math.random() * liveQuotes.length)]);
     }
@@ -57,76 +56,79 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
 
     const funQuotes = [
       'Aku dukung pilihanmu 100%! ⭐',
-      'Fokus & raih skor tertinggi! 🔥',
+      'Fokus & raih peringkat atas! 🔥',
       'Kamu pasti bisa! Semangat! 💪',
       'Keren banget kamu hari ini! ✨',
-      'Jangan lupa kirim reaksi ke panggung! ❤️',
+      'Jangan lupa kirim reaksi cinta! ❤️',
     ];
     const randomQuote = funQuotes[Math.floor(Math.random() * funQuotes.length)];
     setSpeechText(randomQuote);
 
-    // Reset interaction lock after 5 seconds so live state resumes
-    setTimeout(() => setHasInteracted(false), 5000);
+    // Reset interaction lock after 4 seconds
+    setTimeout(() => setHasInteracted(false), 4000);
   };
 
   if (!currentParticipant) return null;
 
   return (
-    <aside 
-      aria-label="Mascot Companion"
-      className="pointer-events-none fixed bottom-14 right-3 sm:right-6 z-30 flex flex-col items-end animate-in fade-in slide-in-from-bottom-2 duration-300"
-    >
-      {/* Speech Bubble */}
-      {!isMinimized && speechText && (
-        <div className="pointer-events-auto mb-2 max-w-[200px] sm:max-w-[240px] bg-white/95 backdrop-blur-md px-3 py-2 rounded-2xl rounded-br-xs border border-slate-200/90 shadow-md text-xs font-semibold text-slate-800 flex items-start space-x-1.5 animate-in zoom-in-95 duration-200">
-          <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-          <span className="leading-tight select-none">{speechText}</span>
+    <div className="w-full max-w-md mx-auto px-3 pt-3 pb-1">
+      {/* Sleek Top Companion Bar */}
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-slate-200/90 shadow-2xs flex items-center justify-between gap-2.5 transition-all">
+        
+        {/* Left: Interactive Avatar Squircle with Speech Bubble */}
+        <div className="flex items-center space-x-2.5 min-w-0 flex-1">
           <button
             type="button"
-            onClick={() => setIsMinimized(true)}
-            className="text-slate-400 hover:text-slate-600 p-0.5 ml-1 shrink-0 cursor-pointer"
-            title="Sembunyikan pesan"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-
-      {/* Expressive Floating Mascot Avatar */}
-      <div className="pointer-events-auto flex items-center space-x-1.5">
-        {isMinimized && (
-          <button
-            type="button"
-            onClick={() => setIsMinimized(false)}
-            className="px-2 py-1 bg-white/90 backdrop-blur-xs border border-slate-200 rounded-full text-[10px] font-bold text-slate-600 shadow-2xs hover:bg-slate-50 cursor-pointer"
-          >
-            <MessageCircle className="w-3 h-3 inline mr-1 text-indigo-600" />
-            <span>Tanya Maskot</span>
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={handleTapCompanion}
-          title={`Maskot ${name} (Klik untuk sapa!)`}
-          className={`relative group p-1.5 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/90 shadow-md hover:shadow-lg transition-all active:scale-90 cursor-pointer ${
-            isBouncing ? 'animate-bounce' : 'hover:scale-105'
-          }`}
-        >
-          {/* Glowing Avatar Squircle */}
-          <div 
-            className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shadow-xs transition-transform"
+            onClick={handleTapCompanion}
+            title="Klik maskot untuk sapaan seru!"
+            className={`relative shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-lg shadow-2xs transition-transform cursor-pointer active:scale-90 ${
+              isBouncing ? 'animate-bounce' : 'hover:scale-105'
+            }`}
             style={{ backgroundColor: bgColor }}
           >
-            <span className="select-none filter drop-shadow-xs">
-              {emoji}
-            </span>
-          </div>
+            <span className="select-none filter drop-shadow-xs">{emoji}</span>
+            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
+          </button>
 
-          {/* Mini Live Status Indicator Dot */}
-          <div className="absolute -top-1 -left-1 w-3.5 h-3.5 bg-emerald-500 rounded-full ring-2 ring-white shadow-2xs animate-pulse" />
-        </button>
+          {/* Speech Text & Participant Nickname */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center space-x-1.5 truncate">
+              <span className="text-xs font-bold text-slate-900 truncate">
+                {name}
+              </span>
+              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0 inline" />
+            </div>
+
+            {/* Dynamic Companion Quote */}
+            <div 
+              onClick={handleTapCompanion}
+              className="text-[11px] font-medium text-slate-600 truncate flex items-center space-x-1 cursor-pointer hover:text-indigo-600 transition-colors"
+            >
+              <Sparkles className="w-2.5 h-2.5 text-amber-500 shrink-0" />
+              <span className="truncate">{speechText}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Score or Exit Button */}
+        <div className="flex items-center space-x-1.5 shrink-0">
+          {currentParticipant?.score !== undefined && currentParticipant.score > 0 ? (
+            <div className="flex items-center space-x-1 px-2 py-1 bg-amber-50 text-amber-800 rounded-lg text-xs font-bold border border-amber-200">
+              <Trophy className="w-3 h-3 text-amber-600" />
+              <span className="font-mono-numbers">{currentParticipant.score} pts</span>
+            </div>
+          ) : (
+            <button
+              onClick={leaveRoom}
+              className="text-[11px] text-slate-400 hover:text-rose-600 flex items-center space-x-1 font-semibold transition-colors px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer"
+              title="Keluar dari room"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Exit</span>
+            </button>
+          )}
+        </div>
       </div>
-    </aside>
+    </div>
   );
 };

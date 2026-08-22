@@ -8,38 +8,7 @@ export const ParticipantWaiting: React.FC = () => {
   const reactionEmojis = ['👏', '🔥', '❤️', '💡', '🚀', '✨', '🎉'];
 
   return (
-    <div className="w-full max-w-md mx-auto px-3 py-4 sm:p-6 flex flex-col justify-between flex-1 gap-4">
-      
-      {/* Top Participant Status Pill */}
-      <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-2xs">
-        <div className="flex items-center space-x-2.5">
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white shadow-2xs"
-            style={{ backgroundColor: currentParticipant?.avatarBg || '#4F46E5' }}
-          >
-            {currentParticipant?.avatarEmoji || '👋'}
-          </div>
-          <div>
-            <div className="text-xs font-bold text-slate-900 flex items-center space-x-1">
-              <span>{currentParticipant?.name || 'Attendee'}</span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 inline" />
-            </div>
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-              Connected & Ready
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={leaveRoom}
-          className="text-xs text-slate-400 hover:text-rose-600 flex items-center space-x-1 font-semibold transition-colors px-2 py-1 rounded-md hover:bg-slate-50 cursor-pointer"
-          title="Leave Room"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>Exit</span>
-        </button>
-      </div>
-
+    <div className="w-full max-w-md mx-auto px-3 py-2 flex flex-col justify-between flex-1 gap-4">
       {/* Main Waiting Card */}
       <div className="my-auto py-6 sm:py-8 text-center bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs relative overflow-hidden">
         

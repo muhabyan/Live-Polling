@@ -14,30 +14,7 @@ export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRe
   const isLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
 
   return (
-    <div className="w-full max-w-md mx-auto px-3 py-4 sm:p-6 flex flex-col justify-between flex-1 gap-4">
-      
-      {/* Top Participant Status */}
-      <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-2xs">
-        <div className="flex items-center space-x-2.5">
-          <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white shadow-2xs"
-            style={{ backgroundColor: currentParticipant?.avatarBg || '#4F46E5' }}
-          >
-            {currentParticipant?.avatarEmoji || '🚀'}
-          </div>
-          <span className="text-xs font-bold text-slate-900">
-            {currentParticipant?.name || 'Attendee'}
-          </span>
-        </div>
-
-        {currentParticipant?.score !== undefined && (
-          <div className="flex items-center space-x-1 px-2.5 py-0.5 bg-amber-50 text-amber-800 rounded-md text-xs font-bold border border-amber-200">
-            <Trophy className="w-3.5 h-3.5 text-amber-600" />
-            <span>{currentParticipant.score} pts</span>
-          </div>
-        )}
-      </div>
-
+    <div className="w-full max-w-md mx-auto px-3 py-2 flex flex-col justify-between flex-1 gap-4">
       {/* Main Success Confirmation Card */}
       <div className="my-auto py-6 sm:py-8 text-center bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs relative overflow-hidden">
         
