@@ -5,6 +5,7 @@ import { ParticipantWaiting } from './ParticipantWaiting';
 import { ParticipantLiveQuestion } from './ParticipantLiveQuestion';
 import { ParticipantSubmitted } from './ParticipantSubmitted';
 import { ParticipantTicker } from './ParticipantTicker';
+import { ParticipantCompanion } from './ParticipantCompanion';
 import { Trophy } from 'lucide-react';
 
 export const ParticipantView: React.FC = () => {
@@ -112,10 +113,16 @@ export const ParticipantView: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-between pb-safe">
+    <div className="w-full flex-1 flex flex-col items-center justify-between pb-safe relative">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
         {renderContent()}
       </div>
+
+      {/* Floating Animated Mascot Companion */}
+      {currentParticipant && (
+        <ParticipantCompanion hasSubmitted={hasSubmittedCurrentQuestion} />
+      )}
+
       {currentParticipant && <ParticipantTicker />}
     </div>
   );
