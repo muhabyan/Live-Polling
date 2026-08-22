@@ -796,16 +796,27 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
+  const lastReactionDbTimeRef = React.useRef<number>(0);
+
   const sendReaction = (emoji: string) => {
     if (!currentEvent) return;
     const name = currentParticipant?.name || 'Attendee';
+    
+    // 1. Instant local animation & local broadcast (unlimited 0ms taps for audience delight)
     broadcastLocalSync({
       type: 'REACTION_SENT',
       eventId: currentEvent.id,
       emoji,
       name,
     });
-    api.sendReactionDirect(currentEvent.id, emoji, name);
+
+    // 2. Throttle database writes to at most 1 per 800ms per participant
+    // Prevents exhausting Supabase Free tier DB quota if 400 people spam emojis
+    const now = Date.now();
+    if (now - lastReactionDbTimeRef.current > 800) {
+      lastReactionDbTimeRef.current = now;
+      api.sendReactionDirect(currentEvent.id, emoji, name).catch(() => {});
+    }
   };
 
   const deleteEvent = async (id: string) => {
