@@ -34,7 +34,7 @@ interface EventContextType {
   setCurrentEventId: (id: string) => void;
   refreshEvent: () => Promise<void>;
   refreshAllEvents: () => Promise<void>;
-  joinRoom: (code: string, name: string, emoji?: string) => Promise<void>;
+  joinRoom: (code: string, name: string, emoji?: string, bgColor?: string) => Promise<void>;
   leaveRoom: () => void;
   submitAnswer: (payload: {
     questionId: string;
@@ -538,10 +538,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setCurrentEventIdState(id);
   };
 
-  const joinRoom = async (code: string, name: string, emoji?: string) => {
+  const joinRoom = async (code: string, name: string, emoji?: string, bgColor?: string) => {
     setError(null);
     try {
-      const res = await api.joinEventByCode(code, name, emoji);
+      const res = await api.joinEventByCode(code, name, emoji, bgColor);
       setCurrentParticipant(res.participant);
       localStorage.setItem('pulselive_participant', JSON.stringify(res.participant));
       // Broadcast to all devices locally in real-time

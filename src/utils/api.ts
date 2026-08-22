@@ -365,10 +365,10 @@ export async function clearAllParticipantsAndResponses(eventId: string) {
 // 4. PARTICIPANT ACTIONS (Direct Supabase)
 // ============================================
 
-export async function joinEventByCode(code: string, name: string, emoji?: string) {
+export async function joinEventByCode(code: string, name: string, emoji?: string, bgColor?: string) {
   const normalizedCode = code.trim().toUpperCase();
-  const avatarBgs = ['#4F46E5', '#0D9488', '#D97706', '#9333EA', '#E11D48', '#0284C7'];
-  const randomBg = avatarBgs[Math.floor(Math.random() * avatarBgs.length)];
+  const avatarBgs = ['#4F46E5', '#0D9488', '#D97706', '#9333EA', '#E11D48', '#0284C7', '#EA580C', '#DB2777'];
+  const finalBg = bgColor || avatarBgs[Math.floor(Math.random() * avatarBgs.length)];
 
   try {
     const { data: event, error: evtErr } = await supabase
@@ -387,8 +387,8 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         id: 'p-' + Date.now(),
         event_id: localEvt.id,
         name: name.trim(),
-        avatarBg: randomBg,
-        avatarEmoji: emoji || '🚀',
+        avatarBg: finalBg,
+        avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),
         score: 0,
       };
@@ -404,8 +404,8 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       .insert({
         event_id: event.id,
         name: name.trim(),
-        avatar_bg: randomBg,
-        avatar_emoji: emoji || '👋',
+        avatar_bg: finalBg,
+        avatar_emoji: emoji || '🦊',
         score: 0,
       })
       .select()
@@ -418,8 +418,8 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         id: 'p-' + Date.now(),
         event_id: event.id,
         name: name.trim(),
-        avatarBg: randomBg,
-        avatarEmoji: emoji || '🚀',
+        avatarBg: finalBg,
+        avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),
         score: 0,
       };
@@ -441,8 +441,8 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         id: 'p-' + Date.now(),
         event_id: localEvt.id,
         name: name.trim(),
-        avatarBg: randomBg,
-        avatarEmoji: emoji || '🚀',
+        avatarBg: finalBg,
+        avatarEmoji: emoji || '🦊',
         joinedAt: Date.now(),
         score: 0,
       };
