@@ -79,7 +79,7 @@ export const RoleHeader: React.FC = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
           
           {/* Left: Brand Logo & Event Selector */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+          <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0">
             <div 
               onClick={() => setActiveView('participant')}
               className="cursor-pointer select-none group shrink-0"
@@ -93,11 +93,13 @@ export const RoleHeader: React.FC = () => {
                 <button
                   id="event-selector-btn"
                   onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
-                  className="flex items-center space-x-2 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[170px] sm:max-w-[240px] truncate cursor-pointer shadow-2xs"
+                  className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate cursor-pointer shadow-2xs"
                 >
-                  <span className="truncate font-bold text-slate-800">{currentEvent?.title || 'Select Event'}</span>
+                  <span className="truncate font-bold text-slate-800 text-[11px] sm:text-xs">
+                    {currentEvent?.title || 'Select Event'}
+                  </span>
                   {currentEvent && (
-                    <span className="shrink-0">{getStatusBadge(currentEvent.status)}</span>
+                    <span className="shrink-0 scale-90 sm:scale-100">{getStatusBadge(currentEvent.status)}</span>
                   )}
                   <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
                 </button>
@@ -133,7 +135,7 @@ export const RoleHeader: React.FC = () => {
 
           {/* Center Navigation: Compact, responsive, no overlap */}
           {isHost ? (
-            <div className="hidden md:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shrink-0">
+            <div className="hidden md:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shrink-0 mx-1">
               {adminViews.map((v) => {
                 const isActive = activeView === v.id;
                 return (
@@ -141,7 +143,7 @@ export const RoleHeader: React.FC = () => {
                     key={v.id}
                     id={`nav-view-${v.id}`}
                     onClick={() => setActiveView(v.id)}
-                    className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-white text-indigo-600 shadow-2xs border border-slate-200/70'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -150,7 +152,7 @@ export const RoleHeader: React.FC = () => {
                     {v.icon}
                     <span className="hidden xl:inline">{v.label}</span>
                     <span className="inline xl:hidden">
-                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Projector' : v.id === 'admin' ? 'Admin' : v.id === 'analytics' ? 'Report' : 'Audience'}
+                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Stage' : v.id === 'admin' ? 'Admin' : v.id === 'analytics' ? 'Report' : 'Audience'}
                     </span>
                     {v.badge && (
                       <span className="text-[9px] px-1 py-0.2 bg-indigo-50 text-indigo-600 rounded font-bold hidden 2xl:inline">
@@ -162,7 +164,7 @@ export const RoleHeader: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-2 text-xs text-slate-500 font-medium">
+            <div className="hidden md:flex items-center space-x-2 text-xs text-slate-500 font-medium truncate">
               <span>Audience Mode</span>
               {currentEvent && (
                 <>
