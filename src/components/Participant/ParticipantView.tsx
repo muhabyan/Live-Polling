@@ -112,8 +112,28 @@ export const ParticipantView: React.FC = () => {
     );
   };
 
+  const timerRemaining = currentEvent?.timerRemainingSeconds ?? 45;
+  const isTimerRunning = currentEvent?.isTimerRunning;
+  const isVotingLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
+  const isLiveQuestionState = currentEvent?.status === 'live' && currentParticipant && !hasSubmittedCurrentQuestion && !isVotingLocked;
+  const isUrgentTimer = isLiveQuestionState && isTimerRunning && timerRemaining <= 10 && timerRemaining > 0;
+
   return (
     <div className="w-full flex-1 flex flex-col items-center justify-between pb-safe relative">
+      {/* Urgent Countdown Screen-Edge Red Pulse Alert (<10s & Not Answered) */}
+      {isUrgentTimer && (
+        <div 
+          aria-hidden="true"
+          className="fixed inset-0 pointer-events-none z-50 border-4 sm:border-8 border-rose-500 animate-danger-pulse transition-opacity duration-300"
+        >
+          {/* Top Urgency Pill Banner */}
+          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-600 to-red-600 text-white font-extrabold text-[11px] px-3.5 py-1 rounded-full shadow-lg flex items-center space-x-1.5 animate-bounce ring-2 ring-white/80 select-none">
+            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+            <span className="tracking-wide font-mono-numbers">⏱ SISA {timerRemaining} DETIK LAGI!</span>
+          </div>
+        </div>
+      )}
+
       {/* Top Companion HUD Bar */}
       {currentParticipant && (
         <ParticipantCompanion hasSubmitted={hasSubmittedCurrentQuestion} />
