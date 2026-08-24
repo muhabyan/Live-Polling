@@ -303,6 +303,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // gets kicked back to the join screen automatically.
   useEffect(() => {
     if (!currentParticipant || !currentEvent) return;
+    
+    // Grace period: allow 5 seconds after joining before running auto-kick to prevent race condition on initial join
+    const isRecentlyJoined = Date.now() - (currentParticipant.joinedAt || 0) < 5000;
+    if (isRecentlyJoined) return;
+
     // Check if our participant still exists in the event's participant list
     const stillExists = currentEvent.participants.some(p => p.id === currentParticipant.id);
     if (!stillExists && currentEvent.status !== 'live') {
@@ -717,8 +722,25 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setError(null);
     try {
       const res = await api.joinEventByCode(code, name, emoji, bgColor);
+      
+      // Update event state immediately so currentEvent has the new participant
+      if (res.eventId) {
+        setCurrentEventIdState(res.eventId);
+        setEvents(prev =>
+          prev.map(e => {
+            if (e.id !== res.eventId) return e;
+            const updatedParts = e.participants.some(p => p.id === res.participant.id)
+              ? e.participants
+              : [...e.participants, res.participant];
+            return { ...e, participants: updatedParts };
+          })
+        );
+      }
+
       setCurrentParticipant(res.participant);
       localStorage.setItem('pulselive_participant', JSON.stringify(res.participant));
+      setActiveView('participant');
+
       // Broadcast to all devices locally in real-time
       broadcastLocalSync({
         type: 'PARTICIPANT_JOINED',
@@ -728,7 +750,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       });
 
       if (res.eventId) {
-        setCurrentEventIdState(res.eventId);
         const fullEvent = await api.fetchFullEvent(res.eventId);
         if (fullEvent) {
           if (!fullEvent.participants.some(p => p.id === res.participant.id)) {
