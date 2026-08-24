@@ -54,28 +54,39 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
     );
   }
 
-  // If very few participants (<= 6), display elegant static pill cluster
+  // If very few participants (<= 4), display prominent, elegant cards with full names
   if (!shouldAnimate) {
     return (
-      <div className="w-full max-w-2xl mx-auto flex flex-wrap items-center justify-center gap-2 py-2">
+      <div className="w-full max-w-xl mx-auto flex flex-wrap items-center justify-center gap-3 py-3 animate-in fade-in zoom-in-95">
         {participants.map((p, idx) => (
           <div
             key={p.id + '-' + idx}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-xs transition-all ${
+            className={`flex items-center space-x-2.5 px-4 py-2 rounded-2xl text-xs font-semibold shadow-xs transition-all ${
               isDark
-                ? 'bg-slate-800/90 border border-slate-700 text-slate-200 hover:border-indigo-500'
-                : 'bg-white border border-slate-200 text-slate-800 shadow-2xs'
+                ? 'bg-slate-800/90 border border-slate-700/80 text-slate-200'
+                : 'bg-white border border-slate-200 text-slate-900 shadow-2xs'
             }`}
           >
             <span
-              className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] shrink-0"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 shadow-2xs font-emoji"
               style={{ backgroundColor: p.avatarBg }}
             >
-              {p.avatarEmoji || '👋'}
+              {p.avatarEmoji || '🦊'}
             </span>
-            <span className="font-bold text-slate-900 dark:text-white truncate max-w-[140px]">{p.name}</span>
+            <div className="min-w-0 text-left">
+              <span className={`font-extrabold text-xs block truncate max-w-[160px] leading-tight ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>
+                {p.name}
+              </span>
+              <span className={`text-[10px] block leading-tight font-mono ${
+                isDark ? 'text-slate-400' : 'text-slate-500 font-semibold'
+              }`}>
+                #{idx + 1} Attendee
+              </span>
+            </div>
             {isQuizMode && p.score !== undefined && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-extrabold">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-300 font-black border border-amber-500/20">
                 {p.score} pts
               </span>
             )}
