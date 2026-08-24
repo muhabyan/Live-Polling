@@ -17,7 +17,6 @@ interface EventContextType {
   isAuthLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
-  loginAsDemoHost: () => void;
   logout: () => Promise<void>;
 
   // Data
@@ -66,7 +65,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Auth state
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [isDemoHost, setIsDemoHost] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   // Data state
@@ -110,9 +108,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const handleNavigationChange = () => {
       const target = getViewFromLocation();
       if (target) {
-        if (['presenter', 'admin', 'analytics'].includes(target)) {
-          setIsDemoHost(true);
-        }
         setActiveViewState(target);
       }
     };
@@ -123,9 +118,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Initial mount sync
     const initialView = getViewFromLocation();
     if (initialView) {
-      if (['presenter', 'admin', 'analytics'].includes(initialView)) {
-        setIsDemoHost(true);
-      }
       setActiveViewState(initialView);
       if (window.location.hash !== '#' + initialView) {
         window.history.replaceState({ view: initialView }, '', '#' + initialView);
@@ -163,11 +155,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await api.signInWithEmail(email, password);
       await refreshAllEvents();
       setActiveView('presenter');
-    } catch {
-      // Allow fallback demo host login
-      setIsDemoHost(true);
-      await refreshAllEvents();
-      setActiveView('presenter');
+    } catch (err: any) {
+      const msg = err.message || 'Invalid email or password';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -181,15 +172,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  const loginAsDemoHost = () => {
-    setIsDemoHost(true);
-    setActiveView('presenter');
-  };
-
   const logout = async () => {
-    setIsDemoHost(false);
     await api.signOut().catch(() => {});
-    setActiveView('participant');
+    setSession(null);
+    setUser(null);
+    setActiveView('login');
   };
 
   // ============================================
@@ -198,9 +185,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const setActiveView = (view: ActiveAppView, pushHistory = true) => {
     let targetView = view;
-    if (['presenter', 'admin', 'analytics'].includes(view) && !session && !isDemoHost) {
+    if (['presenter', 'admin', 'analytics'].includes(view) && !session) {
       targetView = 'login';
-    } else if (view === 'login' && (session || isDemoHost)) {
+    } else if (view === 'login' && session) {
       targetView = 'admin';
     }
     setActiveViewState(targetView);
@@ -1306,11 +1293,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       value={{
         session,
         user,
-        isHost: Boolean(session || isDemoHost),
+        isHost: Boolean(session),
         isAuthLoading,
         login,
         register,
-        loginAsDemoHost,
         logout,
         events,
         currentEvent,

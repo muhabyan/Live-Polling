@@ -5,7 +5,7 @@ import { ButtonSpinner } from '../Shared/Loaders';
 import { BrandLogo } from '../Shared/BrandLogo';
 
 export const LoginScreen: React.FC = () => {
-  const { login, error, clearError, setActiveView, loginAsDemoHost } = useEvent();
+  const { login, error, clearError, setActiveView } = useEvent();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -109,19 +109,6 @@ export const LoginScreen: React.FC = () => {
             )}
           </button>
         </form>
-
-        <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col items-center space-y-2">
-          <button
-            type="button"
-            onClick={loginAsDemoHost}
-            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
-          >
-            <span>⚡ Instant Demo Host Access (Presenter & Admin)</span>
-          </button>
-          <p className="text-[11px] text-slate-400 text-center">
-            No signup required to test live polls, projector, and reports.
-          </p>
-        </div>
       </div>
     </div>
   );
