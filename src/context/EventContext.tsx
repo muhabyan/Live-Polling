@@ -200,6 +200,8 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     let targetView = view;
     if (['presenter', 'admin', 'analytics'].includes(view) && !session && !isDemoHost) {
       targetView = 'login';
+    } else if (view === 'login' && (session || isDemoHost)) {
+      targetView = 'admin';
     }
     setActiveViewState(targetView);
 

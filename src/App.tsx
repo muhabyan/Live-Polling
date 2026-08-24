@@ -25,8 +25,8 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen-dvh bg-[#F8FAFC] text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 antialiased overflow-x-hidden">
       
-      {/* Top Universal Role Switcher & Status Navigation Header */}
-      {activeView !== 'projector' && <RoleHeader />}
+      {/* Top Universal Role Switcher & Status Navigation Header (hidden on Login & Projector Stage) */}
+      {activeView !== 'projector' && activeView !== 'login' && <RoleHeader />}
 
       {/* Main Content Area */}
       <main className="flex-1 w-full relative flex flex-col min-h-0">
