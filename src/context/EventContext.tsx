@@ -1105,11 +1105,13 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const deleteEvent = async (id: string) => {
-    setEvents(prev => prev.filter(e => e.id !== id));
+    const remaining = events.filter(e => e.id !== id);
+    setEvents(remaining);
     setCurrentEventIdState(prev => {
-      const remaining = events.filter(e => e.id !== id);
-      return remaining.length > 0 ? remaining[0].id : '';
+      const stillThere = remaining.some(e => e.id === prev);
+      return stillThere ? prev : (remaining.length > 0 ? remaining[0].id : '');
     });
+    broadcastLocalSync({ type: 'ALL_EVENTS_UPDATED', events: remaining });
     await api.deleteEventById(id);
   };
 

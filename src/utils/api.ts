@@ -117,6 +117,7 @@ export async function fetchFullEvent(eventId: string): Promise<EventData | null>
 
     const fullEvt = dbEventToFrontend(eventRow as DbEvent, questions, participants, responses, reactions);
     localEventsStore = [fullEvt, ...localEventsStore.filter(e => e.id !== eventId)];
+    saveLocalEventsStore(localEventsStore);
     return fullEvt;
   } catch {
     return localEventsStore.find(e => e.id === eventId) || null;
@@ -149,6 +150,7 @@ export async function fetchAllEvents(): Promise<EventData[]> {
       results.push(dbEventToFrontend(row as DbEvent, questions, participants, responses, []));
     }
     localEventsStore = results;
+    saveLocalEventsStore(localEventsStore);
     return results;
   } catch {
     return localEventsStore;
@@ -687,6 +689,7 @@ export async function sendControlAction(eventId: string, action: string, payload
         localEvt.isVotingLocked = false;
         break;
     }
+    saveLocalEventsStore(localEventsStore);
   }
 
   try {
@@ -734,7 +737,7 @@ export async function sendControlAction(eventId: string, action: string, payload
           reveal_answer: false,
           timer_remaining_seconds: qTimerFromDb(0),
         };
-        await Promise.all([
+        await Promise.allSettled([
           supabase.from('responses').delete().eq('event_id', eventId),
           supabase.from('participants').delete().eq('event_id', eventId),
           supabase.from('reactions').delete().eq('event_id', eventId),
