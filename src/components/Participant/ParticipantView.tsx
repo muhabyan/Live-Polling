@@ -11,6 +11,12 @@ import { Trophy } from 'lucide-react';
 export const ParticipantView: React.FC = () => {
   const { currentEvent, currentParticipant } = useEvent();
   const [hasSubmittedCurrentQuestion, setHasSubmittedCurrentQuestion] = useState(false);
+  const [revotingQuestionId, setRevotingQuestionId] = useState<string | null>(null);
+
+  // Reset revote state whenever the presenter advances to a different question
+  useEffect(() => {
+    setRevotingQuestionId(null);
+  }, [currentEvent?.currentQuestionIndex]);
 
   // Check if current participant already answered current question
   useEffect(() => {
@@ -93,11 +99,17 @@ export const ParticipantView: React.FC = () => {
       return <ParticipantWaiting />;
     }
 
-    // If answer already submitted for this question -> show confirmation
-    if (hasSubmittedCurrentQuestion) {
+    const myResponse = currentEvent.responses.find(
+      r => r.participantId === currentParticipant.id && r.questionId === currentQ.id
+    );
+    const hasAnswered = !!myResponse;
+    const isRevoting = revotingQuestionId === currentQ.id;
+
+    // If answer already submitted for this question and NOT in active revote mode -> show confirmation
+    if (hasAnswered && !isRevoting) {
       return (
         <ParticipantSubmitted 
-          onRevote={() => setHasSubmittedCurrentQuestion(false)}
+          onRevote={() => setRevotingQuestionId(currentQ.id)}
         />
       );
     }
@@ -107,7 +119,12 @@ export const ParticipantView: React.FC = () => {
         question={currentQ}
         questionNumber={currentEvent.currentQuestionIndex + 1}
         totalQuestions={currentEvent.questions.length}
-        onAnswerSubmitted={() => setHasSubmittedCurrentQuestion(true)}
+        initialResponse={myResponse}
+        isRevoting={isRevoting}
+        onAnswerSubmitted={() => {
+          setRevotingQuestionId(null);
+          setHasSubmittedCurrentQuestion(true);
+        }}
       />
     );
   };

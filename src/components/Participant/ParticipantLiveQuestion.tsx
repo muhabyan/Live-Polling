@@ -17,6 +17,8 @@ interface ParticipantLiveQuestionProps {
   question: Question;
   questionNumber: number;
   totalQuestions: number;
+  initialResponse?: any;
+  isRevoting?: boolean;
   onAnswerSubmitted: () => void;
 }
 
@@ -24,22 +26,30 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
   question,
   questionNumber,
   totalQuestions,
+  initialResponse,
+  isRevoting,
   onAnswerSubmitted,
 }) => {
   const { currentEvent, submitAnswer } = useEvent();
-  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
-  const [textAnswer, setTextAnswer] = useState('');
-  const [ratingValue, setRatingValue] = useState<number | null>(null);
+  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>(
+    initialResponse?.selectedOptionIds || []
+  );
+  const [textAnswer, setTextAnswer] = useState(
+    initialResponse?.textResponse || ''
+  );
+  const [ratingValue, setRatingValue] = useState<number | null>(
+    initialResponse?.ratingValue ?? null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startTime] = useState(Date.now());
 
-  // Reset state when question changes
+  // Reset or prefill state when question or initialResponse changes
   useEffect(() => {
-    setSelectedOptionIds([]);
-    setTextAnswer('');
-    setRatingValue(null);
+    setSelectedOptionIds(initialResponse?.selectedOptionIds || []);
+    setTextAnswer(initialResponse?.textResponse || '');
+    setRatingValue(initialResponse?.ratingValue ?? null);
     setIsSubmitting(false);
-  }, [question.id]);
+  }, [question.id, initialResponse?.id]);
 
   const timerRemaining = currentEvent?.timerRemainingSeconds ?? (question.timerSeconds || 45);
   const isLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
