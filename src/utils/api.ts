@@ -440,6 +440,7 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         score: 0,
       };
       localEvt.participants = [...localEvt.participants, newPart];
+      saveLocalEventsStore(localEventsStore);
       return {
         eventId: localEvt.id,
         participant: newPart,
@@ -480,15 +481,27 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         joinedAt: Date.now(),
         score: 0,
       };
+      const localEvt = localEventsStore.find(e => e.id === event.id || e.roomCode.toUpperCase() === normalizedCode);
+      if (localEvt) {
+        localEvt.participants = [...localEvt.participants.filter(p => p.id !== fallbackPart.id), fallbackPart];
+        saveLocalEventsStore(localEventsStore);
+      }
       return {
         eventId: event.id,
         participant: fallbackPart,
       };
     }
 
+    const frontendPart = dbParticipantToFrontend(participant as DbParticipant);
+    const localEvt = localEventsStore.find(e => e.id === event.id || e.roomCode.toUpperCase() === normalizedCode);
+    if (localEvt) {
+      localEvt.participants = [...localEvt.participants.filter(p => p.id !== frontendPart.id), frontendPart];
+      saveLocalEventsStore(localEventsStore);
+    }
+
     return {
       eventId: event.id,
-      participant: dbParticipantToFrontend(participant as DbParticipant),
+      participant: frontendPart,
     };
   } catch (err: any) {
     console.error('❌ [Join] Error in joinEventByCode:', err.message);
