@@ -548,14 +548,40 @@ export const PresenterControl: React.FC = () => {
                 <span>Connected Room ({currentEvent.participants.length})</span>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-1.5 flex-wrap gap-y-1">
                 <button
-                  onClick={() => simulateAudienceVotes(8)}
+                  onClick={() => simulateAudienceVotes(10)}
                   disabled={isSimulatingCrowd}
-                  className="text-xs text-indigo-600 font-bold hover:underline flex items-center space-x-1 cursor-pointer"
+                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  title="Simulate 10 participants answering"
                 >
-                  <Zap className="w-3 h-3 text-amber-500 fill-amber-400" />
-                  <span>+8 mock</span>
+                  <Zap className="w-2.5 h-2.5 text-amber-500 fill-amber-400" />
+                  <span>+10</span>
+                </button>
+                <button
+                  onClick={() => simulateAudienceVotes(50)}
+                  disabled={isSimulatingCrowd}
+                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  title="Simulate 50 participants answering"
+                >
+                  <span>+50</span>
+                </button>
+                <button
+                  onClick={() => simulateAudienceVotes(100)}
+                  disabled={isSimulatingCrowd}
+                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  title="Simulate 100 participants answering"
+                >
+                  <span>+100</span>
+                </button>
+                <button
+                  onClick={() => simulateAudienceVotes(400)}
+                  disabled={isSimulatingCrowd}
+                  className="px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md text-[11px] font-extrabold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50 shadow-2xs"
+                  title="Stress test with 400 participants answering concurrently"
+                >
+                  <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                  <span>+400 MAX</span>
                 </button>
 
                 {currentEvent.participants.length > 0 && (
@@ -566,7 +592,7 @@ export const PresenterControl: React.FC = () => {
                         await sendModeratorAction('reset_session');
                       }
                     }}
-                    className="text-xs text-rose-600 hover:text-rose-700 font-semibold hover:underline flex items-center space-x-1 cursor-pointer"
+                    className="px-2 py-0.5 text-[11px] text-rose-600 hover:bg-rose-50 rounded-md font-semibold flex items-center space-x-1 cursor-pointer transition-colors"
                     title="Clear all participants"
                   >
                     <Trash2 className="w-3 h-3 text-rose-500" />

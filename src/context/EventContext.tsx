@@ -863,9 +863,94 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!currentEvent) return;
     setIsSimulatingCrowd(true);
     try {
+      const qIdx = currentEvent.currentQuestionIndex ?? 0;
+      const currentQ = currentEvent.questions[qIdx];
+      if (!currentQ) return;
+
+      const sampleNames = ['Aria', 'Kenzo', 'Maya', 'Devon', 'Chloe', 'Zack', 'Elena', 'Lucas', 'Priya', 'Tariq', 'Sara', 'Leo', 'Budi', 'Rian', 'Dewi', 'Siti', 'Fajar', 'Nadia', 'Dimas', 'Putri', 'Agus', 'Anisa', 'Bayu', 'Citra'];
+      const emojis = ['🦊', '🐼', '🦁', '🦉', '🐱', '🐶', '🚀', '💡', '🔥', '✨', '🧠', '🎉'];
+      const sampleWords = ['Innovation', 'Leadership', 'Efficiency', 'Collaboration', 'Scalability', 'Impact', 'Focus', 'Trust', 'Kecepatan', 'Kreativitas', 'Adaptasi', 'Teknologi'];
+      const bgColors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#6366F1', '#14B8A6'];
+
+      const newSimParts: Participant[] = [];
+      const newSimResps: ResponseItem[] = [];
+
+      for (let i = 0; i < count; i++) {
+        const pId = 'p-sim-' + Date.now() + '-' + i + '-' + Math.random().toString(36).substring(2, 6);
+        const nameBase = sampleNames[(Date.now() + i) % sampleNames.length];
+        const pName = `${nameBase} ${Math.floor(Math.random() * 899 + 100)}`;
+        const avatarEmoji = emojis[i % emojis.length];
+        const avatarBg = bgColors[i % bgColors.length];
+
+        const partObj: Participant = {
+          id: pId,
+          event_id: currentEvent.id,
+          name: pName,
+          avatarBg,
+          avatarEmoji,
+          joinedAt: Date.now(),
+          score: 100,
+        };
+        newSimParts.push(partObj);
+
+        let selectedOptionIds: string[] = [];
+        let textResponse: string | undefined;
+        let ratingValue: number | undefined;
+
+        if (currentQ.type === 'multiple_choice' || currentQ.type === 'true_false') {
+          const qOpts = currentQ.options || [];
+          if (qOpts.length > 0) {
+            const randOpt = qOpts[Math.floor(Math.random() * qOpts.length)];
+            selectedOptionIds = [randOpt.id];
+          }
+        } else if (currentQ.type === 'rating') {
+          ratingValue = Math.floor(Math.random() * 3) + 3; // 3 to 5 stars
+        } else if (currentQ.type === 'word_cloud') {
+          textResponse = sampleWords[Math.floor(Math.random() * sampleWords.length)];
+        } else {
+          textResponse = `Feedback poin #${i + 1} dari partisipan live.`;
+        }
+
+        const respObj: ResponseItem = {
+          id: 'resp-sim-' + Date.now() + '-' + i,
+          event_id: currentEvent.id,
+          participantId: pId,
+          participantName: pName,
+          questionId: currentQ.id,
+          selectedOptionIds,
+          textResponse,
+          ratingValue,
+          timeTakenSeconds: Math.floor(Math.random() * 8) + 2,
+          submittedAt: Date.now(),
+        };
+        newSimResps.push(respObj);
+      }
+
+      setEvents(prev =>
+        prev.map(evt => {
+          if (evt.id !== currentEvent.id) return evt;
+          return {
+            ...evt,
+            participants: [...evt.participants, ...newSimParts],
+            responses: [...evt.responses, ...newSimResps],
+          };
+        })
+      );
+
+      // Broadcast to all connected devices locally
+      broadcastLocalSync({
+        type: 'MODERATOR_ACTION_BROADCAST',
+        eventId: currentEvent.id,
+        action: 'simulate_crowd',
+        updatedFields: {
+          participants: [...currentEvent.participants, ...newSimParts],
+          responses: [...currentEvent.responses, ...newSimResps],
+        },
+      });
+
       await sendModeratorAction('simulate_crowd', { count });
     } finally {
-      setTimeout(() => setIsSimulatingCrowd(false), 800);
+      setTimeout(() => setIsSimulatingCrowd(false), 500);
     }
   };
 
