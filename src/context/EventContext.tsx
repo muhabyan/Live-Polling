@@ -29,6 +29,13 @@ interface EventContextType {
   error: string | null;
   isSimulatingCrowd: boolean;
 
+  // Auto-Advance (Auto-Pilot)
+  autoAdvance: boolean;
+  setAutoAdvance: (on: boolean) => void;
+  autoAdvanceDelay: number; // seconds to wait after timer expires before advancing
+  setAutoAdvanceDelay: (seconds: number) => void;
+  autoAdvanceCountdown: number | null; // null = not counting, number = seconds remaining
+
   // Actions
   setActiveView: (view: ActiveAppView) => void;
   setCurrentEventId: (id: string) => void;
@@ -73,6 +80,12 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSimulatingCrowd, setIsSimulatingCrowd] = useState(false);
+
+  // Auto-Advance (Auto-Pilot) state
+  const [autoAdvance, setAutoAdvance] = useState(false);
+  const [autoAdvanceDelay, setAutoAdvanceDelay] = useState(5); // default 5 seconds pause
+  const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<number | null>(null);
+  const autoAdvanceTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   const getViewFromLocation = (): ActiveAppView | null => {
     if (typeof window === 'undefined') return null;
@@ -550,7 +563,6 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           if (evt.id !== eventId) return evt;
           if (remaining <= 0) {
             // Timer expired: lock voting, freeze at 0.
-            // Do NOT auto-reset — presenter must advance manually.
             return {
               ...evt,
               timerRemainingSeconds: 0,
@@ -570,6 +582,87 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [currentEvent?.id, currentEvent?.isTimerRunning, currentEvent?.questionStartedAt]);
+
+  // ============================================
+  // AUTO-ADVANCE ENGINE (Auto-Pilot)
+  // ============================================
+  // Watches for timer expiry. When auto-advance is ON and the timer just hit 0,
+  // starts a visible countdown (autoAdvanceDelay seconds). When that countdown
+  // reaches 0, automatically calls next_question or end_session.
+  // The host can cancel at any time by toggling autoAdvance off, manually
+  // navigating, or pausing.
+
+  const prevTimerRunningRef = React.useRef(false);
+
+  useEffect(() => {
+    if (!currentEvent || !autoAdvance) {
+      // Auto-advance is off — clear any pending countdown
+      if (autoAdvanceTimerRef.current) {
+        clearInterval(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+      setAutoAdvanceCountdown(null);
+      prevTimerRunningRef.current = currentEvent?.isTimerRunning ?? false;
+      return;
+    }
+
+    const wasRunning = prevTimerRunningRef.current;
+    const isNowStopped = !currentEvent.isTimerRunning;
+    const timerExpired = (currentEvent.timerRemainingSeconds ?? 1) <= 0;
+    const isLive = currentEvent.status === 'live';
+
+    prevTimerRunningRef.current = currentEvent.isTimerRunning;
+
+    // Detect the transition: timer WAS running → now stopped AND timer is at 0
+    if (wasRunning && isNowStopped && timerExpired && isLive && autoAdvanceCountdown === null) {
+      // Start the auto-advance countdown
+      setAutoAdvanceCountdown(autoAdvanceDelay);
+
+      let remaining = autoAdvanceDelay;
+      autoAdvanceTimerRef.current = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          // Time to advance!
+          if (autoAdvanceTimerRef.current) {
+            clearInterval(autoAdvanceTimerRef.current);
+            autoAdvanceTimerRef.current = null;
+          }
+          setAutoAdvanceCountdown(null);
+
+          // Check if this is the last question
+          const qIdx = currentEvent.currentQuestionIndex ?? 0;
+          const totalQ = currentEvent.questions.length;
+          if (qIdx >= totalQ - 1) {
+            // Last question — finish session
+            sendModeratorAction('end_session');
+          } else {
+            // Advance to next question
+            sendModeratorAction('next_question').then(() => {
+              // Auto-start the timer for the next question after a brief moment
+              setTimeout(() => sendModeratorAction('start_timer'), 600);
+            });
+          }
+        } else {
+          setAutoAdvanceCountdown(remaining);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      // Cleanup only on unmount or dep change
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentEvent?.isTimerRunning, currentEvent?.timerRemainingSeconds, autoAdvance, currentEvent?.status]);
+
+  // Cancel auto-advance countdown when host manually navigates questions
+  useEffect(() => {
+    if (autoAdvanceTimerRef.current && currentEvent?.isTimerRunning) {
+      // Host manually started timer again (e.g. navigated) — cancel pending auto-advance
+      clearInterval(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+      setAutoAdvanceCountdown(null);
+    }
+  }, [currentEvent?.currentQuestionIndex, currentEvent?.isTimerRunning]);
 
   // ============================================
   // USER ACTIONS
@@ -1024,6 +1117,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         isLoading,
         error,
         isSimulatingCrowd,
+        autoAdvance,
+        setAutoAdvance,
+        autoAdvanceDelay,
+        setAutoAdvanceDelay,
+        autoAdvanceCountdown,
         setActiveView,
         setCurrentEventId,
         refreshEvent,

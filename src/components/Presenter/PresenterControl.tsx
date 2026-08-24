@@ -36,7 +36,12 @@ export const PresenterControl: React.FC = () => {
     setActiveView,
     refreshEvent,
     deleteParticipant,
-    clearAllParticipants
+    clearAllParticipants,
+    autoAdvance,
+    setAutoAdvance,
+    autoAdvanceDelay,
+    setAutoAdvanceDelay,
+    autoAdvanceCountdown
   } = useEvent();
 
   const [isSummarizingAI, setIsSummarizingAI] = useState(false);
@@ -357,9 +362,78 @@ export const PresenterControl: React.FC = () => {
                   <SkipForward className="w-3.5 h-3.5" />
                 </button>
               )}
-            </div>
+</div>
 
-            {/* Secondary Action Controls Toolbar */}
+            {/* ⚡ Auto-Pilot Control Strip */}
+            <div className={`mt-3 p-3 sm:p-3.5 rounded-xl border transition-all ${
+              autoAdvance
+                ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200/80 shadow-xs'
+                : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                {/* Toggle Switch */}
+                <div className="flex items-center space-x-2.5">
+                  <button
+                    onClick={() => setAutoAdvance(!autoAdvance)}
+                    className={`relative w-10 h-[22px] rounded-full transition-all duration-300 cursor-pointer ${
+                      autoAdvance ? 'bg-amber-500 shadow-amber-300/40 shadow-sm' : 'bg-slate-300'
+                    }`}
+                  >
+                    <span className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${
+                      autoAdvance ? 'left-[22px]' : 'left-[3px]'
+                    }`} />
+                  </button>
+                  <div className="flex items-center space-x-1.5">
+                    <Zap className={`w-3.5 h-3.5 ${
+                      autoAdvance ? 'text-amber-600' : 'text-slate-400'
+                    }`} />
+                    <span className={`text-xs font-bold ${
+                      autoAdvance ? 'text-amber-800' : 'text-slate-600'
+                    }`}>
+                      Auto-Pilot
+                    </span>
+                  </div>
+                </div>
+
+                {/* Delay Selector */}
+                {autoAdvance && (
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Jeda:</span>
+                    {[3, 5, 8, 10].map(sec => (
+                      <button
+                        key={sec}
+                        onClick={() => setAutoAdvanceDelay(sec)}
+                        className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                          autoAdvanceDelay === sec
+                            ? 'bg-amber-500 text-white shadow-xs'
+                            : 'bg-white/80 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                        }`}
+                      >
+                        {sec}s
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Live Countdown Indicator */}
+                {autoAdvanceCountdown !== null && (
+                  <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-xs font-bold animate-pulse">
+                    <SkipForward className="w-3 h-3" />
+                    <span>
+                      {currentQIndex >= currentEvent.questions.length - 1
+                        ? `Finishing in ${autoAdvanceCountdown}s...`
+                        : `Next question in ${autoAdvanceCountdown}s...`}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {autoAdvance && autoAdvanceCountdown === null && (
+                <p className="text-[10px] text-amber-600/80 mt-1.5 font-medium leading-snug">
+                  Timer habis → jeda {autoAdvanceDelay}s → otomatis lanjut ke soal berikutnya. Soal terakhir → otomatis selesai.
+                </p>
+              )}
+            </div>
             <div className="mt-4 pt-3.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
               
               <div className="flex flex-wrap items-center gap-2">
