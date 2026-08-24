@@ -203,6 +203,23 @@ router.post('/events/:id/control', async (req: Request, res: Response) => {
       case 'end_session':
         updates = { status: 'ended', is_timer_running: false };
         break;
+      case 'reset_session':
+      case 'clear_room':
+        updates = {
+          status: 'waiting',
+          current_question_index: 0,
+          is_timer_running: false,
+          is_voting_locked: false,
+          show_results_on_projector: true,
+          reveal_answer: false,
+          timer_remaining_seconds: 45,
+        };
+        await Promise.allSettled([
+          supabase.from('responses').delete().eq('event_id', id),
+          supabase.from('participants').delete().eq('event_id', id),
+          supabase.from('reactions').delete().eq('event_id', id),
+        ]);
+        break;
       case 'next_question':
         updates = {
           current_question_index: event.current_question_index + 1,
