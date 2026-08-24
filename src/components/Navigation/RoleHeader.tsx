@@ -282,6 +282,7 @@ export const RoleHeader: React.FC = () => {
           onClose={() => setIsQRModalOpen(false)}
           roomCode={currentEvent.roomCode}
           eventTitle={currentEvent.title}
+          status={currentEvent.status}
         />
       )}
     </>
