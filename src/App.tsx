@@ -29,7 +29,7 @@ const AppContent: React.FC = () => {
       {activeView !== 'projector' && <RoleHeader />}
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full relative">
+      <main className="flex-1 w-full relative flex flex-col min-h-0">
         {activeView === 'login' && <LoginScreen />}
         {activeView === 'participant' && <ParticipantView />}
         {activeView === 'projector' && <ProjectorDisplay />}

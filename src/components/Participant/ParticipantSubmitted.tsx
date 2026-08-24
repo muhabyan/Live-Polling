@@ -14,9 +14,9 @@ export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRe
   const isLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
 
   return (
-    <div className="w-full max-w-md mx-auto px-3 py-2 flex flex-col justify-between flex-1 gap-4">
+    <div className="w-full max-w-md mx-auto px-3 py-2 flex flex-col justify-between flex-1 gap-3 min-h-0 overflow-y-auto">
       {/* Main Success Confirmation Card */}
-      <div className="my-auto py-6 sm:py-8 text-center bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs relative overflow-hidden">
+      <div className="my-auto py-4 sm:py-8 text-center bg-white rounded-2xl p-4 sm:p-7 border border-slate-200/90 shadow-2xs relative overflow-hidden shrink-0">
         
         {/* Animated Check Icon */}
         <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-xs">
@@ -54,7 +54,7 @@ export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRe
       </div>
 
       {/* Quick Cheer / Reaction Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-3.5 text-center shadow-2xs">
+      <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-3.5 text-center shadow-2xs shrink-0">
         <div className="text-[11px] font-bold text-slate-500 mb-2 flex items-center justify-center space-x-1">
           <Sparkles className="w-3 h-3 text-indigo-600" />
           <span>Send a reaction to the speaker</span>
@@ -64,7 +64,7 @@ export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRe
             <button
               key={emoji}
               onClick={() => sendReaction(emoji)}
-              className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-125 hover:scale-105 transition-all text-xl flex items-center justify-center shadow-2xs border border-slate-200/80 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-125 hover:scale-105 transition-all text-lg sm:text-xl flex items-center justify-center shadow-2xs border border-slate-200/80 cursor-pointer"
             >
               {emoji}
             </button>

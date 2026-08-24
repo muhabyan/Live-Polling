@@ -245,18 +245,34 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           if (exists) {
             return prev.map(e => {
               if (e.id !== updated.id) return e;
-              // Preserve local timer state while it is actively ticking so the
-              // 3-second heartbeat poll does not reset the countdown to the
-              // original duration stored in the Supabase DB column.
-              const preserveTimer = e.isTimerRunning && updated.isTimerRunning;
+
+              // Check if DB timer has elapsed based on questionStartedAt
+              let dbTimerElapsed = false;
+              if (updated.questionStartedAt && updated.isTimerRunning) {
+                const totalSec = updated.questions[updated.currentQuestionIndex]?.timerSeconds || updated.timerRemainingSeconds || 45;
+                const elapsedSec = Math.floor((Date.now() - updated.questionStartedAt) / 1000);
+                if (totalSec - elapsedSec <= 0) {
+                  dbTimerElapsed = true;
+                }
+              }
+
+              // Preserve local timer state while it is actively ticking or if it has reached 0
+              const isLocalExpired = (e.timerRemainingSeconds === 0 && !e.isTimerRunning) || dbTimerElapsed;
+              const preserveLocalRunning = e.isTimerRunning && (e.timerRemainingSeconds ?? 1) > 0;
+
               return {
                 ...updated,
-                timerRemainingSeconds: preserveTimer
+                timerRemainingSeconds: isLocalExpired
+                  ? 0
+                  : preserveLocalRunning
                   ? e.timerRemainingSeconds
                   : updated.timerRemainingSeconds,
-                isTimerRunning: preserveTimer
+                isTimerRunning: isLocalExpired
+                  ? false
+                  : preserveLocalRunning
                   ? e.isTimerRunning
                   : updated.isTimerRunning,
+                isVotingLocked: isLocalExpired ? true : updated.isVotingLocked,
               };
             });
           }
@@ -276,6 +292,24 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Current event derived
   const currentEvent = events.find(e => e.id === currentEventId) || events[0] || null;
+
+  // ============================================
+  // AUTO-KICK: Detect when participant is removed from event
+  // ============================================
+  // When the host resets/deletes the session, participant records get deleted from DB.
+  // On next refresh/poll, the participant discovers they're no longer in the list and
+  // gets kicked back to the join screen automatically.
+  useEffect(() => {
+    if (!currentParticipant || !currentEvent) return;
+    // Check if our participant still exists in the event's participant list
+    const stillExists = currentEvent.participants.some(p => p.id === currentParticipant.id);
+    if (!stillExists && currentEvent.status !== 'live') {
+      // We've been removed (session reset or participant deleted)
+      // Clear local state so we return to the join screen
+      setCurrentParticipant(null);
+      localStorage.removeItem('pulselive_participant');
+    }
+  }, [currentEvent?.participants?.length, currentEvent?.status, currentParticipant]);
 
   // ============================================
   // LOCAL REALTIME SYNC (Phone <-> Laptop <-> Projector)
@@ -586,60 +620,71 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ============================================
   // AUTO-ADVANCE ENGINE (Auto-Pilot)
   // ============================================
-  // Watches for timer expiry. When auto-advance is ON and the timer just hit 0,
-  // starts a visible countdown (autoAdvanceDelay seconds). When that countdown
-  // reaches 0, automatically calls next_question or end_session.
-  // The host can cancel at any time by toggling autoAdvance off, manually
-  // navigating, or pausing.
+  const autoAdvanceIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoAdvanceTargetQRef = React.useRef<number | null>(null);
 
-  const prevTimerRunningRef = React.useRef(false);
-
-  useEffect(() => {
-    if (!currentEvent || !autoAdvance) {
-      // Auto-advance is off — clear any pending countdown
-      if (autoAdvanceTimerRef.current) {
-        clearInterval(autoAdvanceTimerRef.current);
-        autoAdvanceTimerRef.current = null;
-      }
-      setAutoAdvanceCountdown(null);
-      prevTimerRunningRef.current = currentEvent?.isTimerRunning ?? false;
-      return;
+  const clearAutoAdvanceTimer = useCallback(() => {
+    if (autoAdvanceIntervalRef.current) {
+      clearInterval(autoAdvanceIntervalRef.current);
+      autoAdvanceIntervalRef.current = null;
     }
+    setAutoAdvanceCountdown(null);
+  }, []);
 
-    const wasRunning = prevTimerRunningRef.current;
-    const isNowStopped = !currentEvent.isTimerRunning;
-    const timerExpired = (currentEvent.timerRemainingSeconds ?? 1) <= 0;
-    const isLive = currentEvent.status === 'live';
+  // When question index or event changes, reset target so next question can auto-advance
+  useEffect(() => {
+    clearAutoAdvanceTimer();
+    autoAdvanceTargetQRef.current = null;
+  }, [currentEvent?.currentQuestionIndex, currentEvent?.id, clearAutoAdvanceTimer]);
 
-    prevTimerRunningRef.current = currentEvent.isTimerRunning;
+  // When autoAdvance is turned off, cancel any active countdown
+  useEffect(() => {
+    if (!autoAdvance) {
+      clearAutoAdvanceTimer();
+      autoAdvanceTargetQRef.current = null;
+    }
+  }, [autoAdvance, clearAutoAdvanceTimer]);
 
-    // Detect the transition: timer WAS running → now stopped AND timer is at 0
-    if (wasRunning && isNowStopped && timerExpired && isLive && autoAdvanceCountdown === null) {
-      // Start the auto-advance countdown
+  // When timer starts running with time > 0, cancel auto-advance
+  useEffect(() => {
+    if (currentEvent?.isTimerRunning && (currentEvent?.timerRemainingSeconds ?? 0) > 0) {
+      clearAutoAdvanceTimer();
+      autoAdvanceTargetQRef.current = null;
+    }
+  }, [currentEvent?.isTimerRunning, currentEvent?.timerRemainingSeconds, clearAutoAdvanceTimer]);
+
+  // Main Auto-Advance trigger
+  useEffect(() => {
+    if (!currentEvent || !autoAdvance) return;
+    if (currentEvent.status !== 'live') return;
+
+    const qIdx = currentEvent.currentQuestionIndex ?? 0;
+    const isTimerExpired = (currentEvent.timerRemainingSeconds ?? 1) <= 0 && !currentEvent.isTimerRunning;
+
+    // Trigger auto-advance ONLY if:
+    // 1. Timer has expired (0 seconds left & not running)
+    // 2. We haven't already initiated countdown for this question index
+    // 3. No active interval is currently running
+    if (isTimerExpired && autoAdvanceTargetQRef.current !== qIdx && !autoAdvanceIntervalRef.current) {
+      autoAdvanceTargetQRef.current = qIdx;
       setAutoAdvanceCountdown(autoAdvanceDelay);
 
       let remaining = autoAdvanceDelay;
-      autoAdvanceTimerRef.current = setInterval(() => {
+      autoAdvanceIntervalRef.current = setInterval(() => {
         remaining -= 1;
         if (remaining <= 0) {
-          // Time to advance!
-          if (autoAdvanceTimerRef.current) {
-            clearInterval(autoAdvanceTimerRef.current);
-            autoAdvanceTimerRef.current = null;
-          }
-          setAutoAdvanceCountdown(null);
+          clearAutoAdvanceTimer();
 
-          // Check if this is the last question
-          const qIdx = currentEvent.currentQuestionIndex ?? 0;
           const totalQ = currentEvent.questions.length;
           if (qIdx >= totalQ - 1) {
-            // Last question — finish session
+            // Last question -> Finish session
             sendModeratorAction('end_session');
           } else {
-            // Advance to next question
+            // Advance to next question and start timer
             sendModeratorAction('next_question').then(() => {
-              // Auto-start the timer for the next question after a brief moment
-              setTimeout(() => sendModeratorAction('start_timer'), 600);
+              setTimeout(() => {
+                sendModeratorAction('start_timer');
+              }, 600);
             });
           }
         } else {
@@ -647,22 +692,16 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }, 1000);
     }
-
-    return () => {
-      // Cleanup only on unmount or dep change
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentEvent?.isTimerRunning, currentEvent?.timerRemainingSeconds, autoAdvance, currentEvent?.status]);
-
-  // Cancel auto-advance countdown when host manually navigates questions
-  useEffect(() => {
-    if (autoAdvanceTimerRef.current && currentEvent?.isTimerRunning) {
-      // Host manually started timer again (e.g. navigated) — cancel pending auto-advance
-      clearInterval(autoAdvanceTimerRef.current);
-      autoAdvanceTimerRef.current = null;
-      setAutoAdvanceCountdown(null);
-    }
-  }, [currentEvent?.currentQuestionIndex, currentEvent?.isTimerRunning]);
+  }, [
+    currentEvent?.timerRemainingSeconds,
+    currentEvent?.isTimerRunning,
+    currentEvent?.status,
+    currentEvent?.currentQuestionIndex,
+    currentEvent?.questions?.length,
+    autoAdvance,
+    autoAdvanceDelay,
+    clearAutoAdvanceTimer
+  ]);
 
   // ============================================
   // USER ACTIONS

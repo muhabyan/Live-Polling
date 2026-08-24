@@ -40,7 +40,6 @@ export const RoleHeader: React.FC = () => {
     { id: 'projector', label: 'Projector', icon: <Tv className="w-3.5 h-3.5" />, badge: 'Stage' },
     { id: 'admin', label: 'Admin Studio', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" /> },
-    { id: 'participant', label: 'Audience View', icon: <Smartphone className="w-3.5 h-3.5" /> },
   ];
 
   const getStatusBadge = (status?: string) => {
@@ -81,7 +80,7 @@ export const RoleHeader: React.FC = () => {
           {/* Left: Brand Logo & Event Selector */}
           <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0">
             <div 
-              onClick={() => setActiveView('participant')}
+              onClick={() => setActiveView(isHost ? 'admin' : 'participant')}
               className="cursor-pointer select-none group shrink-0"
             >
               <BrandLogo size="sm" />
@@ -152,7 +151,7 @@ export const RoleHeader: React.FC = () => {
                     {v.icon}
                     <span className="hidden xl:inline">{v.label}</span>
                     <span className="inline xl:hidden">
-                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Stage' : v.id === 'admin' ? 'Admin' : v.id === 'analytics' ? 'Report' : 'Audience'}
+                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Stage' : v.id === 'admin' ? 'Admin' : 'Report'}
                     </span>
                     {v.badge && (
                       <span className="text-[9px] px-1 py-0.2 bg-indigo-50 text-indigo-600 rounded font-bold hidden 2xl:inline">

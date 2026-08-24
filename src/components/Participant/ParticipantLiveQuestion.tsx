@@ -129,7 +129,7 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-3 py-4 sm:p-6 flex flex-col justify-between flex-1">
+    <div className="w-full max-w-md mx-auto px-3 py-3 sm:p-6 flex flex-col justify-between flex-1 min-h-0 overflow-y-auto">
       
       {/* Top Header: Progress & Live Countdown */}
       <div>

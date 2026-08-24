@@ -6,10 +6,10 @@ import { ParticipantLiveQuestion } from './ParticipantLiveQuestion';
 import { ParticipantSubmitted } from './ParticipantSubmitted';
 import { ParticipantTicker } from './ParticipantTicker';
 import { ParticipantCompanion } from './ParticipantCompanion';
-import { Trophy } from 'lucide-react';
+import { Trophy, LogOut } from 'lucide-react';
 
 export const ParticipantView: React.FC = () => {
-  const { currentEvent, currentParticipant } = useEvent();
+  const { currentEvent, currentParticipant, leaveRoom } = useEvent();
   const [hasSubmittedCurrentQuestion, setHasSubmittedCurrentQuestion] = useState(false);
   const [revotingQuestionId, setRevotingQuestionId] = useState<string | null>(null);
 
@@ -52,42 +52,51 @@ export const ParticipantView: React.FC = () => {
       const myAnswersCount = currentEvent.responses.filter(r => r.participantId === currentParticipant.id).length;
 
       return (
-        <div className="w-full max-w-md mx-auto p-4 sm:p-6 text-center flex flex-col justify-center my-auto">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 text-2xl shadow-xs">
-              <Trophy className="w-8 h-8" />
+        <div className="w-full max-w-md mx-auto p-3 sm:p-6 text-center flex flex-col justify-center my-auto gap-3">
+          <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-sm">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl shadow-xs">
+              <Trophy className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2 font-display">
+            <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 mb-1.5 sm:mb-2 font-display">
               Session Selesai!
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mb-5">
+            <p className="text-[11px] sm:text-sm text-slate-500 mb-4 sm:mb-5">
               Terima kasih telah berpartisipasi dalam <strong className="text-slate-800">{currentEvent.title}</strong>.
             </p>
             
             {hasQuizScoring ? (
-              <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-5">
+              <div className="p-3 sm:p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-4 sm:mb-5">
                 <div className="text-[10px] text-amber-800 font-bold uppercase tracking-wider mb-1">
                   Skor Quiz Kamu
                 </div>
-                <div className="text-3xl font-extrabold text-amber-600 font-mono-numbers">
+                <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono-numbers">
                   {currentParticipant.score || 0} pts
                 </div>
               </div>
             ) : (
-              <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl mb-5">
+              <div className="p-3 sm:p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl mb-4 sm:mb-5">
                 <div className="text-[10px] text-indigo-800 font-bold uppercase tracking-wider mb-1">
                   Kontribusi Partisipasi Kamu
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-indigo-600 font-mono-numbers">
+                <div className="text-xl sm:text-3xl font-extrabold text-indigo-600 font-mono-numbers">
                   {myAnswersCount} / {currentEvent.questions.length} Soal Terjawab
                 </div>
                 <p className="text-[11px] text-indigo-500 mt-1">✓ Jawaban kamu tersimpan & terhitung secara live</p>
               </div>
             )}
 
-            <p className="text-xs text-slate-400">
+            <p className="text-[11px] sm:text-xs text-slate-400 mb-4">
               Sesi presentasi telah berakhir. Kamu dapat menutup tab ini.
             </p>
+
+            {/* Exit Room Button */}
+            <button
+              onClick={leaveRoom}
+              className="w-full py-2.5 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer border border-slate-200 hover:border-rose-200"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Keluar dari Room</span>
+            </button>
           </div>
         </div>
       );
@@ -136,7 +145,7 @@ export const ParticipantView: React.FC = () => {
   const isUrgentTimer = isLiveQuestionState && isTimerRunning && timerRemaining <= 10 && timerRemaining > 0;
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-between pb-safe relative">
+    <div className="w-full flex-1 flex flex-col items-center pb-safe relative overflow-y-auto overflow-x-hidden">
       {/* Urgent Countdown Screen-Edge Red Pulse Alert (<10s & Not Answered) */}
       {isUrgentTimer && (
         <div 
@@ -156,7 +165,7 @@ export const ParticipantView: React.FC = () => {
         <ParticipantCompanion hasSubmitted={hasSubmittedCurrentQuestion} />
       )}
 
-      <div className="w-full max-w-md mx-auto flex-1 flex flex-col">
+      <div className="w-full max-w-md mx-auto flex-1 flex flex-col min-h-0">
         {renderContent()}
       </div>
 
