@@ -757,6 +757,12 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const leaveRoom = () => {
     setCurrentParticipant(null);
     localStorage.removeItem('pulselive_participant');
+    setError(null);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('code');
+      window.history.replaceState({}, '', url.pathname + (url.hash || ''));
+    }
   };
 
   const submitAnswer = async (payload: {

@@ -127,11 +127,15 @@ router.post('/join', async (req: Request, res: Response) => {
   try {
     const { data: event, error: evtErr } = await supabase
       .from('events')
-      .select('id')
+      .select('id, status')
       .ilike('room_code', roomCode.trim())
       .single();
 
     if (evtErr || !event) return res.status(404).json({ error: 'Room not found with that code' });
+
+    if (event.status === 'ended') {
+      return res.status(403).json({ error: 'Sesi polling ini telah selesai (Ended). Host telah menutup sesi dan tidak lagi menerima peserta baru.' });
+    }
 
     const avatarBgs = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4'];
     const randomBg = avatarBgs[Math.floor(Math.random() * avatarBgs.length)];

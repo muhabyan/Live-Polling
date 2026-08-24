@@ -419,7 +419,7 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
   try {
     const { data: event, error: evtErr } = await supabase
       .from('events')
-      .select('id, room_code, title')
+      .select('id, room_code, title, status')
       .ilike('room_code', normalizedCode)
       .single();
 
@@ -428,6 +428,10 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
       if (!localEvt) {
         throw new Error('Kode room tidak ditemukan. Silakan periksa kembali PIN room.');
+      }
+
+      if (localEvt.status === 'ended') {
+        throw new Error('Sesi polling ini telah selesai (Ended). Host telah menutup sesi dan tidak lagi menerima peserta baru.');
       }
 
       // Check duplicate name in local store
@@ -450,6 +454,11 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
         eventId: localEvt.id,
         participant: newPart,
       };
+    }
+
+    // Check if Supabase event is ended
+    if (event.status === 'ended') {
+      throw new Error('Sesi polling ini telah selesai (Ended). Host telah menutup sesi dan tidak lagi menerima peserta baru.');
     }
 
     // 2. Check duplicate name in Supabase for this specific event
@@ -488,6 +497,9 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
       };
       const localEvt = localEventsStore.find(e => e.id === event.id || e.roomCode.toUpperCase() === normalizedCode);
       if (localEvt) {
+        if (localEvt.status === 'ended') {
+          throw new Error('Sesi polling ini telah selesai (Ended). Host telah menutup sesi dan tidak lagi menerima peserta baru.');
+        }
         localEvt.participants = [...localEvt.participants.filter(p => p.id !== fallbackPart.id), fallbackPart];
         saveLocalEventsStore(localEventsStore);
       }
@@ -510,11 +522,14 @@ export async function joinEventByCode(code: string, name: string, emoji?: string
     };
   } catch (err: any) {
     console.error('❌ [Join] Error in joinEventByCode:', err.message);
-    if (err.message && (err.message.includes('sudah dipakai') || err.message.includes('sudah digunakan') || err.message.includes('tidak pantas') || err.message.includes('maksimal'))) {
+    if (err.message && (err.message.includes('sudah dipakai') || err.message.includes('sudah digunakan') || err.message.includes('telah selesai') || err.message.includes('Ended') || err.message.includes('tidak pantas') || err.message.includes('maksimal'))) {
       throw err;
     }
     const localEvt = localEventsStore.find(e => e.roomCode.toUpperCase() === normalizedCode);
     if (localEvt) {
+      if (localEvt.status === 'ended') {
+        throw new Error('Sesi polling ini telah selesai (Ended). Host telah menutup sesi dan tidak lagi menerima peserta baru.');
+      }
       if (localEvt.participants.some(p => p.name.trim().toLowerCase() === cleanName.toLowerCase())) {
         throw new Error(`Nama "${cleanName}" sudah dipakai di room ini. Gunakan nama lengkap atau tambahkan inisial/angka.`);
       }
