@@ -23,6 +23,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { BrandLogo } from '../Shared/BrandLogo';
+import { ParticipantCreditsRoll } from './ParticipantCreditsRoll';
 
 // Cute Animated Floating Mascot (PulseBot)
 const PulseBotMascot: React.FC<{ theme: 'light' | 'dark'; size?: 'sm' | 'md' | 'lg'; mood?: 'happy' | 'celebrating' | 'curious' }> = ({
@@ -471,41 +472,27 @@ export const ProjectorDisplay: React.FC = () => {
               </div>
             </div>
 
-            {/* Connected Participants Counter & Avatar Bar */}
-            <div className={`mt-6 pt-5 border-t flex flex-col items-center justify-center ${
+            {/* Connected Participants Counter & Cinematic Credits Roll */}
+            <div className={`mt-6 pt-5 border-t flex flex-col items-center justify-center w-full ${
               theme === 'light' ? 'border-slate-100' : 'border-slate-800'
             }`}>
-              <div className={`flex items-center space-x-2 text-xs sm:text-sm font-bold mb-2.5 ${
+              <div className={`flex items-center space-x-2 text-xs sm:text-sm font-bold mb-3 ${
                 theme === 'light' ? 'text-slate-800' : 'text-slate-300'
               }`}>
                 <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span className={`text-sm sm:text-base font-mono-numbers font-extrabold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>
                   {currentEvent.participants.length}
                 </span>
-                <span>attendees ready in lobby</span>
+                <span>attendees connected to room</span>
               </div>
 
-              {currentEvent.participants.length > 0 ? (
-                <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg max-h-20 overflow-y-auto scrollbar-none py-1">
-                  {currentEvent.participants.slice(-12).reverse().map((p) => (
-                    <div
-                      key={p.id}
-                      className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs animate-in fade-in zoom-in-95 ${
-                        theme === 'light'
-                          ? 'bg-white border border-slate-200 text-slate-800 shadow-2xs font-semibold'
-                          : 'bg-slate-800/90 border border-slate-700 text-slate-200 font-semibold'
-                      }`}
-                    >
-                      <span className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px]" style={{ backgroundColor: p.avatarBg }}>
-                        {p.avatarEmoji || '👋'}
-                      </span>
-                      <span>{p.name}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500 font-medium">Scan QR code above with your camera to join instantly.</p>
-              )}
+              <ParticipantCreditsRoll
+                participants={currentEvent.participants}
+                theme={theme}
+                maxHeight="max-h-[160px] sm:max-h-[220px]"
+                isQuizMode={currentEvent.isQuizMode}
+                title="Live Attendees"
+              />
             </div>
 
           </div>
@@ -705,25 +692,16 @@ export const ProjectorDisplay: React.FC = () => {
             })}
           </div>
 
-          {/* Flowing Participant Avatars at Bottom */}
+          {/* Cinematic End Credits Roll for All Participants */}
           {currentEvent.participants.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2.5 mt-8 pt-4">
-              <span className="text-xs uppercase tracking-wider font-extrabold text-slate-400 mr-2">
-                Partisipan:
-              </span>
-              {currentEvent.participants.map((p) => (
-                <span
-                  key={p.id}
-                  className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold shadow-xs ${
-                    theme === 'light'
-                      ? 'bg-white border border-slate-200 text-slate-700'
-                      : 'bg-slate-800/40 border border-slate-700/40 text-slate-200'
-                  }`}
-                >
-                  <span>{p.avatarEmoji || '👋'}</span>
-                  <span className={`font-bold ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{p.name}</span>
-                </span>
-              ))}
+            <div className="mt-10 pt-6 border-t border-slate-200/50 dark:border-slate-800/60 w-full max-w-4xl mx-auto">
+              <ParticipantCreditsRoll
+                participants={currentEvent.participants}
+                theme={theme}
+                maxHeight="max-h-[220px] sm:max-h-[300px]"
+                isQuizMode={currentEvent.isQuizMode}
+                title="Special Thanks & All Attendees"
+              />
             </div>
           )}
 
