@@ -75,24 +75,31 @@ export const RoleHeader: React.FC = () => {
   return (
     <>
       <header id="main-role-header" className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shrink-0">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 h-13 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-2">
           
           {/* Left: Brand Logo & Event Selector */}
-          <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0 shrink-0">
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink">
             <div 
               onClick={() => setActiveView(isHost ? 'admin' : 'participant')}
               className="cursor-pointer select-none group shrink-0"
+              title="PulseLive"
             >
-              <BrandLogo size="sm" />
+              {/* Responsive Brand Logo: Icon on mobile, full text on sm+ */}
+              <div className="sm:hidden">
+                <BrandLogo size="sm" showText={false} />
+              </div>
+              <div className="hidden sm:block">
+                <BrandLogo size="sm" showText={true} />
+              </div>
             </div>
 
             {/* Event Switcher with Integrated Status Badge (Only visible to Admin) */}
             {isHost && (
-              <div className="relative shrink-0">
+              <div className="relative min-w-0 shrink">
                 <button
                   id="event-selector-btn"
                   onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
-                  className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate cursor-pointer shadow-2xs"
+                  className="flex items-center space-x-1 sm:space-x-1.5 px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[110px] xs:max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate cursor-pointer shadow-2xs"
                 >
                   <span className="truncate font-bold text-slate-800 text-[11px] sm:text-xs">
                     {currentEvent?.title || 'Select Event'}
@@ -175,11 +182,11 @@ export const RoleHeader: React.FC = () => {
           )}
 
           {/* Right: Actions */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
             
             {/* Live Participant Count */}
             {currentEvent && (
-              <div className="flex items-center space-x-1 px-2.5 py-1 bg-slate-100 rounded-lg text-slate-700 text-xs font-bold">
+              <div className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 bg-slate-100 rounded-lg text-slate-700 text-[11px] sm:text-xs font-bold">
                 <Users className="w-3.5 h-3.5 text-slate-500" />
                 <span className="font-mono-numbers">{currentEvent.participants.length}</span>
               </div>
@@ -213,10 +220,10 @@ export const RoleHeader: React.FC = () => {
               <button
                 id="header-qr-btn"
                 onClick={() => setIsQRModalOpen(true)}
-                className="p-1.5 sm:p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg shadow-2xs transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg shadow-2xs transition-colors cursor-pointer shrink-0"
                 title="View Room QR Code"
               >
-                <QrCode className="w-4 h-4" />
+                <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             )}
 
@@ -224,16 +231,16 @@ export const RoleHeader: React.FC = () => {
             {isHost ? (
               <button
                 onClick={logout}
-                className="flex items-center space-x-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer"
-                title="Sign out"
+                className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 shadow-2xs"
+                title="Exit Host Session"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Exit Host</span>
+                <LogOut className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <span className="text-[11px] sm:text-xs">Exit</span>
               </button>
             ) : (
               <button
                 onClick={() => setActiveView('login')}
-                className="flex items-center space-x-1 px-2.5 sm:px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer"
+                className="flex items-center space-x-1 px-2 sm:px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
                 title="Host Sign In"
               >
                 <Shield className="w-3 h-3 text-indigo-400" />
@@ -246,7 +253,7 @@ export const RoleHeader: React.FC = () => {
 
         {/* Mobile View Switcher (Only when host is logged in) */}
         {isHost && (
-          <div className="lg:hidden flex items-center overflow-x-auto px-3 py-1.5 bg-slate-50 border-t border-slate-200 space-x-1 scrollbar-none">
+          <div className="lg:hidden flex items-center overflow-x-auto px-2.5 py-1.5 bg-slate-50 border-t border-slate-200 space-x-1 scrollbar-none">
             {adminViews.map((v) => {
               const isActive = activeView === v.id;
               return (
