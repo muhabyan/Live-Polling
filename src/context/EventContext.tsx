@@ -74,20 +74,55 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [error, setError] = useState<string | null>(null);
   const [isSimulatingCrowd, setIsSimulatingCrowd] = useState(false);
 
-  // ============================================
-  // AUTH MANAGEMENT
-  // ============================================
-
-  // Check URL params on initial load (e.g. ?view=projector or ?code=PULSE88)
-  useEffect(() => {
+  const getViewFromLocation = (): ActiveAppView | null => {
+    if (typeof window === 'undefined') return null;
+    const hash = window.location.hash.replace('#', '') as ActiveAppView;
+    if (['projector', 'participant', 'presenter', 'admin', 'analytics', 'login'].includes(hash)) {
+      return hash;
+    }
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view') as ActiveAppView;
-    if (viewParam && ['projector', 'participant', 'presenter', 'admin', 'analytics'].includes(viewParam)) {
-      if (['presenter', 'admin', 'analytics'].includes(viewParam)) {
+    if (viewParam && ['projector', 'participant', 'presenter', 'admin', 'analytics', 'login'].includes(viewParam)) {
+      return viewParam;
+    }
+    return null;
+  };
+
+  // ============================================
+  // AUTH MANAGEMENT & BROWSER HISTORY SYNC
+  // ============================================
+
+  // Sync state with browser back/forward gestures (Android/iOS Swipe Back & Browser Back button)
+  useEffect(() => {
+    const handleNavigationChange = () => {
+      const target = getViewFromLocation();
+      if (target) {
+        if (['presenter', 'admin', 'analytics'].includes(target)) {
+          setIsDemoHost(true);
+        }
+        setActiveViewState(target);
+      }
+    };
+
+    window.addEventListener('popstate', handleNavigationChange);
+    window.addEventListener('hashchange', handleNavigationChange);
+
+    // Initial mount sync
+    const initialView = getViewFromLocation();
+    if (initialView) {
+      if (['presenter', 'admin', 'analytics'].includes(initialView)) {
         setIsDemoHost(true);
       }
-      setActiveViewState(viewParam);
+      setActiveViewState(initialView);
+      if (window.location.hash !== '#' + initialView) {
+        window.history.replaceState({ view: initialView }, '', '#' + initialView);
+      }
     }
+
+    return () => {
+      window.removeEventListener('popstate', handleNavigationChange);
+      window.removeEventListener('hashchange', handleNavigationChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -95,10 +130,9 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setSession(s);
       setUser(s?.user ?? null);
       setIsAuthLoading(false);
-      const params = new URLSearchParams(window.location.search);
-      const viewParam = params.get('view');
-      if (s?.user && !viewParam) {
-        setActiveViewState('presenter');
+      const initialView = getViewFromLocation();
+      if (s?.user && !initialView) {
+        setActiveView('presenter');
       }
     });
 
@@ -115,12 +149,12 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       await api.signInWithEmail(email, password);
       await refreshAllEvents();
-      setActiveViewState('presenter');
+      setActiveView('presenter');
     } catch {
       // Allow fallback demo host login
       setIsDemoHost(true);
       await refreshAllEvents();
-      setActiveViewState('presenter');
+      setActiveView('presenter');
     }
   };
 
@@ -136,25 +170,32 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const loginAsDemoHost = () => {
     setIsDemoHost(true);
-    setActiveViewState('presenter');
+    setActiveView('presenter');
   };
 
   const logout = async () => {
     setIsDemoHost(false);
     await api.signOut().catch(() => {});
-    setActiveViewState('participant');
+    setActiveView('participant');
   };
 
   // ============================================
-  // VIEW MANAGEMENT (auth-aware)
+  // VIEW MANAGEMENT (auth-aware & history-pushed)
   // ============================================
 
-  const setActiveView = (view: ActiveAppView) => {
+  const setActiveView = (view: ActiveAppView, pushHistory = true) => {
+    let targetView = view;
     if (['presenter', 'admin', 'analytics'].includes(view) && !session && !isDemoHost) {
-      setActiveViewState('login');
-      return;
+      targetView = 'login';
     }
-    setActiveViewState(view);
+    setActiveViewState(targetView);
+
+    if (typeof window !== 'undefined' && pushHistory) {
+      const currentHash = window.location.hash.replace('#', '');
+      if (currentHash !== targetView) {
+        window.history.pushState({ view: targetView }, '', '#' + targetView);
+      }
+    }
   };
 
   // ============================================
