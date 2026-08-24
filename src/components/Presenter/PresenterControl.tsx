@@ -158,6 +158,7 @@ export const PresenterControl: React.FC = () => {
             onClick={async () => {
               if (window.confirm('Reset all participants and vote responses for this session?')) {
                 await sendModeratorAction('reset_session');
+                await clearAllParticipants();
                 await refreshEvent();
               }
             }}

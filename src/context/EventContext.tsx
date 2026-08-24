@@ -951,16 +951,128 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       timerSeconds: targetTimerSeconds ?? payload?.timerSeconds,
     };
 
-    // Broadcast updated state to all connected devices locally
-    const updatedEvt = events.find(e => e.id === currentEvent.id);
-    if (updatedEvt) {
-      broadcastLocalSync({
-        type: 'MODERATOR_ACTION_BROADCAST',
-        eventId: currentEvent.id,
-        action,
-        updatedFields: { ...updatedEvt, timerRemainingSeconds: targetTimerSeconds ?? updatedEvt.timerRemainingSeconds },
-      });
+    // Calculate exact updated fields to broadcast
+    let updatedFields: any = {};
+    switch (action) {
+      case 'start_session':
+        updatedFields = {
+          status: 'live',
+          isTimerRunning: true,
+          isVotingLocked: false,
+          timerRemainingSeconds: targetTimerSeconds ?? currentEvent.timerRemainingSeconds ?? getQTimer(qIdx),
+        };
+        break;
+      case 'end_session':
+        updatedFields = {
+          status: 'ended',
+          isTimerRunning: false,
+        };
+        break;
+      case 'reset_session':
+      case 'clear_room':
+        updatedFields = {
+          status: 'waiting',
+          currentQuestionIndex: 0,
+          isTimerRunning: false,
+          isVotingLocked: false,
+          showResultsOnProjector: true,
+          revealAnswer: false,
+          timerRemainingSeconds: getQTimer(0),
+          participants: [],
+          responses: [],
+          reactions: [],
+        };
+        break;
+      case 'next_question': {
+        const nextIdx = Math.min(currentEvent.questions.length - 1, qIdx + 1);
+        updatedFields = {
+          currentQuestionIndex: nextIdx,
+          timerRemainingSeconds: getQTimer(nextIdx),
+          isTimerRunning: false,
+          isVotingLocked: false,
+          revealAnswer: false,
+        };
+        break;
+      }
+      case 'prev_question': {
+        const prevIdx = Math.max(0, qIdx - 1);
+        updatedFields = {
+          currentQuestionIndex: prevIdx,
+          timerRemainingSeconds: getQTimer(prevIdx),
+          isTimerRunning: false,
+          isVotingLocked: false,
+          revealAnswer: false,
+        };
+        break;
+      }
+      case 'jump_to_question': {
+        const jumpIdx = Math.max(0, Math.min(currentEvent.questions.length - 1, payload?.index ?? 0));
+        updatedFields = {
+          currentQuestionIndex: jumpIdx,
+          timerRemainingSeconds: getQTimer(jumpIdx),
+          isTimerRunning: false,
+          isVotingLocked: false,
+          revealAnswer: false,
+        };
+        break;
+      }
+      case 'reset_timer':
+        updatedFields = {
+          timerRemainingSeconds: getQTimer(qIdx),
+          isTimerRunning: false,
+          isVotingLocked: false,
+        };
+        break;
+      case 'toggle_timer':
+        updatedFields = {
+          isTimerRunning: !currentEvent.isTimerRunning,
+        };
+        break;
+      case 'start_timer':
+        updatedFields = {
+          isTimerRunning: true,
+        };
+        break;
+      case 'stop_timer':
+      case 'pause_timer':
+        updatedFields = {
+          isTimerRunning: false,
+        };
+        break;
+      case 'add_time':
+        updatedFields = {
+          timerRemainingSeconds: (currentEvent.timerRemainingSeconds ?? getQTimer(qIdx)) + (payload?.seconds || 15),
+        };
+        break;
+      case 'lock_voting':
+      case 'toggle_lock_voting':
+        updatedFields = {
+          isVotingLocked: !currentEvent.isVotingLocked,
+        };
+        break;
+      case 'reveal_answer':
+      case 'toggle_reveal_answer':
+        updatedFields = {
+          revealAnswer: !currentEvent.revealAnswer,
+        };
+        break;
+      case 'toggle_results':
+        updatedFields = {
+          showResultsOnProjector: payload?.show ?? !currentEvent.showResultsOnProjector,
+        };
+        break;
+      default:
+        updatedFields = payload?.updatedFields || {};
+        break;
     }
+
+    // Broadcast updated state to all connected devices locally
+    broadcastLocalSync({
+      type: 'MODERATOR_ACTION_BROADCAST',
+      eventId: currentEvent.id,
+      action,
+      updatedFields,
+    });
 
     try {
       await api.sendControlAction(currentEvent.id, action, enrichedPayload);
@@ -1003,16 +1115,30 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const deleteParticipant = async (participantId: string) => {
     if (!currentEvent) return;
+    const remainingParticipants = currentEvent.participants.filter(p => p.id !== participantId);
+    const remainingResponses = currentEvent.responses.filter(r => r.participantId !== participantId);
+
     setEvents(prev =>
       prev.map(e => {
         if (e.id !== currentEvent.id) return e;
         return {
           ...e,
-          participants: e.participants.filter(p => p.id !== participantId),
-          responses: e.responses.filter(r => r.participantId !== participantId),
+          participants: remainingParticipants,
+          responses: remainingResponses,
         };
       })
     );
+
+    broadcastLocalSync({
+      type: 'MODERATOR_ACTION_BROADCAST',
+      eventId: currentEvent.id,
+      action: 'delete_participant',
+      updatedFields: {
+        participants: remainingParticipants,
+        responses: remainingResponses,
+      },
+    });
+
     await api.deleteParticipantById(currentEvent.id, participantId);
   };
 
@@ -1029,6 +1155,18 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         };
       })
     );
+
+    broadcastLocalSync({
+      type: 'MODERATOR_ACTION_BROADCAST',
+      eventId: currentEvent.id,
+      action: 'clear_participants',
+      updatedFields: {
+        participants: [],
+        responses: [],
+        reactions: [],
+      },
+    });
+
     await api.clearAllParticipantsAndResponses(currentEvent.id);
   };
 

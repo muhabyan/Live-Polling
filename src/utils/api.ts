@@ -356,17 +356,20 @@ export async function deleteParticipantById(eventId: string, participantId: stri
   // 1. Remove from local store and persist
   const localEvt = localEventsStore.find(e => e.id === eventId);
   if (localEvt) {
-    localEvt.participants = localEvt.participants.filter(p => p.id !== participantId);
-    localEvt.responses = localEvt.responses.filter(r => r.participantId !== participantId);
+    localEvt.participants = (localEvt.participants || []).filter(p => p.id !== participantId);
+    localEvt.responses = (localEvt.responses || []).filter(r => r.participantId !== participantId);
     saveLocalEventsStore(localEventsStore);
   }
 
-  // 2. Remove from Supabase
+  // 2. Remove from Supabase if valid UUID
   try {
-    await Promise.allSettled([
-      supabase.from('responses').delete().eq('participant_id', participantId),
-      supabase.from('participants').delete().eq('id', participantId),
-    ]);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(participantId);
+    if (isUuid) {
+      await Promise.allSettled([
+        supabase.from('responses').delete().eq('participant_id', participantId),
+        supabase.from('participants').delete().eq('id', participantId),
+      ]);
+    }
   } catch (err) {
     console.warn('Supabase delete participant warning:', err);
   }
