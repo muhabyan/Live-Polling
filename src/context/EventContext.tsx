@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import { EventData, Participant, ActiveAppView, Question, ResponseItem, LiveReaction } from '../types';
 import { dbQuestionToFrontend, dbParticipantToFrontend, dbResponseToFrontend, dbReactionToFrontend } from '../types';
@@ -64,6 +64,7 @@ const EventContext = createContext<EventContextType | undefined>(undefined);
 export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Auth state
   const [session, setSession] = useState<Session | null>(null);
+  const sessionRef = useRef<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
 
@@ -132,16 +133,18 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
+      sessionRef.current = s;
       setSession(s);
       setUser(s?.user ?? null);
       setIsAuthLoading(false);
       const initialView = getViewFromLocation();
       if (s?.user && !initialView) {
-        setActiveView('presenter');
+        setActiveViewState('presenter');
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      sessionRef.current = s;
       setSession(s);
       setUser(s?.user ?? null);
     });
@@ -152,9 +155,19 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const login = async (email: string, password: string) => {
     setError(null);
     try {
-      await api.signInWithEmail(email, password);
+      const authData = await api.signInWithEmail(email, password);
+      const s = authData.session;
+      const u = authData.user ?? s?.user ?? null;
+      if (s) {
+        sessionRef.current = s;
+        setSession(s);
+        setUser(u);
+      }
       await refreshAllEvents();
-      setActiveView('presenter');
+      setActiveViewState('presenter');
+      if (typeof window !== 'undefined') {
+        window.history.pushState({ view: 'presenter' }, '', '#presenter');
+      }
     } catch (err: any) {
       const msg = err.message || 'Invalid email or password';
       setError(msg);
@@ -174,6 +187,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const logout = async () => {
     await api.signOut().catch(() => {});
+    sessionRef.current = null;
     setSession(null);
     setUser(null);
     setActiveViewState('participant');
@@ -188,9 +202,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const setActiveView = (view: ActiveAppView, pushHistory = true) => {
     let targetView = view;
-    if (['presenter', 'admin', 'analytics'].includes(view) && !session) {
+    const currentSession = sessionRef.current ?? session;
+    if (['presenter', 'admin', 'analytics'].includes(view) && !currentSession) {
       targetView = 'login';
-    } else if (view === 'login' && session) {
+    } else if (view === 'login' && currentSession) {
       targetView = 'admin';
     }
     setActiveViewState(targetView);
