@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
-import { Sparkles, Trophy, LogOut, CheckCircle2, Zap, Heart } from 'lucide-react';
+import { Sparkles, Trophy, LogOut, CheckCircle2 } from 'lucide-react';
 
 interface ParticipantCompanionProps {
   hasSubmitted?: boolean;
@@ -86,54 +86,53 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
 
   return (
     <>
-      {/* 2D Ambient Floating Pixel / VTuber Pet Companion in Background (Pointer-events-none) */}
+      {/* 2D Ambient Floating Pixel Companion in Background */}
       <div 
         aria-hidden="true"
         className="fixed bottom-6 right-4 sm:right-8 z-0 pointer-events-none select-none opacity-20 hover:opacity-40 transition-opacity duration-300 hidden sm:flex flex-col items-center animate-pulse"
       >
         <div 
-          className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg border border-white/60 transform rotate-6 hover:rotate-0 transition-transform"
-          style={{ backgroundColor: bgColor }}
+          className="w-12 h-12 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-2xl transform rotate-6 hover:rotate-0 transition-transform"
+          style={{ backgroundColor: bgColor, boxShadow: '2px 2px 0px #1E1E1E' }}
         >
           {emoji}
         </div>
-        <div className="text-[9px] font-bold text-slate-600 bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-slate-200/60 shadow-2xs font-mono">
+        <div className="text-[9px] font-bold text-[#1E1E1E] bg-[#FACC15] px-2 py-0.5 rounded-md mt-1 border-2 border-[#1E1E1E] font-mono">
           2D Buddy
         </div>
       </div>
 
       {/* Main Top Companion HUD Bar */}
       <div className="w-full max-w-md mx-auto px-3 pt-3 pb-1 relative z-10">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-slate-200/90 shadow-2xs flex items-center justify-between gap-2.5 transition-all">
+        <div className="neo-card-sm p-2.5 flex items-center justify-between gap-2.5 transition-all">
           
-          {/* Left: Interactive 2D Animated Avatar Squircle with Live Breathing & Speech */}
+          {/* Left: Interactive Avatar with Speech */}
           <div className="flex items-center space-x-2.5 min-w-0 flex-1">
             <button
               type="button"
               onClick={handleTapCompanion}
               title="Klik maskot 2D untuk sapaan & kirim reaksi!"
-              className={`relative shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center text-xl shadow-xs transition-all cursor-pointer active:scale-90 group ${
+              className={`relative shrink-0 w-10 h-10 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-xl transition-all cursor-pointer active:scale-90 group ${
                 isBouncing 
-                  ? 'animate-bounce ring-4 ring-indigo-400/40' 
+                  ? 'animate-bounce ring-4 ring-[#4F46E5]/40' 
                   : petMood === 'urgent'
                   ? 'animate-ping duration-1000'
                   : 'hover:scale-105'
               }`}
-              style={{ backgroundColor: bgColor }}
+              style={{ backgroundColor: bgColor, boxShadow: '2px 2px 0px #1E1E1E' }}
             >
-              {/* 2D Breathing / Idle Motion Container */}
-              <span className="select-none filter drop-shadow-xs transition-transform duration-200 group-hover:scale-110">
+              <span className="select-none transition-transform duration-200 group-hover:scale-110">
                 {emoji}
               </span>
 
               {/* Online Pulse Dot */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full ring-2 ring-white shadow-2xs flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#34D399] rounded-md border-2 border-[#1E1E1E] flex items-center justify-center">
                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
               </div>
 
               {/* Mood Sparkle Badge */}
               {petMood === 'cheer' && (
-                <div className="absolute -bottom-1 -left-1 text-[10px] bg-amber-400 text-white rounded-full w-4 h-4 flex items-center justify-center shadow-xs">
+                <div className="absolute -bottom-1 -left-1 text-[10px] bg-[#FACC15] rounded-md w-4 h-4 flex items-center justify-center border-2 border-[#1E1E1E]">
                   ✨
                 </div>
               )}
@@ -142,18 +141,18 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
             {/* Speech Text & Participant Nickname */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center space-x-1.5 truncate">
-                <span className="text-xs font-bold text-slate-900 truncate">
+                <span className="text-xs font-black text-[#1E1E1E] truncate">
                   {name}
                 </span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 inline" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#34D399] shrink-0 inline" />
               </div>
 
               {/* Dynamic Companion Quote */}
               <div 
                 onClick={handleTapCompanion}
-                className="text-[11px] font-medium text-slate-600 truncate flex items-center space-x-1 cursor-pointer hover:text-indigo-600 transition-colors mt-0.5"
+                className="text-[11px] font-bold text-gray-500 truncate flex items-center space-x-1 cursor-pointer hover:text-[#4F46E5] transition-colors mt-0.5"
               >
-                <Sparkles className="w-2.5 h-2.5 text-amber-500 shrink-0 animate-spin" />
+                <Sparkles className="w-2.5 h-2.5 text-[#FACC15] shrink-0 animate-spin" />
                 <span className="truncate">{speechText}</span>
               </div>
             </div>
@@ -162,14 +161,14 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
           {/* Right: Score (if Quiz Mode) or Exit Button */}
           <div className="flex items-center space-x-1.5 shrink-0">
             {isQuizMode && currentParticipant?.score !== undefined ? (
-              <div className="flex items-center space-x-1 px-2 py-1 bg-amber-50 text-amber-800 rounded-xl text-xs font-bold border border-amber-200 shadow-2xs">
-                <Trophy className="w-3.5 h-3.5 text-amber-600" />
-                <span className="font-mono-numbers">{currentParticipant.score} pts</span>
+              <div className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-xs">
+                <Trophy className="w-3.5 h-3.5" />
+                <span className="font-mono">{currentParticipant.score} pts</span>
               </div>
             ) : (
               <button
                 onClick={leaveRoom}
-                className="text-[11px] text-slate-400 hover:text-rose-600 flex items-center space-x-1 font-semibold transition-colors px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer"
+                className="neo-btn bg-white text-gray-400 hover:text-[#1E1E1E] hover:bg-[#FB7185]/20 text-[11px] px-2 py-1"
                 title="Keluar dari room"
               >
                 <LogOut className="w-3.5 h-3.5" />

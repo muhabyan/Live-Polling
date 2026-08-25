@@ -23,69 +23,69 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex-1 flex items-center justify-center p-4 sm:p-6 pb-safe">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-slate-200/90 p-6 sm:p-8 relative">
+    <div className="w-full flex-1 flex items-center justify-center p-4 sm:p-6 pb-safe bg-dot-grid">
+      <div className="max-w-md w-full neo-card p-6 sm:p-8 relative">
         
         {/* Back button */}
         <button
           onClick={() => setActiveView('participant')}
-          className="absolute top-5 left-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          className="absolute top-4 left-4 neo-btn bg-white p-2"
           title="Back to audience mode"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
 
         <div className="flex flex-col items-center text-center mb-6 pt-2">
-          <BrandLogo size="md" showText={false} className="mb-2" />
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight font-display">
-            PulseLive Host Sign In
+          <BrandLogo size="md" showText={false} className="mb-3" />
+          <h2 className="text-xl sm:text-2xl font-black text-[#1E1E1E] tracking-tight font-display uppercase">
+            Host Sign In
           </h2>
-          <p className="text-slate-500 text-xs mt-0.5">
+          <p className="text-gray-500 text-xs mt-1 font-mono">
             Access Presenter Controls & Admin Studio
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 flex justify-between items-center animate-in fade-in">
+          <div className="mb-4 p-3 bg-[#FB7185] text-[#1E1E1E] text-xs font-bold rounded-lg border-2 border-[#1E1E1E] flex justify-between items-center">
             <span>{error}</span>
-            <button onClick={clearError} className="text-rose-500 hover:text-rose-700 font-bold ml-2">✕</button>
+            <button onClick={clearError} className="font-black ml-2 hover:opacity-70 cursor-pointer">✕</button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-bold text-[#1E1E1E] uppercase tracking-wider mb-1.5 font-mono">
               Email Address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Mail className="w-4 h-4 text-slate-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-indigo-600 focus:outline-none transition-all"
+                className="neo-input w-full pl-9"
                 placeholder="host@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-bold text-[#1E1E1E] uppercase tracking-wider mb-1.5 font-mono">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Lock className="w-4 h-4 text-slate-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-indigo-600 focus:outline-none transition-all"
+                className="neo-input w-full pl-9"
                 placeholder="••••••••"
               />
             </div>
@@ -94,12 +94,12 @@ export const LoginScreen: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer"
+            className="neo-btn w-full mt-2 py-3 px-4 bg-[#FACC15] text-[#1E1E1E] font-black text-sm"
           >
             {isLoading ? (
               <span className="flex items-center space-x-2">
-                <ButtonSpinner size="w-4 h-4" color="text-white" />
-                <span className="tracking-wider text-xs">Authenticating...</span>
+                <ButtonSpinner size="w-4 h-4" color="text-[#1E1E1E]" />
+                <span className="tracking-wider text-xs font-mono">Authenticating...</span>
               </span>
             ) : (
               <>

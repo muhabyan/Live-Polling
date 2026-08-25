@@ -27,7 +27,7 @@ export const FloatingReactions: React.FC = () => {
               {reaction.emoji}
             </span>
             {reaction.senderName && (
-              <span className="text-[10px] font-semibold bg-slate-900/70 text-white px-2 py-0.5 rounded-full mt-1 backdrop-blur-xs">
+              <span className="neo-badge bg-[#1E1E1E] text-white text-[10px] mt-1 font-mono">
                 {reaction.senderName}
               </span>
             )}

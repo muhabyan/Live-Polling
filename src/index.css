@@ -6,21 +6,132 @@
     --sar: env(safe-area-inset-right, 0px);
     --sab: env(safe-area-inset-bottom, 0px);
     --sal: env(safe-area-inset-left, 0px);
+
+    /* Neobrutalism Design Tokens */
+    --neo-black: #1E1E1E;
+    --neo-cream: #FFF8F0;
+    --neo-white: #FFFFFF;
+    --neo-yellow: #FACC15;
+    --neo-pink: #FB7185;
+    --neo-green: #34D399;
+    --neo-blue: #60A5FA;
+    --neo-indigo: #4F46E5;
+    --neo-orange: #FB923C;
+    --neo-purple: #A78BFA;
+    --neo-shadow: 4px 4px 0px var(--neo-black);
+    --neo-shadow-sm: 2px 2px 0px var(--neo-black);
+    --neo-shadow-lg: 6px 6px 0px var(--neo-black);
   }
 
   html, body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
 
   .font-display {
-    font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
   }
   
-  .font-mono-numbers {
+  .font-mono, .font-mono-numbers {
+    font-family: 'Space Mono', monospace;
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* ===========================
+   NEOBRUTALISM UTILITY CLASSES
+   =========================== */
+
+/* Neo Card: thick border, hard shadow, flat bg */
+.neo-card {
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+  border-radius: 12px;
+  box-shadow: var(--neo-shadow);
+}
+
+.neo-card-sm {
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+  border-radius: 8px;
+  box-shadow: var(--neo-shadow-sm);
+}
+
+/* Neo Input */
+.neo-input {
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.neo-input:focus {
+  box-shadow: var(--neo-shadow-sm);
+  transform: translate(-1px, -1px);
+}
+.neo-input::placeholder {
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+/* Neo Button Base */
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 700;
+  border: 2px solid var(--neo-black);
+  border-radius: 8px;
+  box-shadow: var(--neo-shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+.neo-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--neo-black);
+}
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.neo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--neo-shadow-sm);
+}
+
+/* Neo Badge */
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--neo-black);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+/* Dot Grid Background Pattern */
+.bg-dot-grid {
+  background-color: var(--neo-cream);
+  background-image: radial-gradient(circle, #d4d4d4 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-dot-grid-dark {
+  background-color: #1a1a2e;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Safe area insets helpers */
@@ -40,20 +151,20 @@
   height: 100dvh;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Neo Style */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 9999px;
+  background: var(--neo-black);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.6);
+  background: #444;
 }
 
 /* Animations */
@@ -89,104 +200,68 @@
 }
 
 @keyframes movieCreditsRoll {
-  0% {
-    transform: translateY(0%);
-  }
-  100% {
-    transform: translateY(-50%);
-  }
+  0% { transform: translateY(0%); }
+  100% { transform: translateY(-50%); }
 }
 
 .animate-movie-credits {
   animation: movieCreditsRoll 30s linear infinite;
 }
 
-/* Stage Gradient Grid Background for Projector (Dark Mode) */
+/* Neo Stage Backgrounds */
 .bg-stage-mesh {
-  background-color: #070B14;
-  background-image: 
-    radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 40%),
-    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 40%);
+  background-color: #1a1a2e;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-/* Studio Silk / Putih Mahal Background for Projector (Light Mode) */
 .bg-stage-mesh-light {
-  background-color: #F8FAFC;
-  background-image: 
-    radial-gradient(at 50% -10%, rgba(99, 102, 241, 0.1) 0px, transparent 65%),
-    radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 55%),
-    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.06) 0px, transparent 45%);
+  background-color: #FFF8F0;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 @keyframes ambient-drift {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translate(15px, -15px) scale(1.08);
-    opacity: 0.35;
-  }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  50% { transform: translate(15px, -15px) scale(1.08); opacity: 0.35; }
 }
 
 @keyframes ambient-drift-reverse {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: translate(-20px, 10px) scale(1.12);
-    opacity: 0.28;
-  }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+  50% { transform: translate(-20px, 10px) scale(1.12); opacity: 0.28; }
 }
 
 @keyframes badge-float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
 }
 
 @keyframes shimmer-sweep {
-  0% {
-    transform: translateX(-100%);
-  }
-  50%, 100% {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  50%, 100% { transform: translateX(100%); }
 }
 
-.animate-ambient-drift {
-  animation: ambient-drift 12s ease-in-out infinite;
-}
-
-.animate-ambient-drift-reverse {
-  animation: ambient-drift-reverse 15s ease-in-out infinite;
-}
-
-.animate-badge-float {
-  animation: badge-float 3.5s ease-in-out infinite;
-}
-
-.animate-shimmer-sweep {
-  animation: shimmer-sweep 4s ease-in-out infinite;
-}
+.animate-ambient-drift { animation: ambient-drift 12s ease-in-out infinite; }
+.animate-ambient-drift-reverse { animation: ambient-drift-reverse 15s ease-in-out infinite; }
+.animate-badge-float { animation: badge-float 3.5s ease-in-out infinite; }
+.animate-shimmer-sweep { animation: shimmer-sweep 4s ease-in-out infinite; }
 
 @keyframes red-danger-glow {
-  0%, 100% {
-    box-shadow: inset 0 0 15px rgba(244, 63, 94, 0.35), inset 0 0 35px rgba(239, 68, 68, 0.2);
-    border-color: rgba(244, 63, 94, 0.6);
-  }
-  50% {
-    box-shadow: inset 0 0 30px rgba(244, 63, 94, 0.75), inset 0 0 65px rgba(225, 29, 72, 0.45);
-    border-color: rgba(225, 29, 72, 0.95);
-  }
+  0%, 100% { box-shadow: 4px 4px 0px #E11D48; border-color: #E11D48; }
+  50% { box-shadow: 2px 2px 0px #E11D48; border-color: #BE123C; }
 }
 
 .animate-danger-pulse {
   animation: red-danger-glow 0.85s ease-in-out infinite;
+}
+
+/* Neo specific: wiggle for fun interactive feedback */
+@keyframes neo-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+
+.animate-neo-wiggle {
+  animation: neo-wiggle 0.3s ease-in-out;
 }

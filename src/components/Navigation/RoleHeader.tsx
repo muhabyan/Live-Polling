@@ -38,7 +38,7 @@ export const RoleHeader: React.FC = () => {
   const adminViews: { id: ActiveAppView; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'presenter', label: 'Presenter', icon: <Sliders className="w-3.5 h-3.5" /> },
     { id: 'projector', label: 'Projector', icon: <Tv className="w-3.5 h-3.5" />, badge: 'Stage' },
-    { id: 'admin', label: 'Admin Studio', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
+    { id: 'admin', label: 'Admin', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" /> },
   ];
 
@@ -46,26 +46,26 @@ export const RoleHeader: React.FC = () => {
     switch (status) {
       case 'live':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-            <span>LIVE</span>
+          <span className="neo-badge bg-[#34D399] text-[#1E1E1E]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1E1E1E] animate-ping" />
+            LIVE
           </span>
         );
       case 'waiting':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
+          <span className="neo-badge bg-[#FACC15] text-[#1E1E1E]">
             LOBBY
           </span>
         );
       case 'ended':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+          <span className="neo-badge bg-gray-200 text-[#1E1E1E]">
             ENDED
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500">
+          <span className="neo-badge bg-gray-100 text-gray-600">
             DRAFT
           </span>
         );
@@ -74,7 +74,7 @@ export const RoleHeader: React.FC = () => {
 
   return (
     <>
-      <header id="main-role-header" className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shrink-0">
+      <header id="main-role-header" className="sticky top-0 z-30 bg-[#FFF8F0] border-b-2 border-[#1E1E1E] shrink-0">
         <div className="max-w-7xl mx-auto px-2.5 sm:px-6 h-13 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-2">
           
           {/* Left: Brand Logo & Event Selector */}
@@ -84,7 +84,6 @@ export const RoleHeader: React.FC = () => {
               className="cursor-pointer select-none group shrink-0"
               title="PulseLive"
             >
-              {/* Responsive Brand Logo: Icon on mobile, full text on sm+ */}
               <div className="sm:hidden">
                 <BrandLogo size="sm" showText={false} />
               </div>
@@ -93,26 +92,26 @@ export const RoleHeader: React.FC = () => {
               </div>
             </div>
 
-            {/* Event Switcher with Integrated Status Badge (Only visible to Admin) */}
+            {/* Event Switcher */}
             {isHost && (
               <div className="relative min-w-0 shrink">
                 <button
                   id="event-selector-btn"
                   onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
-                  className="flex items-center space-x-1 sm:space-x-1.5 px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors max-w-[110px] xs:max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate cursor-pointer shadow-2xs"
+                  className="neo-btn bg-white px-2 py-1 text-xs max-w-[110px] xs:max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate"
                 >
-                  <span className="truncate font-bold text-slate-800 text-[11px] sm:text-xs">
+                  <span className="truncate font-bold text-[#1E1E1E] text-[11px] sm:text-xs">
                     {currentEvent?.title || 'Select Event'}
                   </span>
                   {currentEvent && (
                     <span className="shrink-0 scale-90 sm:scale-100">{getStatusBadge(currentEvent.status)}</span>
                   )}
-                  <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
+                  <ChevronDown className="w-3 h-3 text-[#1E1E1E] shrink-0" />
                 </button>
 
                 {isEventDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="absolute left-0 mt-2 w-72 neo-card py-1.5 z-50">
+                    <div className="px-3 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">
                       Switch Event Session
                     </div>
                     {events.map((evt) => (
@@ -122,13 +121,13 @@ export const RoleHeader: React.FC = () => {
                           setCurrentEventId(evt.id);
                           setIsEventDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
-                          currentEvent?.id === evt.id ? 'bg-indigo-50/70 font-bold text-indigo-900' : 'text-slate-700'
+                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#FACC15]/30 transition-colors cursor-pointer ${
+                          currentEvent?.id === evt.id ? 'bg-[#FACC15]/20 font-bold text-[#1E1E1E]' : 'text-gray-700'
                         }`}
                       >
                         <div className="truncate mr-2">
-                          <div className="font-semibold truncate">{evt.title}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">PIN: {evt.roomCode}</div>
+                          <div className="font-bold truncate">{evt.title}</div>
+                          <div className="text-[10px] text-gray-500 font-mono">PIN: {evt.roomCode}</div>
                         </div>
                         {getStatusBadge(evt.status)}
                       </button>
@@ -139,9 +138,9 @@ export const RoleHeader: React.FC = () => {
             )}
           </div>
 
-          {/* Center Navigation: Compact, responsive, no overlap */}
+          {/* Center Navigation */}
           {isHost ? (
-            <div className="hidden md:flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shrink-0 mx-1">
+            <div className="hidden md:flex items-center gap-1 shrink-0 mx-1">
               {adminViews.map((v) => {
                 const isActive = activeView === v.id;
                 return (
@@ -149,101 +148,93 @@ export const RoleHeader: React.FC = () => {
                     key={v.id}
                     id={`nav-view-${v.id}`}
                     onClick={() => setActiveView(v.id)}
-                    className={`flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`neo-btn text-xs px-2.5 py-1 ${
                       isActive
-                        ? 'bg-white text-indigo-600 shadow-2xs border border-slate-200/70'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                        ? 'bg-[#4F46E5] text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                        : 'bg-white text-[#1E1E1E]'
                     }`}
                   >
                     {v.icon}
-                    <span className="hidden xl:inline">{v.label}</span>
-                    <span className="inline xl:hidden">
-                      {v.id === 'presenter' ? 'Presenter' : v.id === 'projector' ? 'Stage' : v.id === 'admin' ? 'Admin' : 'Report'}
-                    </span>
-                    {v.badge && (
-                      <span className="text-[9px] px-1 py-0.2 bg-indigo-50 text-indigo-600 rounded font-bold hidden 2xl:inline">
-                        {v.badge}
-                      </span>
-                    )}
+                    <span>{v.label}</span>
                   </button>
                 );
               })}
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-2 text-xs text-slate-500 font-medium truncate">
+            <div className="hidden md:flex items-center space-x-2 text-xs text-gray-600 font-bold truncate">
               <span>Audience Mode</span>
               {currentEvent && (
                 <>
                   <span>•</span>
-                  <span className="font-semibold text-slate-700 max-w-xs truncate">{currentEvent.title}</span>
+                  <span className="font-bold text-[#1E1E1E] max-w-xs truncate">{currentEvent.title}</span>
                 </>
               )}
             </div>
           )}
 
           {/* Right: Actions */}
-          <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
             
             {/* Live Participant Count */}
             {currentEvent && (
-              <div className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 bg-slate-100 rounded-lg text-slate-700 text-[11px] sm:text-xs font-bold">
-                <Users className="w-3.5 h-3.5 text-slate-500" />
-                <span className="font-mono-numbers">{currentEvent.participants.length}</span>
+              <div className="neo-badge bg-white text-[#1E1E1E] text-[11px] sm:text-xs">
+                <Users className="w-3.5 h-3.5" />
+                <span className="font-mono">{currentEvent.participants.length}</span>
               </div>
             )}
 
-            {/* Quick Crowd Simulator (Only for Host) */}
+            {/* Quick Crowd Simulator */}
             {isHost && (
               <button
                 id="simulate-crowd-header-btn"
                 onClick={() => simulateAudienceVotes(10)}
                 disabled={isSimulatingCrowd}
-                className="hidden sm:flex items-center space-x-1 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+                className="hidden sm:flex neo-btn bg-[#FACC15] text-[#1E1E1E] px-2.5 py-1 text-xs"
                 title="Simulate 10 audience members answering live"
               >
                 {isSimulatingCrowd ? (
                   <>
-                    <ButtonSpinner size="w-3 h-3" color="text-amber-600" />
-                    <span className="text-[10px]">VOTING</span>
+                    <ButtonSpinner size="w-3 h-3" color="text-[#1E1E1E]" />
+                    <span className="text-[10px] font-mono">VOTING</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-3 h-3 text-amber-600 fill-amber-500" />
+                    <Zap className="w-3 h-3" />
                     <span>+10</span>
                   </>
                 )}
               </button>
             )}
 
-            {/* QR Code Modal Trigger */}
+            {/* QR Code Trigger */}
             {currentEvent && (
               <button
                 id="header-qr-btn"
                 onClick={() => setIsQRModalOpen(true)}
-                className="p-1.5 sm:p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg shadow-2xs transition-colors cursor-pointer shrink-0"
+                className="neo-btn bg-white p-1.5 sm:p-2"
                 title="View Room QR Code"
               >
                 <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             )}
 
-            {/* Host Login / Logout button */}
+            {/* Host Login / Logout */}
             {isHost ? (
               <button
                 onClick={logout}
-                className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 shadow-2xs"
+                className="neo-btn bg-[#FB7185] text-[#1E1E1E] px-2 sm:px-2.5 py-1 text-xs"
                 title="Exit Host Session"
               >
-                <LogOut className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <LogOut className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[11px] sm:text-xs">Exit</span>
               </button>
             ) : (
               <button
                 onClick={() => setActiveView('login')}
-                className="flex items-center space-x-1 px-2 sm:px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+                className="neo-btn bg-[#1E1E1E] text-white px-2 sm:px-3 py-1 text-xs"
                 title="Host Sign In"
               >
-                <Shield className="w-3 h-3 text-indigo-400" />
+                <Shield className="w-3 h-3" />
                 <span>Host</span>
               </button>
             )}
@@ -251,19 +242,19 @@ export const RoleHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile View Switcher (Only when host is logged in) */}
+        {/* Mobile View Switcher */}
         {isHost && (
-          <div className="lg:hidden flex items-center overflow-x-auto px-2.5 py-1.5 bg-slate-50 border-t border-slate-200 space-x-1 scrollbar-none">
+          <div className="lg:hidden flex items-center overflow-x-auto px-2.5 py-1.5 bg-[#FFF8F0] border-t-2 border-[#1E1E1E] space-x-1.5 scrollbar-none">
             {adminViews.map((v) => {
               const isActive = activeView === v.id;
               return (
                 <button
                   key={v.id}
                   onClick={() => setActiveView(v.id)}
-                  className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-[11px] font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  className={`neo-btn text-[11px] px-2.5 py-1 whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'bg-white text-slate-700 border border-slate-200'
+                      ? 'bg-[#4F46E5] text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                      : 'bg-white text-[#1E1E1E]'
                   }`}
                 >
                   {v.icon}

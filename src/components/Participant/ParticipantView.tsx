@@ -53,46 +53,49 @@ export const ParticipantView: React.FC = () => {
 
       return (
         <div className="w-full max-w-md mx-auto p-3 sm:p-6 text-center flex flex-col justify-center my-auto gap-3">
-          <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 shadow-sm">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl shadow-xs">
+          <div className="neo-card p-5 sm:p-8">
+            <div
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 border-[#1E1E1E] bg-[#FACC15] text-[#1E1E1E] flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl"
+              style={{ boxShadow: '3px 3px 0px #1E1E1E' }}
+            >
               <Trophy className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
-            <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 mb-1.5 sm:mb-2 font-display">
+            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-[#1E1E1E] mb-1.5 sm:mb-2 font-display uppercase">
               Session Selesai!
             </h2>
-            <p className="text-[11px] sm:text-sm text-slate-500 mb-4 sm:mb-5">
-              Terima kasih telah berpartisipasi dalam <strong className="text-slate-800">{currentEvent.title}</strong>.
+            <p className="text-[11px] sm:text-sm text-gray-500 mb-4 sm:mb-5">
+              Terima kasih telah berpartisipasi dalam <strong className="text-[#1E1E1E]">{currentEvent.title}</strong>.
             </p>
             
             {hasQuizScoring ? (
-              <div className="p-3 sm:p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl mb-4 sm:mb-5">
-                <div className="text-[10px] text-amber-800 font-bold uppercase tracking-wider mb-1">
+              <div className="p-3 sm:p-4 bg-[#FACC15]/20 border-2 border-[#1E1E1E] rounded-lg mb-4 sm:mb-5">
+                <div className="text-[10px] text-[#1E1E1E] font-bold uppercase tracking-wider mb-1 font-mono">
                   Skor Quiz Kamu
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono-numbers">
+                <div className="text-2xl sm:text-3xl font-black text-[#1E1E1E] font-mono">
                   {currentParticipant.score || 0} pts
                 </div>
               </div>
             ) : (
-              <div className="p-3 sm:p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl mb-4 sm:mb-5">
-                <div className="text-[10px] text-indigo-800 font-bold uppercase tracking-wider mb-1">
+              <div className="p-3 sm:p-4 bg-[#4F46E5]/10 border-2 border-[#1E1E1E] rounded-lg mb-4 sm:mb-5">
+                <div className="text-[10px] text-[#1E1E1E] font-bold uppercase tracking-wider mb-1 font-mono">
                   Kontribusi Partisipasi Kamu
                 </div>
-                <div className="text-xl sm:text-3xl font-extrabold text-indigo-600 font-mono-numbers">
+                <div className="text-xl sm:text-3xl font-black text-[#4F46E5] font-mono">
                   {myAnswersCount} / {currentEvent.questions.length} Soal Terjawab
                 </div>
-                <p className="text-[11px] text-indigo-500 mt-1">✓ Jawaban kamu tersimpan & terhitung secara live</p>
+                <p className="text-[11px] text-gray-500 mt-1 font-mono">✓ Jawaban kamu tersimpan & terhitung secara live</p>
               </div>
             )}
 
-            <p className="text-[11px] sm:text-xs text-slate-400 mb-4">
+            <p className="text-[11px] sm:text-xs text-gray-400 mb-4">
               Sesi presentasi telah berakhir. Kamu dapat menutup tab ini.
             </p>
 
             {/* Exit Room Button */}
             <button
               onClick={leaveRoom}
-              className="w-full py-2.5 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer border border-slate-200 hover:border-rose-200"
+              className="neo-btn w-full py-2.5 bg-white text-[#1E1E1E] text-xs font-bold hover:bg-[#FB7185]/20"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Keluar dari Room</span>
@@ -150,12 +153,12 @@ export const ParticipantView: React.FC = () => {
       {isUrgentTimer && (
         <div 
           aria-hidden="true"
-          className="fixed inset-0 pointer-events-none z-50 border-4 sm:border-8 border-rose-500 animate-danger-pulse transition-opacity duration-300"
+          className="fixed inset-0 pointer-events-none z-50 border-4 sm:border-8 border-[#FB7185] animate-danger-pulse transition-opacity duration-300"
         >
           {/* Top Urgency Pill Banner */}
-          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-600 to-red-600 text-white font-extrabold text-[11px] px-3.5 py-1 rounded-full shadow-lg flex items-center space-x-1.5 animate-bounce ring-2 ring-white/80 select-none">
-            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-            <span className="tracking-wide font-mono-numbers">⏱ SISA {timerRemaining} DETIK LAGI!</span>
+          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 neo-badge bg-[#FB7185] text-[#1E1E1E] px-3.5 py-1.5 text-[11px] animate-bounce select-none">
+            <span className="w-2 h-2 rounded-full bg-[#1E1E1E] animate-ping" />
+            <span className="tracking-wide font-mono">⏱ SISA {timerRemaining} DETIK LAGI!</span>
           </div>
         </div>
       )}

@@ -2,17 +2,17 @@ import React from 'react';
 
 export const GlobalAppSkeleton: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-6 sm:p-8 flex flex-col">
+    <div className="min-h-screen bg-[#FFF8F0] p-6 sm:p-8 flex flex-col">
       {/* Header Skeleton */}
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between mb-8 animate-pulse">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-indigo-100 rounded-xl"></div>
-          <div className="w-32 h-6 bg-slate-200 rounded-lg hidden sm:block"></div>
+          <div className="w-10 h-10 bg-[#4F46E5]/20 border-2 border-[#1E1E1E] rounded-lg"></div>
+          <div className="w-32 h-6 bg-gray-200 border-2 border-[#1E1E1E] rounded-md hidden sm:block"></div>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="w-24 h-9 bg-slate-200 rounded-lg"></div>
-          <div className="w-24 h-9 bg-slate-200 rounded-lg"></div>
-          <div className="w-24 h-9 bg-slate-200 rounded-lg"></div>
+          <div className="w-24 h-9 bg-white border-2 border-[#1E1E1E] rounded-lg shadow-[2px_2px_0px_#1E1E1E]"></div>
+          <div className="w-24 h-9 bg-white border-2 border-[#1E1E1E] rounded-lg shadow-[2px_2px_0px_#1E1E1E]"></div>
+          <div className="w-24 h-9 bg-white border-2 border-[#1E1E1E] rounded-lg shadow-[2px_2px_0px_#1E1E1E]"></div>
         </div>
       </div>
 
@@ -20,21 +20,21 @@ export const GlobalAppSkeleton: React.FC = () => {
       <div className="flex-1 w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-6 animate-pulse">
         {/* Left main block */}
         <div className="flex-[2] space-y-6">
-          <div className="w-full h-32 md:h-48 bg-white border border-slate-100 shadow-sm rounded-3xl"></div>
+          <div className="w-full h-32 md:h-48 neo-card"></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="h-32 sm:h-48 bg-white border border-slate-100 shadow-sm rounded-3xl"></div>
-            <div className="h-32 sm:h-48 bg-white border border-slate-100 shadow-sm rounded-3xl"></div>
+            <div className="h-32 sm:h-48 neo-card"></div>
+            <div className="h-32 sm:h-48 neo-card"></div>
           </div>
-          <div className="w-full h-64 bg-white border border-slate-100 shadow-sm rounded-3xl"></div>
+          <div className="w-full h-64 neo-card"></div>
         </div>
         
         {/* Right sidebar block */}
-        <div className="flex-1 bg-white border border-slate-100 shadow-sm rounded-3xl min-h-[400px] flex flex-col p-6 space-y-4">
-          <div className="w-1/2 h-6 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-12 bg-slate-100 rounded-xl"></div>
-          <div className="w-full h-12 bg-slate-100 rounded-xl"></div>
-          <div className="w-full h-12 bg-slate-100 rounded-xl"></div>
-          <div className="w-full h-12 bg-slate-100 rounded-xl"></div>
+        <div className="flex-1 neo-card min-h-[400px] flex flex-col p-6 space-y-4">
+          <div className="w-1/2 h-6 bg-gray-200 border-2 border-[#1E1E1E] rounded-md"></div>
+          <div className="w-full h-12 bg-white border-2 border-[#1E1E1E] rounded-lg"></div>
+          <div className="w-full h-12 bg-white border-2 border-[#1E1E1E] rounded-lg"></div>
+          <div className="w-full h-12 bg-white border-2 border-[#1E1E1E] rounded-lg"></div>
+          <div className="w-full h-12 bg-white border-2 border-[#1E1E1E] rounded-lg"></div>
         </div>
       </div>
     </div>

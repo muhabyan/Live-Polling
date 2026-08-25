@@ -48,45 +48,46 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
 
   if (count === 0) {
     return (
-      <div className="text-center py-4 text-xs text-slate-400 italic">
+      <div className="text-center py-4 text-xs font-mono text-gray-400 italic">
         Belum ada partisipan yang terhubung.
       </div>
     );
   }
 
-  // If very few participants (<= 4), display prominent, elegant cards with full names
+  // If very few participants (<= 6), display prominent cards
   if (!shouldAnimate) {
     return (
       <div className="w-full max-w-xl mx-auto flex flex-wrap items-center justify-center gap-3 py-3 animate-in fade-in zoom-in-95">
         {participants.map((p, idx) => (
           <div
             key={p.id + '-' + idx}
-            className={`flex items-center space-x-2.5 px-4 py-2 rounded-2xl text-xs font-semibold shadow-xs transition-all ${
+            className={`flex items-center space-x-2.5 px-4 py-2 rounded-lg border-2 border-[#1E1E1E] text-xs font-bold transition-all ${
               isDark
-                ? 'bg-slate-800/90 border border-slate-700/80 text-slate-200'
-                : 'bg-white border border-slate-200 text-slate-900 shadow-2xs'
+                ? 'bg-[#1a1a2e] text-white'
+                : 'bg-white text-[#1E1E1E]'
             }`}
+            style={{ boxShadow: '3px 3px 0px #1E1E1E' }}
           >
             <span
-              className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 shadow-2xs font-emoji"
+              className="w-7 h-7 rounded-md border-2 border-[#1E1E1E] flex items-center justify-center text-sm shrink-0"
               style={{ backgroundColor: p.avatarBg }}
             >
               {p.avatarEmoji || '🦊'}
             </span>
             <div className="min-w-0 text-left">
-              <span className={`font-extrabold text-xs block truncate max-w-[160px] leading-tight ${
-                isDark ? 'text-white' : 'text-slate-900'
+              <span className={`font-black text-xs block truncate max-w-[160px] leading-tight ${
+                isDark ? 'text-white' : 'text-[#1E1E1E]'
               }`}>
                 {p.name}
               </span>
               <span className={`text-[10px] block leading-tight font-mono ${
-                isDark ? 'text-slate-400' : 'text-slate-500 font-semibold'
+                isDark ? 'text-gray-400' : 'text-gray-500'
               }`}>
                 #{idx + 1} Attendee
               </span>
             </div>
             {isQuizMode && p.score !== undefined && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-300 font-black border border-amber-500/20">
+              <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-[10px] font-mono">
                 {p.score} pts
               </span>
             )}
@@ -109,37 +110,37 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
       {/* Top Header Badge */}
       <div className="flex items-center justify-between px-2 mb-2">
         <div className="flex items-center space-x-2">
-          <span className={`inline-flex items-center space-x-1.5 px-3 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest ${
+          <span className={`neo-badge ${
             isDark
-              ? 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 shadow-xs'
-              : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+              ? 'bg-[#4F46E5] text-white'
+              : 'bg-[#FACC15] text-[#1E1E1E]'
           }`}>
-            <Film className="w-3 h-3 text-indigo-400" />
+            <Film className="w-3 h-3" />
             <span>{title} ({count})</span>
           </span>
-          <span className="text-[10px] text-slate-400 hidden sm:inline flex items-center space-x-1">
-            <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+          <span className="text-[10px] text-gray-400 font-mono hidden sm:inline flex items-center space-x-1">
+            <Sparkles className="w-2.5 h-2.5 text-[#FACC15]" />
             <span>Movie Credits Roll</span>
           </span>
         </div>
 
         {/* Speed & Pause Controls */}
-        <div className="flex items-center space-x-1 opacity-60 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className={`p-1 rounded-md text-[10px] font-bold flex items-center space-x-1 cursor-pointer transition-colors ${
-              isDark ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-100 text-slate-600'
+            className={`neo-btn p-1 text-[10px] font-bold ${
+              isDark ? 'bg-[#1a1a2e] text-white' : 'bg-white text-[#1E1E1E]'
             }`}
             title={isPaused ? 'Resume scroll' : 'Pause scroll'}
           >
-            {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3" />}
+            {isPaused ? <Play className="w-3 h-3 text-[#34D399]" /> : <Pause className="w-3 h-3" />}
           </button>
           <button
             onClick={() => setSpeedMultiplier(speedMultiplier === 1 ? 1.5 : speedMultiplier === 1.5 ? 2 : 1)}
-            className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold flex items-center space-x-0.5 cursor-pointer transition-colors ${
+            className={`neo-btn px-1.5 py-0.5 text-[10px] font-mono font-black ${
               speedMultiplier > 1 
-                ? 'bg-indigo-600 text-white' 
-                : isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'
+                ? 'bg-[#4F46E5] text-white' 
+                : isDark ? 'bg-[#1a1a2e] text-white' : 'bg-white text-[#1E1E1E]'
             }`}
             title="Adjust credit roll speed"
           >
@@ -149,12 +150,13 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
         </div>
       </div>
 
-      {/* Credit Roll Viewport with Cinematic Gradient Masks (Top & Bottom Fade) */}
+      {/* Credit Roll Viewport */}
       <div
-        className={`relative ${maxHeight} overflow-hidden rounded-2xl ${
-          isDark ? 'bg-slate-900/40 border border-slate-800/80' : 'bg-slate-50/70 border border-slate-200/80'
+        className={`relative ${maxHeight} overflow-hidden rounded-xl border-2 border-[#1E1E1E] ${
+          isDark ? 'bg-[#1a1a2e]' : 'bg-[#FFF8F0]'
         }`}
         style={{
+          boxShadow: '4px 4px 0px #1E1E1E',
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)',
         }}
@@ -174,31 +176,32 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
             return (
               <div
                 key={`${p.id}-${idx}`}
-                className={`flex items-center justify-between space-x-2 px-3 py-2 rounded-xl transition-all ${
+                className={`flex items-center justify-between space-x-2 px-3 py-2 rounded-lg border-2 border-[#1E1E1E] transition-all ${
                   isDark
-                    ? 'bg-slate-800/70 border border-slate-700/60 hover:border-indigo-500/80 hover:bg-slate-800'
-                    : 'bg-white border border-slate-200/80 hover:border-indigo-300 hover:shadow-xs'
+                    ? 'bg-[#252542] text-white'
+                    : 'bg-white text-[#1E1E1E]'
                 }`}
+                style={{ boxShadow: '2px 2px 0px #1E1E1E' }}
               >
                 <div className="flex items-center space-x-2 min-w-0">
                   <span
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 shadow-2xs font-emoji"
+                    className="w-6 h-6 rounded-md border-2 border-[#1E1E1E] flex items-center justify-center text-xs shrink-0"
                     style={{ backgroundColor: p.avatarBg }}
                   >
                     {p.avatarEmoji || '🦊'}
                   </span>
                   <div className="min-w-0">
-                    <p className={`text-xs font-bold truncate leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <p className={`text-xs font-black truncate leading-tight ${isDark ? 'text-white' : 'text-[#1E1E1E]'}`}>
                       {p.name}
                     </p>
-                    <span className="text-[9px] text-slate-400 block leading-tight font-mono">
+                    <span className="text-[9px] text-gray-400 block leading-tight font-mono">
                       #{originalIndex + 1} Attendee
                     </span>
                   </div>
                 </div>
 
                 {isQuizMode && p.score !== undefined && (
-                  <span className="text-[10px] font-mono font-black px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-400 shrink-0 border border-amber-500/20">
+                  <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-[9px] font-mono shrink-0">
                     {p.score} pts
                   </span>
                 )}

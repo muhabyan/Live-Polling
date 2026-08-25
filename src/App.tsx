@@ -23,7 +23,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen-dvh bg-[#F8FAFC] text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 antialiased overflow-x-hidden">
+    <div className="min-h-screen-dvh bg-[#FFF8F0] text-[#1E1E1E] flex flex-col font-sans selection:bg-yellow-200 selection:text-black antialiased overflow-x-hidden">
       
       {/* Top Universal Role Switcher & Status Navigation Header (hidden on Login & Projector Stage) */}
       {activeView !== 'projector' && activeView !== 'login' && <RoleHeader />}

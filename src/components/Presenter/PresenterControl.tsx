@@ -22,8 +22,7 @@ import {
   Tv,
   ListOrdered,
   BrainCircuit,
-  Trash2,
-  CheckCircle2
+  Trash2
 } from 'lucide-react';
 import * as api from '../../utils/api';
 
@@ -57,21 +56,21 @@ export const PresenterControl: React.FC = () => {
 
   if (!currentEvent || !currentEvent.questions || currentEvent.questions.length === 0 || !currentQ) {
     return (
-      <div className="max-w-md mx-auto my-12 p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-sm text-center space-y-4">
-        <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+      <div className="max-w-md mx-auto my-12 p-6 sm:p-8 neo-card text-center space-y-4">
+        <div className="w-14 h-14 bg-[#4F46E5]/10 text-[#4F46E5] border-2 border-[#1E1E1E] rounded-xl flex items-center justify-center mx-auto" style={{ boxShadow: '3px 3px 0px #1E1E1E' }}>
           <Radio className="w-7 h-7 animate-pulse" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 font-display">
+        <h2 className="text-xl font-black text-[#1E1E1E] font-display uppercase">
           {!currentEvent ? 'No Active Event Selected' : 'No Questions in this Event'}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500">
+        <p className="text-xs sm:text-sm text-gray-500 font-mono">
           {!currentEvent
             ? "Create your live polling session in Admin Studio to start presenting."
             : "Add interactive questions in Admin Studio to start polling."}
         </p>
         <button
           onClick={() => setActiveView('admin')}
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center space-x-2 mx-auto cursor-pointer"
+          className="neo-btn px-5 py-2.5 bg-[#FACC15] text-[#1E1E1E] font-black text-xs sm:text-sm mx-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Open Admin Studio</span>
@@ -102,21 +101,21 @@ export const PresenterControl: React.FC = () => {
     <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
       
       {/* Top Banner / Master Session Status */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5">
+      <div className="neo-card p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-2xs">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#4F46E5] border-2 border-[#1E1E1E] flex items-center justify-center text-white font-black text-lg shrink-0" style={{ boxShadow: '2px 2px 0px #1E1E1E' }}>
             <Radio className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center space-x-2">
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 truncate font-display">
+              <h1 className="text-lg sm:text-xl font-black tracking-tight text-[#1E1E1E] truncate font-display">
                 {currentEvent.title}
               </h1>
-              <span className="text-[11px] font-mono-numbers font-bold bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-md shrink-0">
+              <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] shrink-0 font-mono">
                 PIN: {currentEvent.roomCode}
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
+            <p className="text-xs text-gray-500 font-bold mt-0.5 font-mono">
               Presenter Cockpit • {currentEvent.organizerName} • {currentEvent.category}
             </p>
           </div>
@@ -126,9 +125,9 @@ export const PresenterControl: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveView('projector')}
-            className="flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+            className="neo-btn bg-[#1E1E1E] text-white px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs"
           >
-            <Tv className="w-3.5 h-3.5 text-indigo-400" />
+            <Tv className="w-3.5 h-3.5 text-[#60A5FA]" />
             <span>Open Stage View</span>
           </button>
 
@@ -136,9 +135,9 @@ export const PresenterControl: React.FC = () => {
             <button
               id="presenter-start-session-btn"
               onClick={() => sendModeratorAction('start_session')}
-              className="flex items-center space-x-1.5 px-3.5 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+              className="neo-btn bg-[#34D399] text-[#1E1E1E] px-3.5 py-1.5 sm:py-2 text-xs font-black"
             >
-              <Play className="w-3.5 h-3.5 fill-white" />
+              <Play className="w-3.5 h-3.5 fill-[#1E1E1E]" />
               <span>Start Session</span>
             </button>
           )}
@@ -147,9 +146,9 @@ export const PresenterControl: React.FC = () => {
             <button
               id="presenter-end-session-btn"
               onClick={() => sendModeratorAction('end_session')}
-              className="flex items-center space-x-1.5 px-3 py-1.5 sm:py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              className="neo-btn bg-white text-[#1E1E1E] px-3.5 py-1.5 sm:py-2 text-xs font-bold hover:bg-[#FB7185]/20"
             >
-              <StopCircle className="w-3.5 h-3.5 text-slate-500" />
+              <StopCircle className="w-3.5 h-3.5 text-gray-600" />
               <span>End Session</span>
             </button>
           )}
@@ -162,7 +161,7 @@ export const PresenterControl: React.FC = () => {
                 await refreshEvent();
               }
             }}
-            className="flex items-center space-x-1 px-2.5 py-1.5 sm:py-2 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+            className="neo-btn bg-white text-gray-600 hover:text-[#FB7185] hover:bg-[#FB7185]/10 px-2.5 py-1.5 sm:py-2 text-xs font-bold"
             title="Clear all responses and participants"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -178,23 +177,23 @@ export const PresenterControl: React.FC = () => {
         <div className="lg:col-span-2 space-y-5">
           
           {/* Active Question Preview Card */}
-          <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-2xs relative overflow-hidden">
+          <div className="neo-card p-5 sm:p-7 relative overflow-hidden">
             
             {/* Top Question Tag & Navigation Header */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
-                  Question {currentQIndex + 1} of {currentEvent.questions.length}
+                <span className="neo-badge bg-[#FFF8F0] text-[#1E1E1E] font-mono">
+                  Question {currentQIndex + 1} / {currentEvent.questions.length}
                 </span>
-                <span className="text-[11px] font-semibold text-slate-500 uppercase">
+                <span className="neo-badge bg-gray-100 text-gray-700 font-mono">
                   {currentQ?.type.replace('_', ' ')}
                 </span>
               </div>
 
               {/* Live Timer Counter */}
-              <div className="flex items-center space-x-1.5 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
-                <Clock className={`w-3.5 h-3.5 ${currentEvent.isTimerRunning ? 'text-indigo-600 animate-spin' : 'text-slate-400'}`} />
-                <span className="font-mono-numbers text-sm font-bold text-slate-900">
+              <div className="neo-badge bg-[#1E1E1E] text-white px-3 py-1 text-sm font-mono">
+                <Clock className={`w-3.5 h-3.5 ${currentEvent.isTimerRunning ? 'text-[#34D399] animate-spin' : 'text-gray-400'}`} />
+                <span>
                   {(() => {
                     const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
                     const mins = Math.floor(remaining / 60);
@@ -206,20 +205,20 @@ export const PresenterControl: React.FC = () => {
             </div>
 
             {/* Question Text */}
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug mb-1 font-display">
+            <h2 className="text-xl sm:text-2xl font-black text-[#1E1E1E] leading-snug mb-1 font-display">
               {currentQ?.title}
             </h2>
             {currentQ?.subtitle && (
-              <p className="text-xs sm:text-sm text-slate-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4 font-mono">
                 {currentQ.subtitle}
               </p>
             )}
 
             {/* Question Options or Submissions Summary */}
-            <div className="bg-slate-50 rounded-xl p-3.5 sm:p-4 border border-slate-200 mb-5">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center justify-between">
+            <div className="bg-[#FFF8F0] border-2 border-[#1E1E1E] rounded-xl p-3.5 sm:p-4 mb-5">
+              <div className="text-[11px] font-black uppercase tracking-wider text-gray-600 mb-2.5 flex items-center justify-between font-mono">
                 <span>Live Breakdown</span>
-                <span className="font-mono-numbers">{responses.length} votes recorded</span>
+                <span className="neo-badge bg-white text-[#1E1E1E]">{responses.length} votes</span>
               </div>
 
               {currentQ?.type === 'multiple_choice' && (
@@ -231,19 +230,20 @@ export const PresenterControl: React.FC = () => {
                     return (
                       <div
                         key={opt.id}
-                        className={`p-2.5 rounded-xl border text-xs flex items-center justify-between ${
+                        className={`p-2.5 rounded-lg border-2 border-[#1E1E1E] text-xs flex items-center justify-between ${
                           opt.isCorrect && currentEvent.revealAnswer
-                            ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-bold'
-                            : 'bg-white border-slate-200 text-slate-800'
+                            ? 'bg-[#34D399]/30 font-black'
+                            : 'bg-white text-[#1E1E1E]'
                         }`}
+                        style={{ boxShadow: '2px 2px 0px #1E1E1E' }}
                       >
                         <div className="flex items-center space-x-2 truncate mr-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] shrink-0">
+                          <span className="w-5 h-5 rounded-md bg-[#1E1E1E] text-white flex items-center justify-center font-black text-[10px] shrink-0 font-mono">
                             {['A', 'B', 'C', 'D', 'E'][i]}
                           </span>
-                          <span className="truncate font-semibold">{opt.text}</span>
+                          <span className="truncate font-bold">{opt.text}</span>
                         </div>
-                        <span className="font-mono-numbers font-bold text-slate-700 shrink-0">{pct}% ({count})</span>
+                        <span className="font-mono font-black text-[#1E1E1E] shrink-0">{pct}% ({count})</span>
                       </div>
                     );
                   })}
@@ -251,51 +251,51 @@ export const PresenterControl: React.FC = () => {
               )}
 
               {currentQ?.type === 'word_cloud' && (
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-gray-600 font-mono">
                   Word cloud active. Words submitted by audience are dynamically weighted on the projector stage.
                 </p>
               )}
 
               {currentQ?.type === 'rating' && (
-                <div className="flex items-center justify-between text-xs text-slate-700">
+                <div className="flex items-center justify-between text-xs text-[#1E1E1E] font-bold">
                   <span>
                     Skala: {currentQ.ratingMinLabel || '1 (Rendah)'} ➔ {currentQ.ratingMaxLabel || '5 (Tinggi)'}
                   </span>
-                  <span className="font-bold text-indigo-700 font-mono-numbers">
-                    Average: {totalResponses > 0 ? (responses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalResponses).toFixed(1) : '0.0'} / {currentQ.ratingMax || 5}.0
+                  <span className="neo-badge bg-[#4F46E5] text-white font-mono">
+                    Avg: {totalResponses > 0 ? (responses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalResponses).toFixed(1) : '0.0'} / {currentQ.ratingMax || 5}.0
                   </span>
                 </div>
               )}
 
               {currentQ?.type === 'open_text' && (
-                <div className="text-xs text-slate-600">
+                <div className="text-xs text-gray-600">
                   {responses.length > 0 ? (
                     <div className="space-y-1.5 max-h-28 overflow-y-auto">
                       {responses.slice(-3).map(r => (
-                        <div key={r.id} className="p-2 bg-white rounded-lg border border-slate-200">
-                          <span className="font-bold text-slate-800">{r.participantName}:</span> {r.textResponse}
+                        <div key={r.id} className="p-2 bg-white rounded-lg border-2 border-[#1E1E1E]" style={{ boxShadow: '2px 2px 0px #1E1E1E' }}>
+                          <span className="font-black text-[#1E1E1E]">{r.participantName}:</span> {r.textResponse}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <span>No audience open text submissions yet.</span>
+                    <span className="font-mono text-gray-400">No audience open text submissions yet.</span>
                   )}
                 </div>
               )}
             </div>
 
             {/* Participation Progress Bar */}
-            <div className="space-y-1 mb-6">
-              <div className="flex justify-between text-xs font-semibold text-slate-600">
+            <div className="space-y-1.5 mb-6">
+              <div className="flex justify-between text-xs font-bold text-[#1E1E1E] font-mono">
                 <span className="flex items-center space-x-1">
-                  <Users className="w-3.5 h-3.5 text-slate-500" />
+                  <Users className="w-3.5 h-3.5" />
                   <span>Room Participation</span>
                 </span>
-                <span className="font-mono-numbers">{totalResponses} / {totalParticipants} answered ({responsePct}%)</span>
+                <span>{totalResponses} / {totalParticipants} ({responsePct}%)</span>
               </div>
-              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-white border-2 border-[#1E1E1E] h-3 rounded-md overflow-hidden">
                 <div
-                  className="bg-indigo-600 h-full rounded-full transition-all duration-500"
+                  className="bg-[#34D399] h-full transition-all duration-500"
                   style={{ width: `${responsePct}%` }}
                 />
               </div>
@@ -309,7 +309,7 @@ export const PresenterControl: React.FC = () => {
                 id="presenter-prev-q-btn"
                 onClick={() => sendModeratorAction('prev_question')}
                 disabled={currentQIndex === 0}
-                className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="neo-btn bg-white text-[#1E1E1E] px-3 py-2.5 text-xs font-bold"
               >
                 <SkipBack className="w-3.5 h-3.5" />
                 <span>Prev Question</span>
@@ -319,16 +319,16 @@ export const PresenterControl: React.FC = () => {
               <button
                 id="presenter-toggle-timer-btn"
                 onClick={() => sendModeratorAction('toggle_timer')}
-                className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                className="neo-btn bg-white text-[#1E1E1E] px-3 py-2.5 text-xs font-bold"
               >
                 {currentEvent.isTimerRunning ? (
                   <>
-                    <Pause className="w-3.5 h-3.5 text-amber-600" />
+                    <Pause className="w-3.5 h-3.5 text-[#FACC15]" />
                     <span>Pause Timer</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-3.5 h-3.5 text-emerald-600" />
+                    <Play className="w-3.5 h-3.5 text-[#34D399]" />
                     <span>Start Timer</span>
                   </>
                 )}
@@ -338,9 +338,9 @@ export const PresenterControl: React.FC = () => {
               <button
                 id="presenter-add-time-btn"
                 onClick={() => sendModeratorAction('add_time', { seconds: 15 })}
-                className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                className="neo-btn bg-white text-[#1E1E1E] px-3 py-2.5 text-xs font-bold"
               >
-                <Plus className="w-3.5 h-3.5 text-indigo-600" />
+                <Plus className="w-3.5 h-3.5 text-[#4F46E5]" />
                 <span>+15 Sec</span>
               </button>
 
@@ -349,7 +349,7 @@ export const PresenterControl: React.FC = () => {
                 <button
                   id="presenter-finish-session-btn"
                   onClick={() => sendModeratorAction('end_session')}
-                  className="flex items-center justify-center space-x-1.5 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer animate-pulse"
+                  className="neo-btn bg-[#34D399] text-[#1E1E1E] px-3 py-2.5 text-xs font-black animate-pulse"
                 >
                   <span>Finish & Finale 🏁</span>
                 </button>
@@ -357,40 +357,38 @@ export const PresenterControl: React.FC = () => {
                 <button
                   id="presenter-next-q-btn"
                   onClick={() => sendModeratorAction('next_question')}
-                  className="flex items-center justify-center space-x-1 px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  className="neo-btn bg-[#FACC15] text-[#1E1E1E] px-3 py-2.5 text-xs font-black"
                 >
                   <span>Next</span>
                   <SkipForward className="w-3.5 h-3.5" />
                 </button>
               )}
-</div>
+            </div>
 
             {/* ⚡ Auto-Pilot Control Strip */}
-            <div className={`mt-3 p-3 sm:p-3.5 rounded-xl border transition-all ${
+            <div className={`mt-4 p-3 sm:p-3.5 rounded-xl border-2 border-[#1E1E1E] transition-all ${
               autoAdvance
-                ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200/80 shadow-xs'
-                : 'bg-slate-50 border-slate-200'
+                ? 'bg-[#FACC15]/20 shadow-[3px_3px_0px_#1E1E1E]'
+                : 'bg-[#FFF8F0]'
             }`}>
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 {/* Toggle Switch */}
                 <div className="flex items-center space-x-2.5">
                   <button
                     onClick={() => setAutoAdvance(!autoAdvance)}
-                    className={`relative w-10 h-[22px] rounded-full transition-all duration-300 cursor-pointer ${
-                      autoAdvance ? 'bg-amber-500 shadow-amber-300/40 shadow-sm' : 'bg-slate-300'
+                    className={`relative w-11 h-6 rounded-full border-2 border-[#1E1E1E] transition-all duration-200 cursor-pointer ${
+                      autoAdvance ? 'bg-[#34D399]' : 'bg-gray-200'
                     }`}
                   >
-                    <span className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${
-                      autoAdvance ? 'left-[22px]' : 'left-[3px]'
+                    <span className={`absolute top-[1px] w-4 h-4 rounded-full bg-[#1E1E1E] transition-all duration-200 ${
+                      autoAdvance ? 'left-[22px]' : 'left-[2px]'
                     }`} />
                   </button>
                   <div className="flex items-center space-x-1.5">
                     <Zap className={`w-3.5 h-3.5 ${
-                      autoAdvance ? 'text-amber-600' : 'text-slate-400'
+                      autoAdvance ? 'text-[#1E1E1E]' : 'text-gray-400'
                     }`} />
-                    <span className={`text-xs font-bold ${
-                      autoAdvance ? 'text-amber-800' : 'text-slate-600'
-                    }`}>
+                    <span className="text-xs font-black text-[#1E1E1E] uppercase font-mono">
                       Auto-Pilot
                     </span>
                   </div>
@@ -399,15 +397,15 @@ export const PresenterControl: React.FC = () => {
                 {/* Delay Selector */}
                 {autoAdvance && (
                   <div className="flex items-center space-x-1.5">
-                    <span className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Jeda:</span>
+                    <span className="text-[10px] font-bold text-[#1E1E1E] uppercase font-mono">Jeda:</span>
                     {[3, 5, 8, 10].map(sec => (
                       <button
                         key={sec}
                         onClick={() => setAutoAdvanceDelay(sec)}
-                        className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                        className={`px-2 py-0.5 rounded-md text-[11px] font-black border-2 border-[#1E1E1E] cursor-pointer font-mono ${
                           autoAdvanceDelay === sec
-                            ? 'bg-amber-500 text-white shadow-xs'
-                            : 'bg-white/80 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                            ? 'bg-[#1E1E1E] text-white'
+                            : 'bg-white text-[#1E1E1E] hover:bg-gray-100'
                         }`}
                       >
                         {sec}s
@@ -418,34 +416,35 @@ export const PresenterControl: React.FC = () => {
 
                 {/* Live Countdown Indicator */}
                 {autoAdvanceCountdown !== null && (
-                  <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-500 text-white text-xs font-bold animate-pulse">
+                  <div className="neo-badge bg-[#FB7185] text-[#1E1E1E] text-xs font-mono animate-pulse">
                     <SkipForward className="w-3 h-3" />
                     <span>
                       {currentQIndex >= currentEvent.questions.length - 1
                         ? `Finishing in ${autoAdvanceCountdown}s...`
-                        : `Next question in ${autoAdvanceCountdown}s...`}
+                        : `Next in ${autoAdvanceCountdown}s...`}
                     </span>
                   </div>
                 )}
               </div>
 
               {autoAdvance && autoAdvanceCountdown === null && (
-                <p className="text-[10px] text-amber-600/80 mt-1.5 font-medium leading-snug">
-                  Timer habis → jeda {autoAdvanceDelay}s → otomatis lanjut ke soal berikutnya. Soal terakhir → otomatis selesai.
+                <p className="text-[10px] text-gray-600 mt-1.5 font-bold font-mono">
+                  Timer habis ➔ jeda {autoAdvanceDelay}s ➔ otomatis lanjut ke soal berikutnya.
                 </p>
               )}
             </div>
-            <div className="mt-4 pt-3.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
-              
+
+            {/* Quick Action Toggles */}
+            <div className="mt-4 pt-3.5 border-t-2 border-[#1E1E1E]/10 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex flex-wrap items-center gap-2">
                 {/* Lock Voting Toggle */}
                 <button
                   id="presenter-lock-voting-btn"
                   onClick={() => sendModeratorAction('toggle_lock_voting')}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`neo-btn px-3 py-1.5 text-xs font-bold ${
                     currentEvent.isVotingLocked
-                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                      : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+                      ? 'bg-[#FB7185] text-[#1E1E1E]'
+                      : 'bg-white text-[#1E1E1E]'
                   }`}
                 >
                   {currentEvent.isVotingLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
@@ -455,10 +454,10 @@ export const PresenterControl: React.FC = () => {
                 {/* Show/Hide Results Toggle */}
                 <button
                   onClick={() => sendModeratorAction('toggle_results')}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`neo-btn px-3 py-1.5 text-xs font-bold ${
                     currentEvent.showResultsOnProjector
-                      ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                      : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+                      ? 'bg-[#4F46E5] text-white'
+                      : 'bg-white text-[#1E1E1E]'
                   }`}
                 >
                   {currentEvent.showResultsOnProjector ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -469,10 +468,10 @@ export const PresenterControl: React.FC = () => {
                 {(currentQ?.type === 'multiple_choice' || currentQ?.type === 'true_false') && (
                   <button
                     onClick={() => sendModeratorAction('toggle_reveal_answer')}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    className={`neo-btn px-3 py-1.5 text-xs font-bold ${
                       currentEvent.revealAnswer
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+                        ? 'bg-[#34D399] text-[#1E1E1E]'
+                        : 'bg-white text-[#1E1E1E]'
                     }`}
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
@@ -484,7 +483,7 @@ export const PresenterControl: React.FC = () => {
               {/* Reset Question Timer */}
               <button
                 onClick={() => sendModeratorAction('reset_timer')}
-                className="text-slate-400 hover:text-slate-700 text-xs font-semibold flex items-center space-x-1 cursor-pointer py-1"
+                className="neo-btn bg-white text-gray-500 hover:text-[#1E1E1E] text-xs font-bold px-2 py-1"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Reset Timer</span>
@@ -493,15 +492,15 @@ export const PresenterControl: React.FC = () => {
           </div>
 
           {/* AI Live Audience Response Synthesizer */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs">
+          <div className="neo-card p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-1.5 bg-indigo-600 text-white rounded-lg shadow-2xs">
+                <div className="p-1.5 bg-[#4F46E5] text-white border-2 border-[#1E1E1E] rounded-lg">
                   <BrainCircuit className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-display">AI Live Audience Intelligence</h3>
-                  <p className="text-[11px] text-slate-500">Instant sentiment breakdown & moderator talking points</p>
+                  <h3 className="text-xs sm:text-sm font-black text-[#1E1E1E] font-display uppercase">AI Audience Intelligence</h3>
+                  <p className="text-[11px] text-gray-500 font-mono">Instant sentiment breakdown & moderator talking points</p>
                 </div>
               </div>
 
@@ -509,16 +508,16 @@ export const PresenterControl: React.FC = () => {
                 id="gemini-summarize-btn"
                 onClick={handleGenerateAISummary}
                 disabled={isSummarizingAI || responses.length === 0}
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold rounded-lg text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="neo-btn bg-[#FACC15] text-[#1E1E1E] px-3 py-1.5 text-xs font-black"
               >
                 {isSummarizingAI ? (
                   <>
-                    <AiGeneratingSpinner size="w-3.5 h-3.5" color="text-indigo-600" />
-                    <span className="text-[10px]">ANALYZING</span>
+                    <AiGeneratingSpinner size="w-3.5 h-3.5" color="text-[#1E1E1E]" />
+                    <span className="text-[10px] font-mono">ANALYZING</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    <Sparkles className="w-3.5 h-3.5" />
                     <span>Analyze Insights</span>
                   </>
                 )}
@@ -526,37 +525,37 @@ export const PresenterControl: React.FC = () => {
             </div>
 
             {aiSummaryResult ? (
-              <div className="mt-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2.5">
+              <div className="mt-3 p-3.5 bg-[#FFF8F0] rounded-xl border-2 border-[#1E1E1E] text-xs space-y-2.5" style={{ boxShadow: '2px 2px 0px #1E1E1E' }}>
                 <div>
-                  <span className="font-bold text-slate-500 uppercase tracking-wider block text-[10px] mb-0.5">Summary:</span>
-                  <p className="text-slate-800 font-medium leading-relaxed">
+                  <span className="font-black text-[#1E1E1E] uppercase tracking-wider block text-[10px] mb-0.5 font-mono">Summary:</span>
+                  <p className="text-[#1E1E1E] font-medium leading-relaxed">
                     {aiSummaryResult.summary}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-200/80">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t-2 border-[#1E1E1E]/10">
                   <div>
-                    <span className="font-bold text-slate-500 uppercase tracking-wider block text-[10px] mb-0.5">Key Themes:</span>
-                    <ul className="list-disc list-inside text-slate-700 font-medium space-y-0.5">
+                    <span className="font-black text-[#1E1E1E] uppercase tracking-wider block text-[10px] mb-0.5 font-mono">Key Themes:</span>
+                    <ul className="list-disc list-inside text-[#1E1E1E] font-medium space-y-0.5">
                       {aiSummaryResult.keyThemes.map((theme, i) => (
                         <li key={i}>{theme}</li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <span className="font-bold text-slate-500 uppercase tracking-wider block text-[10px] mb-0.5">Sentiment:</span>
-                    <span className="inline-block px-2 py-0.5 bg-white text-slate-700 border border-slate-200 rounded font-semibold text-[11px]">
+                    <span className="font-black text-[#1E1E1E] uppercase tracking-wider block text-[10px] mb-0.5 font-mono">Sentiment:</span>
+                    <span className="neo-badge bg-white text-[#1E1E1E]">
                       {aiSummaryResult.sentiment}
                     </span>
-                    <div className="mt-1.5 text-slate-600">
-                      <strong className="text-slate-800">Speaker Tip:</strong> {aiSummaryResult.moderatorTip}
+                    <div className="mt-1.5 text-[#1E1E1E]">
+                      <strong className="font-black">Speaker Tip:</strong> {aiSummaryResult.moderatorTip}
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-[11px] text-slate-400 mt-1">
-                Click above to generate real-time AI key themes from the <strong className="text-slate-700">{responses.length} responses</strong>.
+              <p className="text-[11px] text-gray-500 mt-1 font-mono">
+                Click above to generate real-time AI key themes from the <strong className="text-[#1E1E1E]">{responses.length} responses</strong>.
               </p>
             )}
           </div>
@@ -566,13 +565,13 @@ export const PresenterControl: React.FC = () => {
         <div className="space-y-5">
           
           {/* Question Sequence List */}
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="neo-card p-4 sm:p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-xs sm:text-sm font-display">
-                <ListOrdered className="w-4 h-4 text-indigo-600" />
+              <div className="flex items-center space-x-1.5 text-[#1E1E1E] font-black text-xs sm:text-sm font-display uppercase">
+                <ListOrdered className="w-4 h-4 text-[#4F46E5]" />
                 <span>Session Timeline</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-500">
+              <span className="neo-badge bg-[#FFF8F0] text-[#1E1E1E] font-mono">
                 {currentEvent.questions.length} questions
               </span>
             </div>
@@ -586,26 +585,27 @@ export const PresenterControl: React.FC = () => {
                   <button
                     key={q.id}
                     onClick={() => sendModeratorAction('jump_to_question', { index: idx })}
-                    className={`w-full text-left p-2.5 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
+                    className={`w-full text-left p-2.5 rounded-lg border-2 border-[#1E1E1E] transition-all flex items-center justify-between cursor-pointer ${
                       isActive
-                        ? 'border-indigo-600 bg-indigo-50/70 shadow-2xs font-bold text-indigo-950'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                        ? 'bg-[#4F46E5] text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                        : 'bg-white text-[#1E1E1E] hover:bg-[#FACC15]/20'
                     }`}
+                    style={{ boxShadow: isActive ? 'none' : '2px 2px 0px #1E1E1E' }}
                   >
                     <div className="flex items-center space-x-2.5 truncate mr-2">
-                      <span className={`w-5 h-5 rounded-md text-[11px] font-bold flex items-center justify-center shrink-0 ${
-                        isActive ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                      <span className={`w-5 h-5 rounded-md border-2 border-[#1E1E1E] text-[11px] font-black flex items-center justify-center shrink-0 font-mono ${
+                        isActive ? 'bg-white text-[#1E1E1E]' : 'bg-[#FFF8F0] text-[#1E1E1E]'
                       }`}>
                         {idx + 1}
                       </span>
                       <div className="truncate">
-                        <div className="text-xs font-semibold truncate">{q.title}</div>
-                        <div className="text-[10px] text-slate-400 uppercase tracking-wider">{q.type.replace('_', ' ')} • {q.timerSeconds}s</div>
+                        <div className="text-xs font-bold truncate">{q.title}</div>
+                        <div className={`text-[10px] uppercase font-mono ${isActive ? 'text-white/80' : 'text-gray-400'}`}>{q.type.replace('_', ' ')} • {q.timerSeconds}s</div>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-[10px] font-mono-numbers font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
+                      <span className={`neo-badge text-[10px] font-mono ${isActive ? 'bg-white text-[#1E1E1E]' : 'bg-[#FFF8F0] text-[#1E1E1E]'}`}>
                         {qResponses}
                       </span>
                     </div>
@@ -616,27 +616,27 @@ export const PresenterControl: React.FC = () => {
           </div>
 
           {/* Live Participants Feed */}
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
+          <div className="neo-card p-4 sm:p-5">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-1.5 text-slate-800 font-bold text-xs sm:text-sm font-display">
-                <Users className="w-4 h-4 text-indigo-600" />
-                <span>Connected Room ({currentEvent.participants.length})</span>
+              <div className="flex items-center space-x-1.5 text-[#1E1E1E] font-black text-xs sm:text-sm font-display uppercase">
+                <Users className="w-4 h-4 text-[#4F46E5]" />
+                <span>Audience ({currentEvent.participants.length})</span>
               </div>
 
               <div className="flex items-center space-x-1 sm:space-x-1.5 flex-wrap gap-y-1">
                 <button
                   onClick={() => simulateAudienceVotes(10)}
                   disabled={isSimulatingCrowd}
-                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  className="neo-btn bg-[#FACC15] text-[#1E1E1E] px-2 py-0.5 text-[11px] font-black font-mono"
                   title="Simulate 10 participants answering"
                 >
-                  <Zap className="w-2.5 h-2.5 text-amber-500 fill-amber-400" />
+                  <Zap className="w-2.5 h-2.5" />
                   <span>+10</span>
                 </button>
                 <button
                   onClick={() => simulateAudienceVotes(50)}
                   disabled={isSimulatingCrowd}
-                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  className="neo-btn bg-[#60A5FA] text-[#1E1E1E] px-2 py-0.5 text-[11px] font-black font-mono"
                   title="Simulate 50 participants answering"
                 >
                   <span>+50</span>
@@ -644,7 +644,7 @@ export const PresenterControl: React.FC = () => {
                 <button
                   onClick={() => simulateAudienceVotes(100)}
                   disabled={isSimulatingCrowd}
-                  className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50"
+                  className="neo-btn bg-[#34D399] text-[#1E1E1E] px-2 py-0.5 text-[11px] font-black font-mono"
                   title="Simulate 100 participants answering"
                 >
                   <span>+100</span>
@@ -652,11 +652,11 @@ export const PresenterControl: React.FC = () => {
                 <button
                   onClick={() => simulateAudienceVotes(400)}
                   disabled={isSimulatingCrowd}
-                  className="px-2 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md text-[11px] font-extrabold flex items-center space-x-1 cursor-pointer transition-colors disabled:opacity-50 shadow-2xs"
+                  className="neo-btn bg-[#FB7185] text-[#1E1E1E] px-2 py-0.5 text-[11px] font-black font-mono"
                   title="Stress test with 400 participants answering concurrently"
                 >
-                  <Sparkles className="w-2.5 h-2.5 text-amber-600" />
-                  <span>+400 MAX</span>
+                  <Sparkles className="w-2.5 h-2.5" />
+                  <span>+400</span>
                 </button>
 
                 {currentEvent.participants.length > 0 && (
@@ -667,10 +667,10 @@ export const PresenterControl: React.FC = () => {
                         await sendModeratorAction('reset_session');
                       }
                     }}
-                    className="px-2 py-0.5 text-[11px] text-rose-600 hover:bg-rose-50 rounded-md font-semibold flex items-center space-x-1 cursor-pointer transition-colors"
+                    className="neo-btn bg-white text-[#FB7185] hover:bg-[#FB7185]/20 px-2 py-0.5 text-[11px] font-black"
                     title="Clear all participants"
                   >
-                    <Trash2 className="w-3 h-3 text-rose-500" />
+                    <Trash2 className="w-3 h-3" />
                     <span>Clear</span>
                   </button>
                 )}
@@ -679,29 +679,30 @@ export const PresenterControl: React.FC = () => {
 
             <div className="space-y-1.5 max-h-52 overflow-y-auto pr-0.5">
               {currentEvent.participants.length === 0 ? (
-                <p className="text-xs text-slate-400 py-3 text-center">No participants joined yet.</p>
+                <p className="text-xs text-gray-400 py-3 text-center font-mono">No participants joined yet.</p>
               ) : (
                 currentEvent.participants.slice(-8).reverse().map((p) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-2 bg-slate-50 hover:bg-slate-100/80 transition-colors rounded-xl border border-slate-100 text-xs group"
+                    className="flex items-center justify-between p-2 bg-white rounded-lg border-2 border-[#1E1E1E] text-xs"
+                    style={{ boxShadow: '2px 2px 0px #1E1E1E' }}
                   >
                     <div className="flex items-center space-x-2">
                       <div
-                        className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white shadow-2xs"
+                        className="w-6 h-6 rounded-md border-2 border-[#1E1E1E] flex items-center justify-center text-xs font-bold text-white"
                         style={{ backgroundColor: p.avatarBg }}
                       >
                         {p.avatarEmoji || '👋'}
                       </div>
-                      <span className="font-semibold text-slate-800">{p.name}</span>
+                      <span className="font-bold text-[#1E1E1E]">{p.name}</span>
                     </div>
                     <div className="flex items-center space-x-1.5">
-                      <span className="text-[10px] text-slate-400 font-mono-numbers">
+                      <span className="text-[10px] text-gray-500 font-mono font-bold">
                         {p.score ? `${p.score} pts` : 'Active'}
                       </span>
                       <button
                         onClick={() => deleteParticipant(p.id)}
-                        className="p-1 text-slate-300 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                        className="p-1 text-gray-400 hover:text-[#FB7185] transition-colors cursor-pointer"
                         title="Remove participant"
                       >
                         <Trash2 className="w-3 h-3" />

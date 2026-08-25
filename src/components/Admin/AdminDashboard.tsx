@@ -15,10 +15,7 @@ import {
   MessageSquare, 
   Clock, 
   X,
-  FileText,
-  HelpCircle,
-  TrendingUp,
-  Activity
+  FileText
 } from 'lucide-react';
 import * as api from '../../utils/api';
 
@@ -209,11 +206,11 @@ export const AdminDashboard: React.FC = () => {
       {/* Top Banner & Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight font-display">
-            Event Management Studio
+          <h1 className="text-xl sm:text-2xl font-black text-[#1E1E1E] tracking-tight font-display uppercase">
+            Admin Studio
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Create, moderate, and analyze reusable live polling sessions for seminars, classrooms, and conferences.
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 font-mono">
+            Create, moderate, and manage live polling sessions.
           </p>
         </div>
 
@@ -221,7 +218,7 @@ export const AdminDashboard: React.FC = () => {
           <button
             id="admin-create-event-btn"
             onClick={handleOpenCreateModal}
-            className="flex items-center space-x-1.5 px-4 py-2 sm:px-5 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+            className="neo-btn px-4 py-2 sm:px-5 sm:py-2.5 bg-[#FACC15] text-[#1E1E1E] font-black text-xs sm:text-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Create Session</span>
@@ -232,77 +229,77 @@ export const AdminDashboard: React.FC = () => {
       {/* Overview Metric Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-400 mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Sessions</span>
-            <Layers className="w-4 h-4 text-indigo-600" />
+        <div className="neo-card p-4 sm:p-5">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider font-mono">Total Sessions</span>
+            <Layers className="w-4 h-4 text-[#4F46E5]" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1E1E] font-mono">
             {totalEventsCount}
           </div>
-          <p className="text-[10px] text-slate-400 mt-0.5">Stored events</p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-mono">Stored events</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-400 mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Active Lobby / Live</span>
-            <Play className="w-4 h-4 text-emerald-600" />
+        <div className="neo-card p-4 sm:p-5">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider font-mono">Active / Live</span>
+            <Play className="w-4 h-4 text-[#34D399]" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1E1E] font-mono">
             {activeEventsCount}
           </div>
-          <p className="text-[10px] text-slate-400 mt-0.5">Ready for voting</p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-mono">Ready for voting</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-400 mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Participants</span>
-            <Users className="w-4 h-4 text-teal-600" />
+        <div className="neo-card p-4 sm:p-5">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider font-mono">Participants</span>
+            <Users className="w-4 h-4 text-[#60A5FA]" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1E1E] font-mono">
             {totalParticipantsCount}
           </div>
-          <p className="text-[10px] text-slate-400 mt-0.5">Connected attendees</p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-mono">Connected attendees</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-400 mb-1.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Votes</span>
-            <MessageSquare className="w-4 h-4 text-amber-500" />
+        <div className="neo-card p-4 sm:p-5">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider font-mono">Total Votes</span>
+            <MessageSquare className="w-4 h-4 text-[#FACC15]" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono-numbers">
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1E1E] font-mono">
             {totalResponsesCount}
           </div>
-          <p className="text-[10px] text-slate-400 mt-0.5">Audience submissions</p>
+          <p className="text-[10px] text-gray-400 mt-0.5 font-mono">Audience submissions</p>
         </div>
       </div>
 
       {/* Event List Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-900 font-display">Sessions & Polls</h2>
-          <span className="text-xs text-slate-400 font-semibold">{events.length} total</span>
+      <div className="neo-card overflow-hidden">
+        <div className="px-5 py-3.5 border-b-2 border-[#1E1E1E] bg-[#FFF8F0] flex items-center justify-between">
+          <h2 className="text-sm font-black text-[#1E1E1E] font-display uppercase">Sessions & Polls</h2>
+          <span className="neo-badge bg-white text-[#1E1E1E] font-mono">{events.length} total</span>
         </div>
 
         {events.length === 0 ? (
-          <div className="p-10 text-center text-slate-500 space-y-3">
-            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xs">
+          <div className="p-10 text-center text-gray-500 space-y-3">
+            <div className="w-12 h-12 bg-[#FACC15] text-[#1E1E1E] border-2 border-[#1E1E1E] rounded-xl flex items-center justify-center mx-auto" style={{ boxShadow: '2px 2px 0px #1E1E1E' }}>
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">No Events Created Yet</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <h3 className="text-base font-black text-[#1E1E1E] font-display">No Events Created Yet</h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto font-mono">
               Create your first interactive live polling session or use AI to generate questions in seconds.
             </p>
             <button
               onClick={handleOpenCreateModal}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all inline-flex items-center space-x-1.5 cursor-pointer"
+              className="neo-btn px-4 py-2 bg-[#FACC15] text-[#1E1E1E] font-black text-xs inline-flex items-center space-x-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Create First Event</span>
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y-2 divide-[#1E1E1E]">
             {events.map((evt) => {
               const isLive = evt.status === 'live';
               const isWaiting = evt.status === 'waiting';
@@ -311,41 +308,41 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   key={evt.id}
                   onClick={() => setCurrentEventId(evt.id)}
-                  className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3.5 cursor-pointer"
+                  className="p-4 sm:p-5 hover:bg-[#FFF8F0] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3.5 cursor-pointer"
                 >
                   {/* Event Details */}
                   <div className="space-y-1 max-w-xl min-w-0">
                     <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="text-[11px] font-bold font-mono-numbers tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
-                        {evt.roomCode}
+                      <span className="neo-badge bg-[#FFF8F0] text-[#1E1E1E] font-mono">
+                        PIN: {evt.roomCode}
                       </span>
-                      <h3 className="text-base font-bold text-slate-900 hover:text-indigo-600 transition-colors truncate font-display">
+                      <h3 className="text-base font-black text-[#1E1E1E] hover:text-[#4F46E5] transition-colors truncate font-display">
                         {evt.title}
                       </h3>
                       {isLive && (
-                        <span className="px-2 py-0.5 bg-emerald-600 text-white rounded-full text-[10px] font-bold tracking-wider animate-pulse">
+                        <span className="neo-badge bg-[#34D399] text-[#1E1E1E] animate-pulse">
                           LIVE
                         </span>
                       )}
                       {isWaiting && (
-                        <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold border border-amber-200">
+                        <span className="neo-badge bg-[#FACC15] text-[#1E1E1E]">
                           WAITING
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-500 line-clamp-1">
+                    <p className="text-xs text-gray-500 line-clamp-1 font-mono">
                       {evt.description || 'No description provided.'}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 font-medium pt-0.5">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 font-bold font-mono pt-0.5">
                       <span>{evt.category}</span>
                       <span>•</span>
                       <span>{evt.questions.length} questions</span>
                       <span>•</span>
-                      <span className="font-mono-numbers">{evt.participants.length} joined</span>
+                      <span>{evt.participants.length} joined</span>
                       <span>•</span>
-                      <span className="font-mono-numbers">{evt.responses.length} votes</span>
+                      <span>{evt.responses.length} votes</span>
                     </div>
                   </div>
 
@@ -358,7 +355,7 @@ export const AdminDashboard: React.FC = () => {
                         setCurrentEventId(evt.id);
                         setActiveView('presenter');
                       }}
-                      className="flex items-center space-x-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="neo-btn px-3 py-1.5 bg-[#4F46E5] text-white text-xs font-bold"
                     >
                       <Play className="w-3.5 h-3.5 fill-white" />
                       <span>Presenter</span>
@@ -370,10 +367,10 @@ export const AdminDashboard: React.FC = () => {
                         setCurrentEventId(evt.id);
                         setActiveView('projector');
                       }}
-                      className="flex items-center space-x-1 px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="neo-btn px-2.5 py-1.5 bg-white text-[#1E1E1E] text-xs font-bold"
                       title="Open Stage Projector"
                     >
-                      <Tv className="w-3.5 h-3.5 text-slate-500" />
+                      <Tv className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Stage</span>
                     </button>
 
@@ -383,17 +380,17 @@ export const AdminDashboard: React.FC = () => {
                         setCurrentEventId(evt.id);
                         setActiveView('analytics');
                       }}
-                      className="flex items-center space-x-1 px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+                      className="neo-btn px-2.5 py-1.5 bg-white text-[#1E1E1E] text-xs font-bold"
                       title="View Report"
                     >
-                      <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
+                      <BarChart3 className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Report</span>
                     </button>
 
                     {/* Duplicate */}
                     <button
                       onClick={(e) => handleDuplicateEvent(evt, e)}
-                      className="p-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg shadow-2xs transition-colors cursor-pointer"
+                      className="neo-btn p-1.5 bg-white text-[#1E1E1E]"
                       title="Duplicate Event"
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -402,7 +399,7 @@ export const AdminDashboard: React.FC = () => {
                     {/* Delete */}
                     <button
                       onClick={(e) => handleDeleteEvent(evt.id, e)}
-                      className="p-1.5 bg-white border border-slate-200 hover:bg-rose-50 text-slate-400 hover:border-rose-200 hover:text-rose-600 rounded-lg shadow-2xs transition-colors cursor-pointer"
+                      className="neo-btn p-1.5 bg-white text-[#FB7185] hover:bg-[#FB7185]/20"
                       title="Delete Event"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -417,18 +414,18 @@ export const AdminDashboard: React.FC = () => {
 
       {/* CREATE EVENT MODAL */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto">
+          <div className="relative w-full max-w-2xl neo-card overflow-hidden my-6 animate-in fade-in">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b-2 border-[#1E1E1E] bg-[#FFF8F0]">
               <div className="flex items-center space-x-2">
-                <div className="p-1.5 bg-indigo-600 text-white rounded-lg">
+                <div className="p-1.5 bg-[#4F46E5] text-white border-2 border-[#1E1E1E] rounded-lg">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 font-display">Create Polling Session</h3>
-                  <p className="text-[11px] text-slate-500">Configure questions, timer, and room code</p>
+                  <h3 className="text-sm font-black text-[#1E1E1E] font-display uppercase">Create Polling Session</h3>
+                  <p className="text-[11px] text-gray-500 font-mono">Configure questions, timer, and room code</p>
                 </div>
               </div>
 
@@ -436,14 +433,14 @@ export const AdminDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAiModalOpen(true)}
-                  className="flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 transition-all cursor-pointer"
+                  className="neo-btn px-2.5 py-1 bg-[#FACC15] text-[#1E1E1E] text-xs font-black"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span>AI Generator</span>
                 </button>
                 <button
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+                  className="neo-btn p-1 bg-white text-[#1E1E1E]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -456,7 +453,7 @@ export const AdminDashboard: React.FC = () => {
               {/* Event Metadata */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider mb-1 font-mono">
                     Event Title *
                   </label>
                   <input
@@ -465,12 +462,12 @@ export const AdminDashboard: React.FC = () => {
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     placeholder="e.g. Annual Strategy Keynote 2026"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-600 focus:outline-none"
+                    className="neo-input w-full"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider mb-1 font-mono">
                     Category
                   </label>
                   <input
@@ -478,19 +475,19 @@ export const AdminDashboard: React.FC = () => {
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
                     placeholder="e.g. Conference, Classroom"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-600 focus:outline-none"
+                    className="neo-input w-full text-xs"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                    <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider font-mono">
                       Room PIN
                     </label>
                     <button
                       type="button"
                       onClick={() => setFormRoomCode(Math.random().toString(36).substring(2, 8).toUpperCase())}
-                      className="text-[10px] text-indigo-600 hover:text-indigo-700 font-bold cursor-pointer"
+                      className="text-[10px] text-[#4F46E5] font-black font-mono cursor-pointer hover:underline"
                     >
                       🎲 Generate PIN
                     </button>
@@ -501,14 +498,14 @@ export const AdminDashboard: React.FC = () => {
                     onChange={(e) => setFormRoomCode(e.target.value.toUpperCase())}
                     placeholder="e.g. PULSE88"
                     maxLength={10}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold font-mono-numbers tracking-widest text-indigo-700 focus:bg-white focus:border-indigo-600 focus:outline-none uppercase"
+                    className="neo-input w-full text-xs font-mono font-black tracking-widest uppercase"
                   />
                 </div>
               </div>
 
               {/* Mode Sesi: Polling Biasa vs Kuis Berpoin */}
               <div className="pt-2">
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider mb-1.5 font-mono">
                   Mode Sesi & Penilaian
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -518,19 +515,19 @@ export const AdminDashboard: React.FC = () => {
                       setFormIsQuizMode(false);
                       setFormQuestions(prev => prev.map(q => ({ ...q, points: undefined })));
                     }}
-                    className={`p-3 rounded-xl border text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
+                    className={`p-3 rounded-lg border-2 border-[#1E1E1E] text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
                       !formIsQuizMode 
-                        ? 'bg-indigo-50/80 border-indigo-600 text-indigo-950 ring-2 ring-indigo-600/20 shadow-2xs' 
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'bg-[#4F46E5]/10 shadow-[2px_2px_0px_#1E1E1E]' 
+                        : 'bg-white'
                     }`}
                   >
                     <span className="text-xl shrink-0">📊</span>
                     <div>
-                      <div className="text-xs font-bold flex items-center space-x-1">
+                      <div className="text-xs font-black flex items-center space-x-1">
                         <span>Polling & Survey</span>
-                        {!formIsQuizMode && <span className="text-[10px] text-indigo-600 font-bold">✓ Aktif</span>}
+                        {!formIsQuizMode && <span className="neo-badge bg-[#34D399] text-[#1E1E1E] text-[9px]">✓ Aktif</span>}
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                      <div className="text-[10px] text-gray-500 mt-0.5 leading-tight font-mono">
                         Murni voting opini & persentase (Tanpa Poin / Skor).
                       </div>
                     </div>
@@ -542,19 +539,19 @@ export const AdminDashboard: React.FC = () => {
                       setFormIsQuizMode(true);
                       setFormQuestions(prev => prev.map(q => ({ ...q, points: q.points || 100 })));
                     }}
-                    className={`p-3 rounded-xl border text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
+                    className={`p-3 rounded-lg border-2 border-[#1E1E1E] text-left flex items-start space-x-2.5 transition-all cursor-pointer ${
                       formIsQuizMode 
-                        ? 'bg-amber-50/80 border-amber-600 text-amber-950 ring-2 ring-amber-600/20 shadow-2xs' 
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'bg-[#FACC15]/20 shadow-[2px_2px_0px_#1E1E1E]' 
+                        : 'bg-white'
                     }`}
                   >
                     <span className="text-xl shrink-0">🏆</span>
                     <div>
-                      <div className="text-xs font-bold flex items-center space-x-1">
+                      <div className="text-xs font-black flex items-center space-x-1">
                         <span>Kuis & Kompetisi Poin</span>
-                        {formIsQuizMode && <span className="text-[10px] text-amber-600 font-bold">✓ Aktif</span>}
+                        {formIsQuizMode && <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-[9px]">✓ Aktif</span>}
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">
+                      <div className="text-[10px] text-gray-500 mt-0.5 leading-tight font-mono">
                         Ada skor jawaban, kunci benar/salah, & Leaderboard.
                       </div>
                     </div>
@@ -563,10 +560,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Question Sequence Builder */}
-              <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div className="space-y-3 pt-3 border-t-2 border-[#1E1E1E]/10">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 font-display">Questions ({formQuestions.length})</h4>
+                    <h4 className="text-xs font-black text-[#1E1E1E] font-display uppercase">Questions ({formQuestions.length})</h4>
                   </div>
 
                   {/* Add Question Types */}
@@ -574,35 +571,35 @@ export const AdminDashboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleAddQuestionToForm('multiple_choice')}
-                      className="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                      className="neo-btn px-2 py-1 bg-white text-[#1E1E1E] text-[11px] font-bold"
                     >
                       + Choice
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddQuestionToForm('word_cloud')}
-                      className="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                      className="neo-btn px-2 py-1 bg-white text-[#1E1E1E] text-[11px] font-bold"
                     >
                       + Word Cloud
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddQuestionToForm('rating')}
-                      className="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                      className="neo-btn px-2 py-1 bg-white text-[#1E1E1E] text-[11px] font-bold"
                     >
                       + Rating
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddQuestionToForm('open_text')}
-                      className="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                      className="neo-btn px-2 py-1 bg-white text-[#1E1E1E] text-[11px] font-bold"
                     >
                       + Open Text
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddQuestionToForm('true_false')}
-                      className="px-2 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-[11px] font-bold transition-colors cursor-pointer"
+                      className="neo-btn px-2 py-1 bg-white text-[#1E1E1E] text-[11px] font-bold"
                     >
                       + True/False
                     </button>
@@ -612,14 +609,14 @@ export const AdminDashboard: React.FC = () => {
                 {/* Question Cards List */}
                 <div className="space-y-2.5">
                   {formQuestions.map((q, idx) => (
-                    <div key={q.id || idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div key={q.id || idx} className="p-3.5 rounded-lg bg-[#FFF8F0] border-2 border-[#1E1E1E] space-y-2" style={{ boxShadow: '2px 2px 0px #1E1E1E' }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-1.5">
-                          <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                          <span className="neo-badge bg-white text-[#1E1E1E] text-[10px] font-mono">
                             Q{idx + 1} • {q.type.replace('_', ' ').toUpperCase()}
                           </span>
                           {formIsQuizMode && (
-                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-[10px] font-mono">
                               +{q.points || 100} pts
                             </span>
                           )}
@@ -632,14 +629,14 @@ export const AdminDashboard: React.FC = () => {
                                 const pts = Number(e.target.value);
                                 setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, points: pts } : item));
                               }}
-                              className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-bold text-amber-700"
+                              className="bg-white border-2 border-[#1E1E1E] rounded px-1.5 py-0.5 text-[11px] font-bold text-[#1E1E1E]"
                             >
                               <option value={50}>50 pts</option>
                               <option value={100}>100 pts</option>
                               <option value={200}>200 pts</option>
                             </select>
                           )}
-                          <div className="flex items-center space-x-1 text-xs text-slate-500">
+                          <div className="flex items-center space-x-1 text-xs text-gray-600 font-mono font-bold">
                             <Clock className="w-3 h-3" />
                             <select
                               value={q.timerSeconds}
@@ -647,7 +644,7 @@ export const AdminDashboard: React.FC = () => {
                                 const val = Number(e.target.value);
                                 setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, timerSeconds: val } : item));
                               }}
-                              className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs font-bold"
+                              className="bg-white border-2 border-[#1E1E1E] rounded px-1.5 py-0.5 text-xs font-bold"
                             >
                               <option value={15}>15s</option>
                               <option value={30}>30s</option>
@@ -660,7 +657,7 @@ export const AdminDashboard: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleRemoveQuestionFromForm(idx)}
-                            className="text-slate-400 hover:text-rose-600 p-0.5 cursor-pointer"
+                            className="text-gray-400 hover:text-[#FB7185] p-0.5 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -675,7 +672,7 @@ export const AdminDashboard: React.FC = () => {
                           setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, title: val } : item));
                         }}
                         placeholder="Question title..."
-                        className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none"
+                        className="neo-input w-full text-xs font-bold"
                       />
 
                       {/* Options for Multiple Choice */}
@@ -683,7 +680,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="space-y-1 pl-1">
                           {(q.options || []).map((opt, optIdx) => (
                             <div key={opt.id || optIdx} className="flex items-center space-x-2">
-                              <span className="text-[10px] font-bold text-slate-400 w-3">{['A', 'B', 'C', 'D'][optIdx]}</span>
+                              <span className="text-[10px] font-black text-gray-500 w-3 font-mono">{['A', 'B', 'C', 'D'][optIdx]}</span>
                               <input
                                 type="text"
                                 value={opt.text}
@@ -696,7 +693,7 @@ export const AdminDashboard: React.FC = () => {
                                     return { ...item, options: updatedOpts };
                                   }));
                                 }}
-                                className="flex-1 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-xs font-medium"
+                                className="flex-1 px-2.5 py-1 bg-white border-2 border-[#1E1E1E] rounded-md text-xs font-bold"
                               />
                             </div>
                           ))}
@@ -705,16 +702,16 @@ export const AdminDashboard: React.FC = () => {
 
                       {/* Rating Scale Customization */}
                       {q.type === 'rating' && (
-                        <div className="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2 text-xs">
+                        <div className="p-2.5 bg-white border-2 border-[#1E1E1E] rounded-lg space-y-2 text-xs">
                           <div className="flex items-center justify-between gap-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase">Tampilan Skala:</label>
+                            <label className="text-[10px] font-black text-gray-500 uppercase font-mono">Tampilan Skala:</label>
                             <select
                               value={q.ratingStyle || 'numeric'}
                               onChange={(e) => {
                                 const style = e.target.value as any;
                                 setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingStyle: style } : item));
                               }}
-                              className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold"
+                              className="px-2 py-1 bg-[#FFF8F0] border-2 border-[#1E1E1E] rounded-md text-xs font-bold"
                             >
                               <option value="numeric">🔢 Skala Angka (1-5 / 1-10)</option>
                               <option value="likert">📝 Skala Likert (Kata-kata)</option>
@@ -725,7 +722,7 @@ export const AdminDashboard: React.FC = () => {
 
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="text-[10px] font-bold text-slate-400 block mb-0.5">Label Nilai Minimum (1):</label>
+                              <label className="text-[10px] font-bold text-gray-500 block mb-0.5 font-mono">Label Min (1):</label>
                               <input
                                 type="text"
                                 value={q.ratingMinLabel || ''}
@@ -733,12 +730,12 @@ export const AdminDashboard: React.FC = () => {
                                   const val = e.target.value;
                                   setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingMinLabel: val } : item));
                                 }}
-                                placeholder="e.g. Kurang Yakin / Ragu"
-                                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[11px]"
+                                placeholder="e.g. Kurang Yakin"
+                                className="w-full px-2 py-1 bg-[#FFF8F0] border-2 border-[#1E1E1E] rounded text-[11px] font-bold"
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-slate-400 block mb-0.5">Label Nilai Maksimum (5/10):</label>
+                              <label className="text-[10px] font-bold text-gray-500 block mb-0.5 font-mono">Label Max (5/10):</label>
                               <input
                                 type="text"
                                 value={q.ratingMaxLabel || ''}
@@ -747,7 +744,7 @@ export const AdminDashboard: React.FC = () => {
                                   setFormQuestions(prev => prev.map((item, i) => i === idx ? { ...item, ratingMaxLabel: val } : item));
                                 }}
                                 placeholder="e.g. Sangat Yakin"
-                                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[11px]"
+                                className="w-full px-2 py-1 bg-[#FFF8F0] border-2 border-[#1E1E1E] rounded text-[11px] font-bold"
                               />
                             </div>
                           </div>
@@ -759,17 +756,17 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Form Action Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+              <div className="pt-3 border-t-2 border-[#1E1E1E]/10 flex items-center justify-end space-x-2">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer"
+                  className="neo-btn px-3.5 py-2 bg-white text-[#1E1E1E] font-bold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-xs transition-colors cursor-pointer"
+                  className="neo-btn px-4 py-2 bg-[#FACC15] text-[#1E1E1E] font-black text-xs"
                 >
                   Save & Launch Event
                 </button>
@@ -781,37 +778,37 @@ export const AdminDashboard: React.FC = () => {
 
       {/* AI QUESTION GENERATOR MODAL */}
       {isAiModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 p-5 sm:p-6 animate-in fade-in space-y-3.5">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60">
+          <div className="relative w-full max-w-md neo-card p-5 sm:p-6 animate-in fade-in space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b-2 border-[#1E1E1E]">
               <div className="flex items-center space-x-1.5">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-bold text-slate-900 font-display">AI Question Generator</h3>
+                <Sparkles className="w-4 h-4 text-[#4F46E5]" />
+                <h3 className="text-sm font-black text-[#1E1E1E] font-display uppercase">AI Question Generator</h3>
               </div>
-              <button onClick={() => setIsAiModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+              <button onClick={() => setIsAiModalOpen(false)} className="neo-btn p-1 bg-white text-[#1E1E1E]">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500">
-              Describe your topic and AI will create interactive multiple choice, word cloud, rating, and true/false polls.
+            <p className="text-xs text-gray-600 font-mono">
+              Describe your topic and AI will create interactive polls in seconds.
             </p>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Seminar / Presentation Topic *
+              <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider mb-1 font-mono">
+                Topic *
               </label>
               <input
                 type="text"
                 value={aiTopic}
                 onChange={(e) => setAiTopic(e.target.value)}
                 placeholder="e.g. Modern Web Development, Leadership Skills"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-indigo-600 focus:outline-none"
+                className="neo-input w-full text-xs font-bold"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-black text-[#1E1E1E] uppercase tracking-wider mb-1 font-mono">
                 Target Audience
               </label>
               <input
@@ -819,7 +816,7 @@ export const AdminDashboard: React.FC = () => {
                 value={aiAudience}
                 onChange={(e) => setAiAudience(e.target.value)}
                 placeholder="e.g. University Students, Tech Professionals"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-600 focus:outline-none"
+                className="neo-input w-full text-xs"
               />
             </div>
 
@@ -828,12 +825,12 @@ export const AdminDashboard: React.FC = () => {
               type="button"
               onClick={handleGenerateWithAI}
               disabled={isGeneratingAI || !aiTopic.trim()}
-              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+              className="neo-btn w-full py-2.5 bg-[#FACC15] text-[#1E1E1E] font-black text-xs"
             >
               {isGeneratingAI ? (
                 <>
-                  <AiGeneratingSpinner size="w-4 h-4" color="text-white" />
-                  <span className="tracking-wide ml-1">GENERATING QUESTIONS...</span>
+                  <AiGeneratingSpinner size="w-4 h-4" color="text-[#1E1E1E]" />
+                  <span className="tracking-wide ml-1 font-mono">GENERATING QUESTIONS...</span>
                 </>
               ) : (
                 <>
