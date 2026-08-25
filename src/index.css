@@ -7,17 +7,21 @@
     --sab: env(safe-area-inset-bottom, 0px);
     --sal: env(safe-area-inset-left, 0px);
 
-    /* Neobrutalism Design Tokens */
-    --neo-black: #1E1E1E;
+    /* Piktera Neobrutalism Official Color Tokens */
+    --piktera-lime: #C1FF33;
+    --piktera-pink: #FF1784;
+    --piktera-blue: #2F36C9;
+    --piktera-black: #000000;
+    --piktera-cream: #FFF8F0;
+    --piktera-white: #FFFFFF;
+
+    --neo-black: #000000;
     --neo-cream: #FFF8F0;
     --neo-white: #FFFFFF;
-    --neo-yellow: #FACC15;
-    --neo-pink: #FB7185;
-    --neo-green: #34D399;
-    --neo-blue: #60A5FA;
-    --neo-indigo: #4F46E5;
-    --neo-orange: #FB923C;
-    --neo-purple: #A78BFA;
+    --neo-yellow: #C1FF33; /* Piktera Lime */
+    --neo-pink: #FF1784;   /* Piktera Pink */
+    --neo-green: #C1FF33;  /* Piktera Lime */
+    --neo-blue: #2F36C9;   /* Piktera Blue */
     --neo-shadow: 4px 4px 0px var(--neo-black);
     --neo-shadow-sm: 2px 2px 0px var(--neo-black);
     --neo-shadow-lg: 6px 6px 0px var(--neo-black);
@@ -29,8 +33,16 @@
     touch-action: manipulation;
   }
 
+  .font-heading {
+    font-family: 'Archivo Black', 'Space Grotesk', sans-serif;
+  }
+
   .font-display {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Archivo Black', 'Space Grotesk', sans-serif;
+  }
+
+  .font-pixel {
+    font-family: 'Pixelify Sans', cursive, sans-serif;
   }
   
   .font-mono, .font-mono-numbers {
@@ -47,14 +59,14 @@
 .neo-card {
   background: var(--neo-white);
   border: 2px solid var(--neo-black);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: var(--neo-shadow);
 }
 
 .neo-card-sm {
   background: var(--neo-white);
   border: 2px solid var(--neo-black);
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: var(--neo-shadow-sm);
 }
 
@@ -64,7 +76,7 @@
   border: 2px solid var(--neo-black);
   border-radius: 8px;
   padding: 10px 14px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   outline: none;
   transition: box-shadow 0.15s ease, transform 0.15s ease;
@@ -74,7 +86,7 @@
   transform: translate(-1px, -1px);
 }
 .neo-input::placeholder {
-  color: #94A3B8;
+  color: #888888;
   font-weight: 500;
 }
 
@@ -84,7 +96,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-weight: 700;
+  font-weight: 800;
   border: 2px solid var(--neo-black);
   border-radius: 8px;
   box-shadow: var(--neo-shadow-sm);
@@ -101,7 +113,7 @@
   box-shadow: none;
 }
 .neo-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
   box-shadow: var(--neo-shadow-sm);
@@ -112,7 +124,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -121,17 +133,28 @@
   padding: 2px 8px;
 }
 
-/* Dot Grid Background Pattern */
+/* Pixel Pattern Backgrounds */
 .bg-dot-grid {
   background-color: var(--neo-cream);
-  background-image: radial-gradient(circle, #d4d4d4 1px, transparent 1px);
+  background-image: radial-gradient(circle, #000000 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .bg-dot-grid-dark {
-  background-color: #1a1a2e;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: #121420;
+  background-image: radial-gradient(circle, rgba(193, 255, 51, 0.15) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+.bg-pixel-checker {
+  background-color: #FFF8F0;
+  background-image: 
+    linear-gradient(45deg, #f0e6d6 25%, transparent 25%), 
+    linear-gradient(-45deg, #f0e6d6 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #f0e6d6 75%), 
+    linear-gradient(-45deg, transparent 75%, #f0e6d6 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
 /* Safe area insets helpers */
@@ -151,20 +174,20 @@
   height: 100dvh;
 }
 
-/* Custom Scrollbar - Neo Style */
+/* Custom Scrollbar - Neo Pixel Style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #FFF8F0;
+  border-left: 2px solid #000;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--neo-black);
-  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #2F36C9;
 }
 
 /* Animations */
@@ -210,14 +233,14 @@
 
 /* Neo Stage Backgrounds */
 .bg-stage-mesh {
-  background-color: #1a1a2e;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-color: #121420;
+  background-image: radial-gradient(circle, rgba(193, 255, 51, 0.15) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
 }
 
 .bg-stage-mesh-light {
   background-color: #FFF8F0;
-  background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1.2px, transparent 1.2px);
   background-size: 28px 28px;
 }
 
@@ -233,35 +256,27 @@
 
 @keyframes badge-float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-5px); }
 }
 
-@keyframes shimmer-sweep {
-  0% { transform: translateX(-100%); }
-  50%, 100% { transform: translateX(100%); }
+@keyframes robot-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.animate-robot-blink {
+  animation: robot-blink 4s infinite;
 }
 
 .animate-ambient-drift { animation: ambient-drift 12s ease-in-out infinite; }
 .animate-ambient-drift-reverse { animation: ambient-drift-reverse 15s ease-in-out infinite; }
 .animate-badge-float { animation: badge-float 3.5s ease-in-out infinite; }
-.animate-shimmer-sweep { animation: shimmer-sweep 4s ease-in-out infinite; }
 
 @keyframes red-danger-glow {
-  0%, 100% { box-shadow: 4px 4px 0px #E11D48; border-color: #E11D48; }
-  50% { box-shadow: 2px 2px 0px #E11D48; border-color: #BE123C; }
+  0%, 100% { box-shadow: 4px 4px 0px #FF1784; border-color: #FF1784; }
+  50% { box-shadow: 2px 2px 0px #FF1784; border-color: #D60064; }
 }
 
 .animate-danger-pulse {
   animation: red-danger-glow 0.85s ease-in-out infinite;
-}
-
-/* Neo specific: wiggle for fun interactive feedback */
-@keyframes neo-wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-2deg); }
-  75% { transform: rotate(2deg); }
-}
-
-.animate-neo-wiggle {
-  animation: neo-wiggle 0.3s ease-in-out;
 }

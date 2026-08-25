@@ -90,7 +90,7 @@ export const EventSummaryExport: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `PulseLive-${currentEvent.roomCode}-Analytics-Report.csv`);
+    link.setAttribute('download', `Piktera-${currentEvent.roomCode}-Analytics-Report.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
 import { Sparkles, Trophy, LogOut, CheckCircle2 } from 'lucide-react';
+import { PikteraMascot } from '../Shared/PikteraMascot';
 
 interface ParticipantCompanionProps {
   hasSubmitted?: boolean;
@@ -13,9 +14,10 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
   const [hasInteracted, setHasInteracted] = useState<boolean>(false);
   const [petMood, setPetMood] = useState<'idle' | 'focus' | 'urgent' | 'cheer' | 'celebrate'>('idle');
 
-  const emoji = currentParticipant?.avatarEmoji || '🦊';
+  const emoji = currentParticipant?.avatarEmoji || '🤖';
   const name = currentParticipant?.name || 'Attendee';
-  const bgColor = currentParticipant?.avatarBg || '#EA580C';
+  const bgColor = currentParticipant?.avatarBg || '#2F36C9';
+  const isPikteraBot = currentParticipant?.name === 'Piktera' || currentParticipant?.avatarEmoji === '🤖';
 
   const timerRemaining = currentEvent?.timerRemainingSeconds ?? 45;
   const isVotingLocked = currentEvent?.isVotingLocked || timerRemaining === 0;
@@ -24,14 +26,14 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
 
   // Dynamic state-driven dialogue & mood
   useEffect(() => {
-    if (hasInteracted) return; // user tapped custom speech
+    if (hasInteracted) return;
 
     if (status === 'waiting' || status === 'draft') {
       setPetMood('idle');
       const waitingQuotes = [
         `Siap-siap ya! Sesi segera mulai 🚀`,
         `Nunggu presenter membuka sesi... ☕`,
-        `Yuk fokus & raih pengalaman seru! ✨`,
+        `Piktera siap mencatat suaramu! ✨`,
       ];
       setSpeechText(waitingQuotes[Math.floor(Math.random() * waitingQuotes.length)]);
     } else if (status === 'ended') {
@@ -39,7 +41,7 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
       setSpeechText(`Sesi selesai! Terima kasih ${name}! 🏆`);
     } else if (hasSubmitted) {
       setPetMood('cheer');
-      setSpeechText('Jawabanmu terkirim! Mantap! 🎉');
+      setSpeechText('Jawabanmu terkirim ke panggung! 🎉');
     } else if (isVotingLocked) {
       setPetMood('focus');
       setSpeechText('Voting ditutup! Cek hasil di layar 📺');
@@ -63,13 +65,12 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
     setPetMood('cheer');
     setTimeout(() => setIsBouncing(false), 700);
 
-    // Send a subtle heart burst reaction to stage
     try {
       sendReaction('❤️');
     } catch {}
 
     const funQuotes = [
-      'Aku dukung pilihanmu 100%! ⭐',
+      'Piktera dukung pilihanmu 100%! ⭐',
       'Fokus & raih peringkat atas! 🔥',
       'Kamu pasti bisa! Semangat! 💪',
       'Keren banget kamu hari ini! ✨',
@@ -78,7 +79,6 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
     const randomQuote = funQuotes[Math.floor(Math.random() * funQuotes.length)];
     setSpeechText(randomQuote);
 
-    // Reset interaction lock after 4 seconds
     setTimeout(() => setHasInteracted(false), 4000);
   };
 
@@ -86,19 +86,14 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
 
   return (
     <>
-      {/* 2D Ambient Floating Pixel Companion in Background */}
+      {/* 2D Ambient Floating Piktera Robot Companion in Background */}
       <div 
         aria-hidden="true"
-        className="fixed bottom-6 right-4 sm:right-8 z-0 pointer-events-none select-none opacity-20 hover:opacity-40 transition-opacity duration-300 hidden sm:flex flex-col items-center animate-pulse"
+        className="fixed bottom-6 right-4 sm:right-8 z-0 pointer-events-none select-none opacity-30 hover:opacity-60 transition-opacity duration-300 hidden sm:flex flex-col items-center animate-pulse"
       >
-        <div 
-          className="w-12 h-12 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-2xl transform rotate-6 hover:rotate-0 transition-transform"
-          style={{ backgroundColor: bgColor, boxShadow: '2px 2px 0px #1E1E1E' }}
-        >
-          {emoji}
-        </div>
-        <div className="text-[9px] font-bold text-[#1E1E1E] bg-[#FACC15] px-2 py-0.5 rounded-md mt-1 border-2 border-[#1E1E1E] font-mono">
-          2D Buddy
+        <PikteraMascot size="sm" mood={petMood === 'urgent' ? 'curious' : petMood === 'celebrate' ? 'celebrating' : 'happy'} />
+        <div className="text-[9px] font-bold text-[#000000] bg-[#C1FF33] px-2 py-0.5 rounded-md mt-1 border-2 border-[#000000] font-mono">
+          Piktera Buddy
         </div>
       </div>
 
@@ -111,28 +106,34 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
             <button
               type="button"
               onClick={handleTapCompanion}
-              title="Klik maskot 2D untuk sapaan & kirim reaksi!"
-              className={`relative shrink-0 w-10 h-10 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-xl transition-all cursor-pointer active:scale-90 group ${
+              title="Klik maskot untuk sapaan & kirim reaksi!"
+              className={`relative shrink-0 w-10 h-10 rounded-lg border-2 border-[#000000] flex items-center justify-center text-xl transition-all cursor-pointer active:scale-90 group ${
                 isBouncing 
-                  ? 'animate-bounce ring-4 ring-[#4F46E5]/40' 
+                  ? 'animate-bounce ring-4 ring-[#2F36C9]/40' 
                   : petMood === 'urgent'
                   ? 'animate-ping duration-1000'
                   : 'hover:scale-105'
               }`}
-              style={{ backgroundColor: bgColor, boxShadow: '2px 2px 0px #1E1E1E' }}
+              style={{ backgroundColor: bgColor, boxShadow: '2px 2px 0px #000000' }}
             >
-              <span className="select-none transition-transform duration-200 group-hover:scale-110">
-                {emoji}
-              </span>
+              {isPikteraBot ? (
+                <div className="scale-75">
+                  <PikteraMascot size="xs" headOnly={true} />
+                </div>
+              ) : (
+                <span className="select-none transition-transform duration-200 group-hover:scale-110">
+                  {emoji}
+                </span>
+              )}
 
               {/* Online Pulse Dot */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#34D399] rounded-md border-2 border-[#1E1E1E] flex items-center justify-center">
-                <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C1FF33] rounded-md border-2 border-[#000000] flex items-center justify-center">
+                <span className="w-1.5 h-1.5 bg-[#000000] rounded-full animate-ping" />
               </div>
 
               {/* Mood Sparkle Badge */}
               {petMood === 'cheer' && (
-                <div className="absolute -bottom-1 -left-1 text-[10px] bg-[#FACC15] rounded-md w-4 h-4 flex items-center justify-center border-2 border-[#1E1E1E]">
+                <div className="absolute -bottom-1 -left-1 text-[10px] bg-[#C1FF33] rounded-md w-4 h-4 flex items-center justify-center border-2 border-[#000000]">
                   ✨
                 </div>
               )}
@@ -141,18 +142,18 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
             {/* Speech Text & Participant Nickname */}
             <div className="min-w-0 flex-1">
               <div className="flex items-center space-x-1.5 truncate">
-                <span className="text-xs font-black text-[#1E1E1E] truncate">
+                <span className="text-xs font-black text-[#000000] truncate font-mono">
                   {name}
                 </span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#34D399] shrink-0 inline" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#2F36C9] shrink-0 inline" />
               </div>
 
               {/* Dynamic Companion Quote */}
               <div 
                 onClick={handleTapCompanion}
-                className="text-[11px] font-bold text-gray-500 truncate flex items-center space-x-1 cursor-pointer hover:text-[#4F46E5] transition-colors mt-0.5"
+                className="text-[11px] font-bold text-gray-600 truncate flex items-center space-x-1 cursor-pointer hover:text-[#2F36C9] transition-colors mt-0.5 font-mono"
               >
-                <Sparkles className="w-2.5 h-2.5 text-[#FACC15] shrink-0 animate-spin" />
+                <Sparkles className="w-2.5 h-2.5 text-[#2F36C9] shrink-0 animate-spin" />
                 <span className="truncate">{speechText}</span>
               </div>
             </div>
@@ -161,14 +162,14 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
           {/* Right: Score (if Quiz Mode) or Exit Button */}
           <div className="flex items-center space-x-1.5 shrink-0">
             {isQuizMode && currentParticipant?.score !== undefined ? (
-              <div className="neo-badge bg-[#FACC15] text-[#1E1E1E] text-xs">
-                <Trophy className="w-3.5 h-3.5" />
+              <div className="neo-badge bg-[#C1FF33] text-[#000000] text-xs">
+                <Trophy className="w-3.5 h-3.5 text-[#000000]" />
                 <span className="font-mono">{currentParticipant.score} pts</span>
               </div>
             ) : (
               <button
                 onClick={leaveRoom}
-                className="neo-btn bg-white text-gray-400 hover:text-[#1E1E1E] hover:bg-[#FB7185]/20 text-[11px] px-2 py-1"
+                className="neo-btn bg-white text-gray-500 hover:text-white hover:bg-[#FF1784] text-[11px] px-2 py-1"
                 title="Keluar dari room"
               >
                 <LogOut className="w-3.5 h-3.5" />

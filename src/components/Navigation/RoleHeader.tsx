@@ -3,7 +3,6 @@ import { useEvent } from '../../context/EventContext';
 import { ActiveAppView } from '../../types';
 import { ButtonSpinner } from '../Shared/Loaders';
 import { 
-  Smartphone, 
   Tv, 
   Sliders, 
   LayoutDashboard, 
@@ -13,8 +12,7 @@ import {
   Zap, 
   ChevronDown,
   LogOut,
-  Shield,
-  Radio
+  Shield
 } from 'lucide-react';
 import { QRCodeModal } from '../Shared/QRCodeModal';
 import { BrandLogo } from '../Shared/BrandLogo';
@@ -46,20 +44,20 @@ export const RoleHeader: React.FC = () => {
     switch (status) {
       case 'live':
         return (
-          <span className="neo-badge bg-[#34D399] text-[#1E1E1E]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1E1E1E] animate-ping" />
+          <span className="neo-badge bg-[#C1FF33] text-[#000000]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#000000] animate-ping" />
             LIVE
           </span>
         );
       case 'waiting':
         return (
-          <span className="neo-badge bg-[#FACC15] text-[#1E1E1E]">
+          <span className="neo-badge bg-[#FACC15] text-[#000000]">
             LOBBY
           </span>
         );
       case 'ended':
         return (
-          <span className="neo-badge bg-gray-200 text-[#1E1E1E]">
+          <span className="neo-badge bg-gray-200 text-[#000000]">
             ENDED
           </span>
         );
@@ -74,15 +72,15 @@ export const RoleHeader: React.FC = () => {
 
   return (
     <>
-      <header id="main-role-header" className="sticky top-0 z-30 bg-[#FFF8F0] border-b-2 border-[#1E1E1E] shrink-0">
-        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 h-13 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-2">
+      <header id="main-role-header" className="sticky top-0 z-30 bg-[#FFF8F0] border-b-2 border-[#000000] shrink-0">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-2">
           
-          {/* Left: Brand Logo & Event Selector */}
+          {/* Left: Piktera Brand Logo & Event Selector */}
           <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink">
             <div 
               onClick={() => setActiveView(isHost ? 'admin' : 'participant')}
               className="cursor-pointer select-none group shrink-0"
-              title="PulseLive"
+              title="Piktera"
             >
               <div className="sm:hidden">
                 <BrandLogo size="sm" showText={false} />
@@ -100,18 +98,18 @@ export const RoleHeader: React.FC = () => {
                   onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
                   className="neo-btn bg-white px-2 py-1 text-xs max-w-[110px] xs:max-w-[140px] md:max-w-[180px] xl:max-w-[210px] truncate"
                 >
-                  <span className="truncate font-bold text-[#1E1E1E] text-[11px] sm:text-xs">
+                  <span className="truncate font-bold text-[#000000] text-[11px] sm:text-xs font-mono">
                     {currentEvent?.title || 'Select Event'}
                   </span>
                   {currentEvent && (
                     <span className="shrink-0 scale-90 sm:scale-100">{getStatusBadge(currentEvent.status)}</span>
                   )}
-                  <ChevronDown className="w-3 h-3 text-[#1E1E1E] shrink-0" />
+                  <ChevronDown className="w-3 h-3 text-[#000000] shrink-0" />
                 </button>
 
                 {isEventDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-72 neo-card py-1.5 z-50">
-                    <div className="px-3 py-1 text-[10px] font-bold text-gray-500 uppercase tracking-wider font-mono">
+                    <div className="px-3 py-1 text-[10px] font-black text-gray-500 uppercase tracking-wider font-mono">
                       Switch Event Session
                     </div>
                     {events.map((evt) => (
@@ -121,8 +119,8 @@ export const RoleHeader: React.FC = () => {
                           setCurrentEventId(evt.id);
                           setIsEventDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#FACC15]/30 transition-colors cursor-pointer ${
-                          currentEvent?.id === evt.id ? 'bg-[#FACC15]/20 font-bold text-[#1E1E1E]' : 'text-gray-700'
+                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#C1FF33]/30 transition-colors cursor-pointer ${
+                          currentEvent?.id === evt.id ? 'bg-[#C1FF33]/20 font-black text-[#000000]' : 'text-gray-700'
                         }`}
                       >
                         <div className="truncate mr-2">
@@ -150,8 +148,8 @@ export const RoleHeader: React.FC = () => {
                     onClick={() => setActiveView(v.id)}
                     className={`neo-btn text-xs px-2.5 py-1 ${
                       isActive
-                        ? 'bg-[#4F46E5] text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                        : 'bg-white text-[#1E1E1E]'
+                        ? 'bg-[#2F36C9] text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                        : 'bg-white text-[#000000]'
                     }`}
                   >
                     {v.icon}
@@ -161,12 +159,12 @@ export const RoleHeader: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className="hidden md:flex items-center space-x-2 text-xs text-gray-600 font-bold truncate">
-              <span>Audience Mode</span>
+            <div className="hidden md:flex items-center space-x-2 text-xs text-gray-600 font-bold truncate font-mono">
+              <span className="neo-badge bg-[#C1FF33] text-[#000000]">Audience</span>
               {currentEvent && (
                 <>
                   <span>•</span>
-                  <span className="font-bold text-[#1E1E1E] max-w-xs truncate">{currentEvent.title}</span>
+                  <span className="font-bold text-[#000000] max-w-xs truncate">{currentEvent.title}</span>
                 </>
               )}
             </div>
@@ -177,8 +175,8 @@ export const RoleHeader: React.FC = () => {
             
             {/* Live Participant Count */}
             {currentEvent && (
-              <div className="neo-badge bg-white text-[#1E1E1E] text-[11px] sm:text-xs">
-                <Users className="w-3.5 h-3.5" />
+              <div className="neo-badge bg-white text-[#000000] text-[11px] sm:text-xs">
+                <Users className="w-3.5 h-3.5 text-[#2F36C9]" />
                 <span className="font-mono">{currentEvent.participants.length}</span>
               </div>
             )}
@@ -189,12 +187,12 @@ export const RoleHeader: React.FC = () => {
                 id="simulate-crowd-header-btn"
                 onClick={() => simulateAudienceVotes(10)}
                 disabled={isSimulatingCrowd}
-                className="hidden sm:flex neo-btn bg-[#FACC15] text-[#1E1E1E] px-2.5 py-1 text-xs"
+                className="hidden sm:flex neo-btn bg-[#C1FF33] text-[#000000] px-2.5 py-1 text-xs"
                 title="Simulate 10 audience members answering live"
               >
                 {isSimulatingCrowd ? (
                   <>
-                    <ButtonSpinner size="w-3 h-3" color="text-[#1E1E1E]" />
+                    <ButtonSpinner size="w-3 h-3" color="text-[#000000]" />
                     <span className="text-[10px] font-mono">VOTING</span>
                   </>
                 ) : (
@@ -211,7 +209,7 @@ export const RoleHeader: React.FC = () => {
               <button
                 id="header-qr-btn"
                 onClick={() => setIsQRModalOpen(true)}
-                className="neo-btn bg-white p-1.5 sm:p-2"
+                className="neo-btn bg-white p-1.5 sm:p-2 text-[#000000]"
                 title="View Room QR Code"
               >
                 <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -222,19 +220,19 @@ export const RoleHeader: React.FC = () => {
             {isHost ? (
               <button
                 onClick={logout}
-                className="neo-btn bg-[#FB7185] text-[#1E1E1E] px-2 sm:px-2.5 py-1 text-xs"
+                className="neo-btn bg-[#FF1784] text-white px-2 sm:px-2.5 py-1 text-xs"
                 title="Exit Host Session"
               >
                 <LogOut className="w-3.5 h-3.5 shrink-0" />
-                <span className="text-[11px] sm:text-xs">Exit</span>
+                <span className="text-[11px] sm:text-xs font-bold">Exit</span>
               </button>
             ) : (
               <button
                 onClick={() => setActiveView('login')}
-                className="neo-btn bg-[#1E1E1E] text-white px-2 sm:px-3 py-1 text-xs"
+                className="neo-btn bg-[#000000] text-white px-2 sm:px-3 py-1 text-xs"
                 title="Host Sign In"
               >
-                <Shield className="w-3 h-3" />
+                <Shield className="w-3 h-3 text-[#C1FF33]" />
                 <span>Host</span>
               </button>
             )}
@@ -244,7 +242,7 @@ export const RoleHeader: React.FC = () => {
 
         {/* Mobile View Switcher */}
         {isHost && (
-          <div className="lg:hidden flex items-center overflow-x-auto px-2.5 py-1.5 bg-[#FFF8F0] border-t-2 border-[#1E1E1E] space-x-1.5 scrollbar-none">
+          <div className="lg:hidden flex items-center overflow-x-auto px-2.5 py-1.5 bg-[#FFF8F0] border-t-2 border-[#000000] space-x-1.5 scrollbar-none">
             {adminViews.map((v) => {
               const isActive = activeView === v.id;
               return (
@@ -253,8 +251,8 @@ export const RoleHeader: React.FC = () => {
                   onClick={() => setActiveView(v.id)}
                   className={`neo-btn text-[11px] px-2.5 py-1 whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'bg-[#4F46E5] text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                      : 'bg-white text-[#1E1E1E]'
+                      ? 'bg-[#2F36C9] text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                      : 'bg-white text-[#000000]'
                   }`}
                 >
                   {v.icon}

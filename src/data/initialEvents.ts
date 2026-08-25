@@ -3,11 +3,11 @@ import { EventData } from '../types';
 export const INITIAL_EVENTS: EventData[] = [
   {
     id: 'evt-keynote-2026',
-    roomCode: 'PULSE88',
+    roomCode: 'PIK88',
     title: 'Future of Work & AI Summit 2026',
     description: 'Interactive live session covering modern communication, leadership dynamics, and AI collaboration in high-growth teams.',
     category: 'Conference / Keynote',
-    organizerName: 'Dr. Evelyn Vance & Pulse Team',
+    organizerName: 'Dr. Evelyn Vance & Piktera Team',
     createdAt: Date.now() - 3600000 * 24,
     status: 'waiting',
     currentQuestionIndex: 0,
