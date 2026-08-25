@@ -1,15 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
-  <defs>
-    <linearGradient id="stageSyncGradient" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4F46E5" />
-      <stop offset="0.5" stop-color="#3B82F6" />
-      <stop offset="1" stop-color="#06B6D4" />
-    </linearGradient>
-  </defs>
-  <rect width="40" height="40" rx="11" fill="url(#stageSyncGradient)" />
-  <rect x="8.5" y="16" width="3.5" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.85" />
-  <rect x="14.5" y="10" width="3.5" height="20" rx="1.75" fill="#FFFFFF" />
-  <rect x="20.5" y="7" width="3.5" height="26" rx="1.75" fill="#FFFFFF" />
-  <rect x="26.5" y="13" width="3.5" height="14" rx="1.75" fill="#FFFFFF" />
-  <circle cx="32" cy="8" r="2.5" fill="#34D399" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" shape-rendering="crispEdges">
+  <!-- Neobrutalist Base Card: Cobalt Blue with Solid Black Border -->
+  <rect width="64" height="64" rx="14" fill="#2F36C9" />
+  <rect x="1" y="1" width="62" height="62" rx="13" stroke="#000000" stroke-width="2" />
+  
+  <!-- Live Accent Dot -->
+  <circle cx="53" cy="11" r="3.5" fill="#C1FF33" stroke="#000000" stroke-width="1.5" />
+
+  <!-- Piktera 'P' Shape in Crisp Pure White -->
+  <!-- Left Vertical Spine (7 blocks) -->
+  <rect x="12" y="10" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="17" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="24" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="31" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="38" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="45" width="6" height="6" fill="#FFFFFF" />
+  <rect x="12" y="52" width="6" height="6" fill="#FFFFFF" />
+
+  <!-- Top Horizontal Bar -->
+  <rect x="19" y="10" width="6" height="6" fill="#FFFFFF" />
+  <rect x="26" y="10" width="6" height="6" fill="#FFFFFF" />
+  <rect x="33" y="10" width="6" height="6" fill="#FFFFFF" />
+  <rect x="40" y="10" width="6" height="6" fill="#FFFFFF" />
+  <rect x="47" y="10" width="6" height="6" fill="#FFFFFF" />
+
+  <!-- Right Loop Vertical Edge -->
+  <rect x="47" y="17" width="6" height="6" fill="#FFFFFF" />
+  <rect x="47" y="24" width="6" height="6" fill="#FFFFFF" />
+  <rect x="47" y="31" width="6" height="6" fill="#FFFFFF" />
+
+  <!-- Middle Horizontal Bar -->
+  <rect x="19" y="31" width="6" height="6" fill="#FFFFFF" />
+  <rect x="26" y="31" width="6" height="6" fill="#FFFFFF" />
+  <rect x="33" y="31" width="6" height="6" fill="#FFFFFF" />
+  <rect x="40" y="31" width="6" height="6" fill="#FFFFFF" />
+
+  <!-- Upward Pixel Arrow (Pointing UP in Lime Green) -->
+  <rect x="29" y="22" width="6" height="7" fill="#C1FF33" />
+  <polygon points="32,14 21,23 43,23" fill="#C1FF33" />
 </svg>
