@@ -143,10 +143,21 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       sessionRef.current = s;
       setSession(s);
       setUser(s?.user ?? null);
+      if (event === 'SIGNED_IN' && s?.user) {
+        setActiveViewState('presenter');
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ view: 'presenter' }, '', '#presenter');
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setActiveViewState('participant');
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ view: 'participant' }, '', '#participant');
+        }
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -163,11 +174,11 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setSession(s);
         setUser(u);
       }
-      await refreshAllEvents();
       setActiveViewState('presenter');
       if (typeof window !== 'undefined') {
         window.history.pushState({ view: 'presenter' }, '', '#presenter');
       }
+      refreshAllEvents().catch(() => {});
     } catch (err: any) {
       const msg = err.message || 'Invalid email or password';
       setError(msg);

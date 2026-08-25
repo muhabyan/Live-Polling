@@ -12,7 +12,8 @@ import {
   Zap, 
   ChevronDown,
   LogOut,
-  Shield
+  Shield,
+  Smartphone
 } from 'lucide-react';
 import { QRCodeModal } from '../Shared/QRCodeModal';
 import { BrandLogo } from '../Shared/BrandLogo';
@@ -38,6 +39,7 @@ export const RoleHeader: React.FC = () => {
     { id: 'projector', label: 'Projector', icon: <Tv className="w-3.5 h-3.5" />, badge: 'Stage' },
     { id: 'admin', label: 'Admin', icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" /> },
+    { id: 'participant', label: 'Audience', icon: <Smartphone className="w-3.5 h-3.5" /> },
   ];
 
   const getStatusBadge = (status?: string) => {
