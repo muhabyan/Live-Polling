@@ -63,15 +63,16 @@ export const LoginScreen: React.FC = () => {
               Email Address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="w-4 h-4 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
+                <Mail className="w-4 h-4 text-gray-500" />
               </div>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="neo-input w-full pl-9"
+                className="neo-input w-full text-sm"
+                style={{ paddingLeft: '2.75rem' }}
                 placeholder="host@piktera.live"
               />
             </div>
@@ -82,15 +83,16 @@ export const LoginScreen: React.FC = () => {
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="w-4 h-4 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
+                <Lock className="w-4 h-4 text-gray-500" />
               </div>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="neo-input w-full pl-9"
+                className="neo-input w-full text-sm font-mono"
+                style={{ paddingLeft: '2.75rem' }}
                 placeholder="••••••••"
               />
             </div>
