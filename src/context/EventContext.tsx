@@ -147,12 +147,7 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       sessionRef.current = s;
       setSession(s);
       setUser(s?.user ?? null);
-      if (event === 'SIGNED_IN' && s?.user) {
-        setActiveViewState('presenter');
-        if (typeof window !== 'undefined') {
-          window.history.pushState({ view: 'presenter' }, '', '#presenter');
-        }
-      } else if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT') {
         setActiveViewState('participant');
         if (typeof window !== 'undefined') {
           window.history.pushState({ view: 'participant' }, '', '#participant');
