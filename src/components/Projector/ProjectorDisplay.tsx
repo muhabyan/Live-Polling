@@ -253,26 +253,34 @@ export const ProjectorDisplay: React.FC = () => {
 
         {/* Right: Join Instructions & Mini QR Code & Theme Toggle */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className={`rounded-xl border-2 border-[#000000] px-3.5 py-2 flex items-center space-x-3 ${
-            isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-          }`} style={{ boxShadow: '3px 3px 0px #000000' }}>
-            <div>
-              <div className="text-[10px] uppercase font-black tracking-wider text-gray-500 font-mono">
-                Join at <strong className="text-[#2F36C9] normal-case font-bold">{window.location.host}</strong>
+          {currentEvent.status !== 'ended' ? (
+            <div className={`rounded-xl border-2 border-[#000000] px-3.5 py-2 flex items-center space-x-3 ${
+              isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+            }`} style={{ boxShadow: '3px 3px 0px #000000' }}>
+              <div>
+                <div className="text-[10px] uppercase font-black tracking-wider text-gray-500 font-mono">
+                  Join at <strong className="text-[#2F36C9] normal-case font-bold">{window.location.host}</strong>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-xs font-bold text-gray-500 font-mono">PIN:</span>
+                  <span className={`text-xl sm:text-2xl font-black font-mono tracking-widest ${
+                    isDark ? 'text-white' : 'text-[#000000]'
+                  }`}>
+                    {currentEvent.roomCode}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-bold text-gray-500 font-mono">PIN:</span>
-                <span className={`text-xl sm:text-2xl font-black font-mono tracking-widest ${
-                  isDark ? 'text-white' : 'text-[#000000]'
-                }`}>
-                  {currentEvent.roomCode}
-                </span>
+              <div className="bg-white p-0.5 rounded-md border-2 border-[#000000] shrink-0">
+                <canvas ref={miniQrRef} className="w-11 h-11 sm:w-12 sm:h-12" />
               </div>
             </div>
-            <div className="bg-white p-0.5 rounded-md border-2 border-[#000000] shrink-0">
-              <canvas ref={miniQrRef} className="w-11 h-11 sm:w-12 sm:h-12" />
+          ) : (
+            <div className="rounded-xl border-2 border-[#000000] px-3.5 py-2 bg-[#FF1784] text-white flex items-center space-x-2" style={{ boxShadow: '3px 3px 0px #000000' }}>
+              <span className="text-xs font-black uppercase tracking-wider font-mono">
+                Session Finished • Closed
+              </span>
             </div>
-          </div>
+          )}
 
           {/* Theme Toggle */}
           <button
