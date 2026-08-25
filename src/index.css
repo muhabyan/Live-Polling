@@ -280,3 +280,59 @@
 .animate-danger-pulse {
   animation: red-danger-glow 0.85s ease-in-out infinite;
 }
+
+/* Piktera Robot Pixel Animations */
+@keyframes piktera-arm-wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-16deg) translateY(-2px);
+  }
+  50% {
+    transform: rotate(4deg) translateY(1px);
+  }
+  75% {
+    transform: rotate(-22deg) translateY(-3px);
+  }
+}
+
+.animate-piktera-arm {
+  transform-origin: 70px 88px;
+  animation: piktera-arm-wave 1.6s ease-in-out infinite;
+}
+
+@keyframes piktera-cheer-wave {
+  0%, 100% {
+    transform: rotate(-8deg) translateY(-2px);
+  }
+  50% {
+    transform: rotate(-32deg) translateY(-6px);
+  }
+}
+
+.animate-piktera-cheer-arm {
+  transform-origin: 70px 88px;
+  animation: piktera-cheer-wave 0.75s ease-in-out infinite;
+}
+
+@keyframes piktera-left-arm-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.animate-piktera-left-arm {
+  transform-origin: 26px 88px;
+  animation: piktera-left-arm-idle 2.4s ease-in-out infinite;
+}
+
+@keyframes piktera-antenna-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+.animate-piktera-antenna {
+  transform-origin: 48px 20px;
+  animation: piktera-antenna-wiggle 3.2s ease-in-out infinite;
+}

@@ -27,16 +27,17 @@ export const PikteraMascot: React.FC<PikteraMascotProps> = ({
   };
 
   const { width, height } = sizeMap[size];
+  const isExcited = mood === 'celebrating' || mood === 'waving';
 
   return (
-    <div className={`inline-flex items-center gap-2 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
       <div className="relative inline-block">
         {/* Animated Floating Container */}
         <div className="animate-badge-float relative flex flex-col items-center">
           
-          {/* Celebrating Hat or Star (Optional mood) */}
+          {/* Celebrating Hat or Crown */}
           {mood === 'celebrating' && (
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 animate-bounce" style={{ animationDuration: '2s' }}>
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 animate-bounce" style={{ animationDuration: '1.5s' }}>
               <span className="text-xl">👑</span>
             </div>
           )}
@@ -51,20 +52,22 @@ export const PikteraMascot: React.FC<PikteraMascotProps> = ({
             className="filter drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
             shapeRendering="crispEdges"
           >
-            {/* ====== 1. ANTENNA ====== */}
-            {/* Left Antenna */}
-            <rect x="26" y="2" width="6" height="6" fill="#2F36C9" />
-            <rect x="28" y="4" width="2" height="2" fill="#C1FF33" />
-            <rect x="30" y="8" width="4" height="4" fill="#000000" />
-            <rect x="34" y="12" width="4" height="4" fill="#000000" />
-            <rect x="38" y="16" width="4" height="4" fill="#000000" />
+            {/* ====== 1. ANTENNA (Animated Wiggle) ====== */}
+            <g className="animate-piktera-antenna">
+              {/* Left Antenna */}
+              <rect x="26" y="2" width="6" height="6" fill="#2F36C9" />
+              <rect x="28" y="4" width="2" height="2" fill="#C1FF33" />
+              <rect x="30" y="8" width="4" height="4" fill="#000000" />
+              <rect x="34" y="12" width="4" height="4" fill="#000000" />
+              <rect x="38" y="16" width="4" height="4" fill="#000000" />
 
-            {/* Right Antenna */}
-            <rect x="68" y="2" width="6" height="6" fill="#2F36C9" />
-            <rect x="70" y="4" width="2" height="2" fill="#FF1784" />
-            <rect x="66" y="8" width="4" height="4" fill="#000000" />
-            <rect x="62" y="12" width="4" height="4" fill="#000000" />
-            <rect x="58" y="16" width="4" height="4" fill="#000000" />
+              {/* Right Antenna */}
+              <rect x="68" y="2" width="6" height="6" fill="#2F36C9" />
+              <rect x="70" y="4" width="2" height="2" fill="#FF1784" />
+              <rect x="66" y="8" width="4" height="4" fill="#000000" />
+              <rect x="62" y="12" width="4" height="4" fill="#000000" />
+              <rect x="58" y="16" width="4" height="4" fill="#000000" />
+            </g>
 
             {/* ====== 2. HEAD HOUSING (CRT MONITOR) ====== */}
             {/* Left 3D Shadow Plate (Cobalt Blue) */}
@@ -85,7 +88,7 @@ export const PikteraMascot: React.FC<PikteraMascotProps> = ({
             {/* Main Outer Head Frame (Black) */}
             <rect x="18" y="20" width="70" height="56" fill="#000000" />
 
-            {/* Inner TV Bezel (Light Grey / Lavender Highlight) */}
+            {/* Inner TV Bezel (Light Grey Highlight) */}
             <rect x="22" y="24" width="62" height="48" fill="#E2E8F0" />
 
             {/* Screen Face (Pure White) */}
@@ -129,33 +132,37 @@ export const PikteraMascot: React.FC<PikteraMascotProps> = ({
                 <rect x="42" y="96" width="8" height="6" fill="#2F36C9" />
                 <rect x="50" y="96" width="8" height="6" fill="#FACC15" />
 
-                {/* Left Arm & Hand */}
-                <rect x="26" y="86" width="8" height="6" fill="#000000" />
-                <rect x="24" y="92" width="6" height="12" fill="#000000" />
-                <rect x="22" y="104" width="8" height="6" fill="#2F36C9" />
+                {/* Left Arm & Hand (Animated Sway) */}
+                <g className="animate-piktera-left-arm">
+                  <rect x="26" y="86" width="8" height="6" fill="#000000" />
+                  <rect x="24" y="92" width="6" height="12" fill="#000000" />
+                  <rect x="22" y="104" width="8" height="6" fill="#2F36C9" />
+                </g>
 
-                {/* Right Arm Holding Arrow Staff */}
-                <rect x="66" y="86" width="8" height="6" fill="#000000" />
-                <rect x="70" y="90" width="6" height="10" fill="#000000" />
-                <rect x="72" y="100" width="6" height="6" fill="#2F36C9" />
+                {/* Right Arm Holding Arrow Staff (ANIMATED WAVING HAND & WAND) */}
+                <g className={isExcited ? "animate-piktera-cheer-arm" : "animate-piktera-arm"}>
+                  <rect x="66" y="86" width="8" height="6" fill="#000000" />
+                  <rect x="70" y="90" width="6" height="10" fill="#000000" />
+                  <rect x="72" y="100" width="6" height="6" fill="#2F36C9" />
 
-                {/* PIXEL ARROW STAFF (Iconic Polling Tool) */}
-                {/* Staff Handle */}
-                <rect x="76" y="98" width="5" height="22" fill="#000000" />
-                <rect x="77" y="100" width="3" height="18" fill="#E2E8F0" />
-                <rect x="76" y="116" width="5" height="4" fill="#FF1784" />
+                  {/* PIXEL ARROW STAFF (Wand) */}
+                  {/* Staff Handle */}
+                  <rect x="76" y="98" width="5" height="22" fill="#000000" />
+                  <rect x="77" y="100" width="3" height="18" fill="#E2E8F0" />
+                  <rect x="76" y="116" width="5" height="4" fill="#FF1784" />
 
-                {/* Arrow Head (Pointing Up-Right) */}
-                <path
-                  d="M72 96 H84 V90 H90 V84 H96 V72 H84 V78 H78 V84 H72 Z"
-                  fill="#000000"
-                />
-                <path
-                  d="M74 94 H82 V88 H88 V82 H94 V74 H86 V80 H80 V86 H74 Z"
-                  fill="#FFFFFF"
-                />
-                {/* Accent inside Arrow */}
-                <rect x="86" y="78" width="4" height="4" fill="#C1FF33" />
+                  {/* Arrow Head (Pointing Up-Right) */}
+                  <path
+                    d="M72 96 H84 V90 H90 V84 H96 V72 H84 V78 H78 V84 H72 Z"
+                    fill="#000000"
+                  />
+                  <path
+                    d="M74 94 H82 V88 H88 V82 H94 V74 H86 V80 H80 V86 H74 Z"
+                    fill="#FFFFFF"
+                  />
+                  {/* Accent inside Arrow */}
+                  <rect x="86" y="78" width="4" height="4" fill="#C1FF33" />
+                </g>
 
                 {/* Left Leg & Foot */}
                 <rect x="38" y="112" width="8" height="14" fill="#000000" />
@@ -176,7 +183,7 @@ export const PikteraMascot: React.FC<PikteraMascotProps> = ({
 
       {/* Speech Bubble (Optional) */}
       {withSpeech && (
-        <div className="neo-card-sm px-3 py-1.5 bg-[#FFF8F0] text-[#000000] text-xs font-pixel font-bold flex items-center gap-1.5 animate-in fade-in zoom-in-95">
+        <div className="neo-card-sm px-3 py-1.5 bg-[#FFF8F0] text-[#000000] text-xs font-mono font-bold flex items-center gap-1.5 animate-in fade-in zoom-in-95" style={{ boxShadow: '2px 2px 0px #000000' }}>
           <span className="text-[#2F36C9] font-black">✔️</span>
           <span>{speechText || 'Ready to poll!'}</span>
         </div>
