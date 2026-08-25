@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useEvent } from '../../context/EventContext';
 import { Sparkles, Trophy, LogOut, CheckCircle2 } from 'lucide-react';
-import { PikteraMascot } from '../Shared/PikteraMascot';
+import { CharacterMascot, getPersonaCustomQuotes } from '../Shared/CharacterMascot';
 
 interface ParticipantCompanionProps {
   hasSubmitted?: boolean;
@@ -23,21 +23,21 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
   const status = currentEvent?.status || 'waiting';
   const isQuizMode = currentEvent?.isQuizMode;
 
-  // Dynamic state-driven dialogue & mood
+  // Dynamic state-driven dialogue & mood tailored to selected character persona
   useEffect(() => {
     if (hasInteracted) return;
 
     if (status === 'waiting' || status === 'draft') {
       setPetMood('idle');
       const waitingQuotes = [
-        `Siap-siap ya! Sesi segera mulai 🚀`,
+        `Siap-siap ya ${name}! Sesi segera mulai 🚀`,
         `Nunggu presenter membuka sesi... ☕`,
-        `Piktera siap mencatat suaramu! ✨`,
+        `Karaktermu siap mencatat suaramu! ✨`,
       ];
       setSpeechText(waitingQuotes[Math.floor(Math.random() * waitingQuotes.length)]);
     } else if (status === 'ended') {
       setPetMood('celebrate');
-      setSpeechText(`Sesi selesai! Terima kasih ${name}! 🏆`);
+      setSpeechText(`Sesi selesai! Terima kasih banyak ${name}! 🏆`);
     } else if (hasSubmitted) {
       setPetMood('cheer');
       setSpeechText('Jawabanmu terkirim ke panggung! 🎉');
@@ -46,17 +46,13 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
       setSpeechText('Voting ditutup! Cek hasil di layar 📺');
     } else if (timerRemaining <= 10 && timerRemaining > 0) {
       setPetMood('urgent');
-      setSpeechText('Waktu mau habis! Ayo pilih! ⚡');
+      setSpeechText('Waktu mau habis! Ayo tentukan pilihan! ⚡');
     } else {
       setPetMood('focus');
-      const liveQuotes = [
-        'Pilih jawaban paling tepat! 💡',
-        'Kira-kira apa jawabannya ya? 🤔',
-        'Tentukan pilihanmu sekarang! ✨',
-      ];
-      setSpeechText(liveQuotes[Math.floor(Math.random() * liveQuotes.length)]);
+      const personaQuotes = getPersonaCustomQuotes(emoji, name);
+      setSpeechText(personaQuotes[Math.floor(Math.random() * personaQuotes.length)]);
     }
-  }, [status, hasSubmitted, isVotingLocked, timerRemaining, name, hasInteracted]);
+  }, [status, hasSubmitted, isVotingLocked, timerRemaining, name, emoji, hasInteracted]);
 
   const handleTapCompanion = () => {
     setIsBouncing(true);
@@ -68,17 +64,11 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
       sendReaction('❤️');
     } catch {}
 
-    const funQuotes = [
-      'Piktera dukung pilihanmu 100%! ⭐',
-      'Fokus & raih peringkat atas! 🔥',
-      'Kamu pasti bisa! Semangat! 💪',
-      'Keren banget kamu hari ini! ✨',
-      'Kirim cinta ke panggung! ❤️',
-    ];
+    const funQuotes = getPersonaCustomQuotes(emoji, name);
     const randomQuote = funQuotes[Math.floor(Math.random() * funQuotes.length)];
     setSpeechText(randomQuote);
 
-    setTimeout(() => setHasInteracted(false), 4000);
+    setTimeout(() => setHasInteracted(false), 4500);
   };
 
   if (!currentParticipant) return null;
@@ -87,21 +77,23 @@ export const ParticipantCompanion: React.FC<ParticipantCompanionProps> = ({ hasS
     <div className="w-full max-w-md mx-auto px-3 pt-3 pb-1 relative z-10 select-none">
       <div className="neo-card p-3 flex items-center justify-between gap-3 transition-all bg-white">
         
-        {/* Left: Full-body Animated Piktera Robot Companion (Not just an avatar photo) */}
+        {/* Left: Full-body Animated Character Companion (Dragon, Fox, Panda, Piktera, etc.) */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
           <button
             type="button"
             onClick={handleTapCompanion}
-            title="Ketuk maskot Piktera untuk sapaan & reaksi!"
+            title={`Ketuk maskot ${emoji} untuk sapaan & reaksi!`}
             className={`relative shrink-0 transition-transform cursor-pointer active:scale-90 group ${
               isBouncing ? 'animate-bounce' : 'hover:scale-105'
             }`}
           >
-            {/* Full Formed Animated Piktera Robot Mascot with Moving Waving Hand */}
-            <PikteraMascot
+            {/* Dynamic Character Companion based on User's Avatar Choice */}
+            <CharacterMascot
+              emoji={emoji}
+              bgColor={bgColor}
+              name={name}
               size="sm"
               mood={petMood === 'celebrate' || petMood === 'cheer' ? 'celebrating' : petMood === 'urgent' ? 'curious' : 'happy'}
-              headOnly={false}
             />
           </button>
 

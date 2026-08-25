@@ -1,14 +1,14 @@
 import React from 'react';
 import { useEvent } from '../../context/EventContext';
 import { Sparkles, Clock, Check } from 'lucide-react';
-import { PikteraMascot } from '../Shared/PikteraMascot';
+import { CharacterMascot } from '../Shared/CharacterMascot';
 
 interface ParticipantSubmittedProps {
   onRevote?: () => void;
 }
 
 export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRevote }) => {
-  const { currentEvent, sendReaction } = useEvent();
+  const { currentEvent, currentParticipant, sendReaction } = useEvent();
   const reactionEmojis = ['👏', '🔥', '❤️', '💡', '🚀', '🎉'];
 
   const timerRemaining = currentEvent?.timerRemainingSeconds ?? 0;
@@ -19,9 +19,15 @@ export const ParticipantSubmitted: React.FC<ParticipantSubmittedProps> = ({ onRe
       {/* Main Success Confirmation Card */}
       <div className="my-auto py-5 sm:py-8 text-center neo-card p-4 sm:p-7 relative overflow-hidden shrink-0 bg-white">
         
-        {/* Animated Celebrating Piktera Robot Mascot */}
+        {/* Animated Celebrating Character Mascot (Dragon, Fox, Panda, Piktera, etc.) */}
         <div className="flex justify-center mb-3 sm:mb-4">
-          <PikteraMascot size="md" mood="celebrating" headOnly={false} />
+          <CharacterMascot
+            emoji={currentParticipant?.avatarEmoji || '🤖'}
+            bgColor={currentParticipant?.avatarBg || '#2F36C9'}
+            name={currentParticipant?.name || 'Attendee'}
+            size="md"
+            mood="celebrating"
+          />
         </div>
 
         <div className="inline-flex items-center space-x-1 neo-badge bg-[#C1FF33] text-[#000000] text-xs mb-2 font-mono">

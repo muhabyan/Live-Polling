@@ -1,21 +1,27 @@
 import React from 'react';
 import { useEvent } from '../../context/EventContext';
 import { Users, Sparkles, LogOut } from 'lucide-react';
-import { PikteraMascot } from '../Shared/PikteraMascot';
+import { CharacterMascot } from '../Shared/CharacterMascot';
 
 export const ParticipantWaiting: React.FC = () => {
-  const { currentEvent, leaveRoom, sendReaction } = useEvent();
+  const { currentEvent, currentParticipant, leaveRoom, sendReaction } = useEvent();
 
   const reactionEmojis = ['👏', '🔥', '❤️', '💡', '🚀', '✨', '🎉'];
 
   return (
     <div className="w-full max-w-md mx-auto px-3 py-2 flex flex-col justify-between flex-1 gap-3 min-h-0 overflow-y-auto">
-      {/* Main Waiting Card with Animated Piktera Robot Mascot */}
+      {/* Main Waiting Card with Animated Character Mascot */}
       <div className="my-auto py-5 sm:py-8 text-center neo-card p-4 sm:p-7 relative overflow-hidden shrink-0 bg-white">
         
-        {/* Animated Full Piktera Robot Mascot */}
+        {/* Animated Full Character Mascot (Dragon, Fox, Panda, Piktera, etc.) */}
         <div className="flex justify-center mb-3 sm:mb-4">
-          <PikteraMascot size="md" mood="happy" headOnly={false} />
+          <CharacterMascot
+            emoji={currentParticipant?.avatarEmoji || '🤖'}
+            bgColor={currentParticipant?.avatarBg || '#2F36C9'}
+            name={currentParticipant?.name || 'Attendee'}
+            size="md"
+            mood="happy"
+          />
         </div>
 
         <span className="neo-badge bg-[#FACC15] text-[#000000] mb-2 inline-flex font-mono">
@@ -27,7 +33,7 @@ export const ParticipantWaiting: React.FC = () => {
         </h2>
 
         <p className="text-[11px] sm:text-xs text-gray-600 max-w-xs mx-auto mb-3 sm:mb-5 font-mono">
-          Piktera sedang bersiap! Soal akan otomatis muncul begitu presenter memulai sesi.
+          Karaktermu sedang bersiap! Soal akan otomatis muncul begitu presenter memulai sesi.
         </p>
 
         {/* Live Participant Counter */}

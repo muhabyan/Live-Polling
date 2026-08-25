@@ -7,6 +7,7 @@ import { ParticipantSubmitted } from './ParticipantSubmitted';
 import { ParticipantTicker } from './ParticipantTicker';
 import { ParticipantCompanion } from './ParticipantCompanion';
 import { Trophy, LogOut } from 'lucide-react';
+import { CharacterMascot } from '../Shared/CharacterMascot';
 
 export const ParticipantView: React.FC = () => {
   const { currentEvent, currentParticipant, leaveRoom } = useEvent();
@@ -53,18 +54,21 @@ export const ParticipantView: React.FC = () => {
 
       return (
         <div className="w-full max-w-md mx-auto p-3 sm:p-6 text-center flex flex-col justify-center my-auto gap-3">
-          <div className="neo-card p-5 sm:p-8">
-            <div
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border-2 border-[#1E1E1E] bg-[#FACC15] text-[#1E1E1E] flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl"
-              style={{ boxShadow: '3px 3px 0px #1E1E1E' }}
-            >
-              <Trophy className="w-7 h-7 sm:w-8 sm:h-8" />
+          <div className="neo-card p-5 sm:p-8 bg-white">
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <CharacterMascot
+                emoji={currentParticipant.avatarEmoji || '🤖'}
+                bgColor={currentParticipant.avatarBg || '#2F36C9'}
+                name={currentParticipant.name}
+                size="md"
+                mood="celebrating"
+              />
             </div>
-            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-[#1E1E1E] mb-1.5 sm:mb-2 font-display uppercase">
-              Session Selesai!
+            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-[#000000] mb-1.5 sm:mb-2 font-heading uppercase">
+              Sesi Selesai!
             </h2>
-            <p className="text-[11px] sm:text-sm text-gray-500 mb-4 sm:mb-5">
-              Terima kasih telah berpartisipasi dalam <strong className="text-[#1E1E1E]">{currentEvent.title}</strong>.
+            <p className="text-[11px] sm:text-xs text-gray-600 mb-4 sm:mb-5 font-mono">
+              Terima kasih telah berpartisipasi dalam <strong className="text-[#000000]">{currentEvent.title}</strong>.
             </p>
             
             {hasQuizScoring ? (
