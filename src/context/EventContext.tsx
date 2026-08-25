@@ -176,7 +176,10 @@ export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     await api.signOut().catch(() => {});
     setSession(null);
     setUser(null);
-    setActiveView('login');
+    setActiveViewState('participant');
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ view: 'participant' }, '', '#participant');
+    }
   };
 
   // ============================================

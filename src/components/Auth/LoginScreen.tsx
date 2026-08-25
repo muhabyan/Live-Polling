@@ -41,7 +41,7 @@ export const LoginScreen: React.FC = () => {
           <div className="mb-2">
             <PikteraMascot size="sm" mood="happy" headOnly={false} />
           </div>
-          <BrandLogo size="md" showText={true} showTagline={true} className="mb-2 justify-center" />
+          <BrandLogo size="md" showText={true} className="mb-2 justify-center" />
           <h2 className="text-xl sm:text-2xl font-black text-[#000000] tracking-tight font-heading uppercase">
             Host Sign In
           </h2>

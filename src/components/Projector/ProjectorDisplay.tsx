@@ -214,7 +214,7 @@ export const ProjectorDisplay: React.FC = () => {
             </button>
           )}
 
-          <BrandLogo size="sm" showText={true} showTagline={false} theme={isDark ? 'dark' : 'light'} />
+          <BrandLogo size="sm" showText={true} theme={isDark ? 'dark' : 'light'} />
           <div>
             <div className="flex items-center space-x-2">
               <span className={`text-[11px] font-black uppercase tracking-widest font-mono ${

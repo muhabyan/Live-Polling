@@ -3,7 +3,6 @@ import React from 'react';
 interface BrandLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
-  showTagline?: boolean;
   theme?: 'light' | 'dark';
   iconStyle?: 'black' | 'pink';
   className?: string;
@@ -12,7 +11,6 @@ interface BrandLogoProps {
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   showText = true,
-  showTagline = false,
   theme = 'light',
   iconStyle = 'black',
   className = '',
@@ -105,20 +103,12 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
       {/* Brand Text: IKTERA immediately adjacent to P */}
       {showText && (
-        <div className="flex flex-col leading-none">
-          <div className="flex items-center">
-            <span className={`font-black tracking-tight font-heading ${textSizes[size]} ${isDark ? 'text-white' : 'text-[#000000]'}`}>
-              IKTERA
-            </span>
-            {/* Live Lime Green Pulse Dot */}
-            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#C1FF33] border border-[#000000] ml-1 sm:ml-1.5 animate-pulse" />
-          </div>
-
-          {showTagline && (
-            <span className={`text-[7px] sm:text-[8px] uppercase tracking-[0.06em] font-black font-heading mt-0.5 ${isDark ? 'text-gray-400' : 'text-[#000000]'}`}>
-              LIVE POLLING DENGAN SENTUHAN PIKSEL.
-            </span>
-          )}
+        <div className="flex items-center leading-none">
+          <span className={`font-black tracking-tight font-heading ${textSizes[size]} ${isDark ? 'text-white' : 'text-[#000000]'}`}>
+            IKTERA
+          </span>
+          {/* Live Lime Green Pulse Dot */}
+          <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#C1FF33] border border-[#000000] ml-1 sm:ml-1.5 animate-pulse" />
         </div>
       )}
     </div>

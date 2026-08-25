@@ -16,30 +16,34 @@ import { FloatingReactions } from './components/Shared/FloatingReactions';
 import { GlobalAppSkeleton } from './components/Shared/Loaders';
 
 const AppContent: React.FC = () => {
-  const { activeView, isLoading, isAuthLoading } = useEvent();
+  const { activeView, isLoading, isAuthLoading, isHost } = useEvent();
 
   if (isLoading || isAuthLoading) {
     return <GlobalAppSkeleton />;
   }
 
+  // Auth Guard: If not host and activeView is a host-only view, fallback to participant view
+  const isHostOnlyView = ['presenter', 'admin', 'analytics'].includes(activeView);
+  const effectiveView = (!isHost && isHostOnlyView) ? 'participant' : activeView;
+
   return (
-    <div className="min-h-screen-dvh bg-[#FFF8F0] text-[#1E1E1E] flex flex-col font-sans selection:bg-yellow-200 selection:text-black antialiased overflow-x-hidden">
+    <div className="min-h-screen-dvh bg-[#FFF8F0] text-[#1E1E1E] flex flex-col font-sans selection:bg-[#C1FF33] selection:text-black antialiased overflow-x-hidden">
       
       {/* Top Universal Role Switcher & Status Navigation Header (hidden on Login & Projector Stage) */}
-      {activeView !== 'projector' && activeView !== 'login' && <RoleHeader />}
+      {effectiveView !== 'projector' && effectiveView !== 'login' && <RoleHeader />}
 
       {/* Main Content Area */}
       <main className="flex-1 w-full relative flex flex-col min-h-0">
-        {activeView === 'login' && <LoginScreen />}
-        {activeView === 'participant' && <ParticipantView />}
-        {activeView === 'projector' && <ProjectorDisplay />}
-        {activeView === 'presenter' && <PresenterControl />}
-        {activeView === 'admin' && <AdminDashboard />}
-        {activeView === 'analytics' && <EventSummaryExport />}
+        {effectiveView === 'login' && <LoginScreen />}
+        {effectiveView === 'participant' && <ParticipantView />}
+        {effectiveView === 'projector' && <ProjectorDisplay />}
+        {effectiveView === 'presenter' && <PresenterControl />}
+        {effectiveView === 'admin' && <AdminDashboard />}
+        {effectiveView === 'analytics' && <EventSummaryExport />}
       </main>
 
       {/* Floating Audience Cheer Reactions Overlay */}
-      {activeView !== 'login' && <FloatingReactions />}
+      {effectiveView !== 'login' && <FloatingReactions />}
 
     </div>
   );

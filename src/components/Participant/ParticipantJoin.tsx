@@ -98,12 +98,12 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({ onJoined }) =>
     <div className="w-full max-w-md mx-auto px-3.5 py-5 sm:py-7 flex flex-col justify-center">
       
       {/* Brand & Greeting Header with Piktera Mascot */}
-      <div className="flex flex-col items-center text-center mb-4 sm:mb-5">
+      <div className="flex flex-col items-center text-center mb-5 sm:mb-6">
         <div className="mb-2">
           <PikteraMascot size="sm" mood="happy" headOnly={false} />
         </div>
-        <BrandLogo size="md" showText={true} showTagline={true} className="mb-1 justify-center" />
-        <p className="text-xs text-gray-600 mt-1 max-w-xs mx-auto font-mono font-bold">
+        <BrandLogo size="lg" showText={true} className="justify-center" />
+        <p className="text-xs text-gray-600 mt-2 max-w-xs mx-auto font-mono font-bold">
           Pilih karaktermu & masukkan kode PIN untuk voting langsung.
         </p>
       </div>
