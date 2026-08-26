@@ -308,34 +308,34 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   key={evt.id}
                   onClick={() => setCurrentEventId(evt.id)}
-                  className="p-4 sm:p-5 hover:bg-[#FFF8F0] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3.5 cursor-pointer"
+                  className="p-4 sm:p-5 hover:bg-[#FFF8F0] transition-colors flex flex-col gap-3 cursor-pointer overflow-hidden"
                 >
                   {/* Event Details */}
-                  <div className="space-y-1 max-w-xl min-w-0">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="neo-badge bg-[#FFF8F0] text-[#1E1E1E] font-mono">
+                  <div className="space-y-1 min-w-0 w-full">
+                    <div className="flex items-start gap-x-2 gap-y-1 flex-wrap">
+                      <span className="neo-badge bg-[#FFF8F0] text-[#1E1E1E] font-mono shrink-0">
                         PIN: {evt.roomCode}
                       </span>
-                      <h3 className="text-base font-black text-[#1E1E1E] hover:text-[#4F46E5] transition-colors truncate font-display">
-                        {evt.title}
-                      </h3>
                       {isLive && (
-                        <span className="neo-badge bg-[#34D399] text-[#1E1E1E] animate-pulse">
+                        <span className="neo-badge bg-[#34D399] text-[#1E1E1E] animate-pulse shrink-0">
                           LIVE
                         </span>
                       )}
                       {isWaiting && (
-                        <span className="neo-badge bg-[#FACC15] text-[#1E1E1E]">
+                        <span className="neo-badge bg-[#FACC15] text-[#1E1E1E] shrink-0">
                           WAITING
                         </span>
                       )}
                     </div>
+                    <h3 className="text-base font-black text-[#1E1E1E] hover:text-[#4F46E5] transition-colors font-display break-words line-clamp-2">
+                      {evt.title}
+                    </h3>
 
                     <p className="text-xs text-gray-500 line-clamp-1 font-mono">
                       {evt.description || 'No description provided.'}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500 font-bold font-mono pt-0.5">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500 font-bold font-mono pt-0.5">
                       <span>{evt.category}</span>
                       <span>•</span>
                       <span>{evt.questions.length} questions</span>
@@ -347,7 +347,7 @@ export const AdminDashboard: React.FC = () => {
                   </div>
 
                   {/* Event Action Toolbar */}
-                  <div className="flex flex-wrap items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex flex-wrap items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     
                     {/* Launch Live Presenter */}
                     <button
