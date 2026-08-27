@@ -434,19 +434,6 @@ export const ProjectorDisplay: React.FC = () => {
                   <span className="text-[10px] font-black uppercase font-mono text-gray-500">Soal</span>
                 </div>
               </div>
-
-              {/* Attendees Roll */}
-              {currentEvent.participants.length > 0 && (
-                <div className="pt-3 border-t-2 border-[#000000]/10">
-                  <ParticipantCreditsRoll
-                    participants={currentEvent.participants}
-                    theme={theme}
-                    maxHeight="max-h-[140px]"
-                    isQuizMode={currentEvent.isQuizMode}
-                    title="All Attendees"
-                  />
-                </div>
-              )}
             </div>
 
             {/* RIGHT COLUMN: Question results — rich & prominent */}
@@ -696,15 +683,18 @@ export const ProjectorDisplay: React.FC = () => {
 
           </div>
 
-          {/* Celebration Footer Bar */}
-          <div className={`rounded-xl border-2 border-[#000000] p-3 text-center font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-2 ${
-            isDark ? 'bg-[#1a1a2e] text-gray-300' : 'bg-white text-gray-700'
-          }`} style={{ boxShadow: '3px 3px 0px #000000' }}>
-            <span>🎉</span>
-            <span>Terima kasih telah berpartisipasi dalam sesi live interaction ini!</span>
-            <span>•</span>
-            <span className="text-[#2F36C9] font-black uppercase">Piktera Live Polling</span>
-          </div>
+          {/* Full-width All Attendees Roll Bar across bottom */}
+          {currentEvent.participants.length > 0 && (
+            <div className="w-full pt-1">
+              <ParticipantCreditsRoll
+                participants={currentEvent.participants}
+                theme={theme}
+                maxHeight="max-h-[140px] sm:max-h-[170px]"
+                isQuizMode={currentEvent.isQuizMode}
+                title="All Attendees"
+              />
+            </div>
+          )}
 
         </main>
       ) : (
