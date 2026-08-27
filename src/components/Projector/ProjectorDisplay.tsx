@@ -192,9 +192,11 @@ export const ProjectorDisplay: React.FC = () => {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`w-full min-h-screen-dvh flex flex-col justify-between p-4 sm:p-6 lg:p-10 select-none relative overflow-hidden transition-colors ${
+    <div className={`w-full min-h-screen-dvh flex flex-col justify-between select-none relative overflow-hidden transition-colors ${
       isDark ? 'bg-dot-grid-dark text-white' : 'bg-dot-grid text-[#000000]'
     }`}>
+      {/* Inner content bounded at 1280px for readability on wide projectors */}
+      <div className="w-full max-w-screen-xl mx-auto flex flex-col justify-between min-h-screen-dvh p-4 sm:p-6 lg:p-10">
       
       {/* Top Projector Stage Bar */}
       <header className="flex items-center justify-between pb-4 sm:pb-6 border-b-2 border-[#000000] gap-3 relative z-10">
@@ -995,6 +997,7 @@ export const ProjectorDisplay: React.FC = () => {
           </div>
         </footer>
       )}
+      </div>
     </div>
   );
 };
