@@ -384,233 +384,156 @@ export const ProjectorDisplay: React.FC = () => {
           </div>
         </main>
       ) : currentEvent.status === 'ended' ? (
-        /* GRAND FINALE — 2-column landscape, fits projector in one screen */
-        <main className="flex-1 flex flex-col lg:flex-row gap-5 lg:gap-6 py-4 sm:py-6 w-full relative z-10 min-h-0 overflow-hidden">
+        /* GRAND FINALE — Balanced landscape, vertically centered & rich */
+        <main className="my-auto py-4 sm:py-6 w-full relative z-10 flex flex-col gap-6">
+          <div className="flex flex-col lg:flex-row gap-6 items-stretch">
 
-          {/* LEFT COLUMN: Fixed info panel */}
-          <div className="lg:w-[300px] xl:w-[340px] shrink-0 flex flex-col gap-4">
+            {/* LEFT COLUMN: Fixed summary stage */}
+            <div className={`lg:w-[320px] xl:w-[360px] shrink-0 rounded-2xl border-4 border-[#000000] p-6 flex flex-col justify-between gap-5 ${
+              isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+            }`} style={{ boxShadow: '6px 6px 0px #000000' }}>
 
-            {/* Mascot + badge */}
-            <div className="flex flex-col items-center gap-2">
-              <PikteraMascot size="sm" mood="celebrating" />
-              <span className="neo-badge bg-[#C1FF33] text-[#000000] text-xs font-black">
-                <Sparkles className="w-3 h-3" />
-                <span>Session Concluded</span>
-              </span>
+              {/* Mascot + badge + title */}
+              <div className="flex flex-col items-center text-center gap-3">
+                <PikteraMascot size="md" mood="celebrating" />
+                <span className="neo-badge bg-[#C1FF33] text-[#000000] text-xs font-black uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Session Concluded</span>
+                </span>
+                <h1 className={`text-2xl sm:text-3xl font-black tracking-tight font-heading uppercase leading-tight ${
+                  isDark ? 'text-white' : 'text-[#000000]'
+                }`}>
+                  {currentEvent.title}
+                </h1>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                  isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
+                }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                  <span className="block text-2xl sm:text-3xl font-black font-mono text-[#2F36C9]">
+                    {currentEvent.participants.length}
+                  </span>
+                  <span className="text-[10px] font-black uppercase font-mono text-gray-500">Peserta</span>
+                </div>
+                <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                  isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
+                }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                  <span className="block text-2xl sm:text-3xl font-black font-mono text-[#FF1784]">
+                    {currentEvent.responses.length}
+                  </span>
+                  <span className="text-[10px] font-black uppercase font-mono text-gray-500">Respon</span>
+                </div>
+                <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                  isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
+                }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                  <span className={`block text-2xl sm:text-3xl font-black font-mono ${isDark ? 'text-white' : 'text-[#000000]'}`}>
+                    {currentEvent.questions.length}
+                  </span>
+                  <span className="text-[10px] font-black uppercase font-mono text-gray-500">Soal</span>
+                </div>
+              </div>
+
+              {/* Attendees Roll */}
+              {currentEvent.participants.length > 0 && (
+                <div className="pt-3 border-t-2 border-[#000000]/10">
+                  <ParticipantCreditsRoll
+                    participants={currentEvent.participants}
+                    theme={theme}
+                    maxHeight="max-h-[140px]"
+                    isQuizMode={currentEvent.isQuizMode}
+                    title="All Attendees"
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Event title */}
-            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight font-heading uppercase text-center leading-tight ${
-              isDark ? 'text-white' : 'text-[#000000]'
-            }`}>
-              {currentEvent.title}
-            </h1>
+            {/* RIGHT COLUMN: Question results — rich & prominent */}
+            <div className="flex-1 overflow-y-auto space-y-4 max-h-[600px] pr-1"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#C1FF33 transparent' }}>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
-                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
-                <span className="block text-2xl sm:text-3xl font-black font-mono text-[#2F36C9]">
-                  {currentEvent.participants.length}
-                </span>
-                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Peserta</span>
-              </div>
-              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
-                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
-                <span className="block text-2xl sm:text-3xl font-black font-mono text-[#FF1784]">
-                  {currentEvent.responses.length}
-                </span>
-                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Respon</span>
-              </div>
-              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
-                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
-                <span className={`block text-2xl sm:text-3xl font-black font-mono ${isDark ? 'text-white' : 'text-[#000000]'}`}>
-                  {currentEvent.questions.length}/{currentEvent.questions.length}
-                </span>
-                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Selesai</span>
-              </div>
-            </div>
+              {currentEvent.questions.map((q, qIdx) => {
+                const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
+                const totalQResponses = qResponses.length;
 
-            {/* Credits Roll */}
-            {currentEvent.participants.length > 0 && (
-              <div className="flex-1 min-h-0">
-                <ParticipantCreditsRoll
-                  participants={currentEvent.participants}
-                  theme={theme}
-                  maxHeight="max-h-[180px] lg:max-h-full"
-                  isQuizMode={currentEvent.isQuizMode}
-                  title="All Attendees"
-                />
-              </div>
-            )}
-          </div>
+                return (
+                  <div key={q.id} className={`rounded-2xl border-4 border-[#000000] p-5 sm:p-7 space-y-4 ${
+                    isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+                  }`} style={{ boxShadow: '6px 6px 0px #000000' }}>
 
-          {/* RIGHT COLUMN: Question results — scrollable internally */}
-          <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: '#C1FF33 transparent' }}>
-
-            {currentEvent.questions.map((q, qIdx) => {
-              const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
-              const totalQResponses = qResponses.length;
-
-              return (
-                <div key={q.id} className={`rounded-2xl border-4 border-[#000000] p-4 sm:p-5 space-y-3 ${
-                  isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-                }`} style={{ boxShadow: '4px 4px 0px #000000' }}>
-
-                  {/* Question header */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="neo-badge bg-[#2F36C9] text-white text-xs font-mono shrink-0 px-2.5 py-1">
-                        {String(qIdx + 1).padStart(2, '0')}
-                      </span>
-                      <h3 className={`text-base sm:text-xl font-black tracking-tight leading-snug ${
-                        isDark ? 'text-white' : 'text-[#000000]'
-                      }`}>
-                        {q.title}
-                      </h3>
-                    </div>
-                    <span className={`shrink-0 text-xs font-black font-mono px-2.5 py-1 rounded-lg border-2 border-[#000000] ${
-                      isDark ? 'bg-[#252542] text-white' : 'bg-gray-50 text-[#000000]'
-                    }`}>
-                      {totalQResponses} suara
-                    </span>
-                  </div>
-
-                  {/* ── MULTIPLE CHOICE ── */}
-                  {q.type === 'multiple_choice' && (() => {
-                    const counts: Record<string, number> = {};
-                    qResponses.forEach(r => {
-                      (r.selectedOptionIds || []).forEach(optId => {
-                        counts[optId] = (counts[optId] || 0) + 1;
-                      });
-                    });
-                    const sorted = (q.options || [])
-                      .map(o => ({ ...o, count: counts[o.id] || 0 }))
-                      .sort((a, b) => b.count - a.count);
-                    const topCount = sorted[0]?.count || 0;
-
-                    if (totalQResponses === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
-
-                    const barColors = [
-                      'bg-[#C1FF33]', 'bg-[#2F36C9]', 'bg-[#FF1784]', 'bg-[#0D9488]', 'bg-[#D97706]', 'bg-[#7C3AED]'
-                    ];
-
-                    return (
-                      <div className="space-y-2">
-                        {sorted.map((opt, i) => {
-                          const pct = totalQResponses > 0 ? Math.round((opt.count / totalQResponses) * 100) : 0;
-                          const isWinner = opt.count === topCount && topCount > 0;
-                          return (
-                            <div key={opt.id} className={`relative overflow-hidden rounded-xl border-2 border-[#000000] ${
-                              isWinner
-                                ? (isDark ? 'bg-[#C1FF33]/10' : 'bg-[#C1FF33]/20')
-                                : (isDark ? 'bg-[#252542]' : 'bg-gray-50')
-                            }`} style={{ boxShadow: isWinner ? '3px 3px 0px #000' : 'none' }}>
-                              <div
-                                className={`absolute inset-y-0 left-0 ${barColors[i % barColors.length]} opacity-25 transition-all duration-1000`}
-                                style={{ width: `${pct}%` }}
-                              />
-                              <div className="relative z-10 flex items-center justify-between gap-3 px-3 py-2.5 sm:py-3">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  {isWinner && <span className="shrink-0">🏆</span>}
-                                  <span className={`font-black leading-tight ${
-                                    isWinner
-                                      ? 'text-base sm:text-lg text-[#000000]'
-                                      : `text-sm sm:text-base ${isDark ? 'text-white/80' : 'text-[#1E1E1E]/70'}`
-                                  }`}>
-                                    {opt.text}
-                                  </span>
-                                </div>
-                                <div className="flex items-baseline gap-1.5 shrink-0">
-                                  <span className={`font-black font-mono ${
-                                    isWinner ? 'text-2xl sm:text-3xl text-[#2F36C9]' : `text-lg sm:text-xl ${isDark ? 'text-white/60' : 'text-[#000000]/50'}`
-                                  }`}>
-                                    {pct}%
-                                  </span>
-                                  <span className={`text-xs font-mono font-bold ${isDark ? 'text-white/40' : 'text-gray-400'}`}>
-                                    ({opt.count})
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                    {/* Question header */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="neo-badge bg-[#2F36C9] text-white text-sm font-mono shrink-0 px-3 py-1">
+                          {String(qIdx + 1).padStart(2, '0')}
+                        </span>
+                        <h3 className={`text-lg sm:text-2xl font-black tracking-tight leading-snug ${
+                          isDark ? 'text-white' : 'text-[#000000]'
+                        }`}>
+                          {q.title}
+                        </h3>
                       </div>
-                    );
-                  })()}
+                      <span className={`shrink-0 text-sm font-black font-mono px-3 py-1.5 rounded-xl border-2 border-[#000000] ${
+                        isDark ? 'bg-[#252542] text-white' : 'bg-gray-50 text-[#000000]'
+                      }`}>
+                        {totalQResponses} suara
+                      </span>
+                    </div>
 
-                  {/* ── TRUE/FALSE ── */}
-                  {q.type === 'true_false' && (() => {
-                    const opts = q.options || [{ id: 'tf-1', text: 'True' }, { id: 'tf-2', text: 'False' }];
-                    const opt0 = opts[0];
-                    const opt1 = opts[1];
-                    const counts: Record<string, number> = {};
-                    qResponses.forEach(r => {
-                      (r.selectedOptionIds || []).forEach(id => {
-                        counts[id] = (counts[id] || 0) + 1;
+                    {/* ── MULTIPLE CHOICE ── */}
+                    {q.type === 'multiple_choice' && (() => {
+                      const counts: Record<string, number> = {};
+                      qResponses.forEach(r => {
+                        (r.selectedOptionIds || []).forEach(optId => {
+                          counts[optId] = (counts[optId] || 0) + 1;
+                        });
                       });
-                    });
-                    const c0 = counts[opt0?.id] || 0;
-                    const c1 = counts[opt1?.id] || 0;
-                    const total = c0 + c1;
-                    const p0 = total > 0 ? Math.round((c0 / total) * 100) : 0;
-                    const p1 = total > 0 ? 100 - p0 : 0;
-                    const leader = total === 0 ? -1 : c0 > c1 ? 0 : c1 > c0 ? 1 : -1;
+                      const sorted = (q.options || [])
+                        .map(o => ({ ...o, count: counts[o.id] || 0 }))
+                        .sort((a, b) => b.count - a.count);
+                      const topCount = sorted[0]?.count || 0;
 
-                    if (total === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
+                      if (totalQResponses === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
 
-                    return (
-                      <div className="space-y-2.5">
-                        <div className="flex h-5 rounded-xl border-2 border-[#000000] overflow-hidden">
-                          <div className="h-full bg-emerald-400 transition-all duration-1000" style={{ width: `${p0}%` }} />
-                          <div className="h-full bg-rose-400 flex-1 transition-all duration-1000" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          {[opt0, opt1].map((opt, idx) => {
-                            const count = idx === 0 ? c0 : c1;
-                            const pct = idx === 0 ? p0 : p1;
-                            const isLeader = leader === idx;
-                            const isLoser = leader !== -1 && !isLeader;
+                      const barColors = [
+                        'bg-[#C1FF33]', 'bg-[#2F36C9]', 'bg-[#FF1784]', 'bg-[#0D9488]', 'bg-[#D97706]', 'bg-[#7C3AED]'
+                      ];
+
+                      return (
+                        <div className="space-y-3">
+                          {sorted.map((opt, i) => {
+                            const pct = totalQResponses > 0 ? Math.round((opt.count / totalQResponses) * 100) : 0;
+                            const isWinner = opt.count === topCount && topCount > 0;
                             return (
-                              <div
-                                key={opt?.id || idx}
-                                className={`relative overflow-hidden rounded-2xl border-4 p-4 sm:p-5 text-center transition-all duration-500 ${
-                                  idx === 0
-                                    ? (isDark ? 'bg-emerald-900/40 border-emerald-500' : 'bg-emerald-50 border-emerald-400')
-                                    : (isDark ? 'bg-rose-900/40 border-rose-500' : 'bg-rose-50 border-rose-400')
-                                } ${isLoser ? 'opacity-55' : ''}`}
-                                style={{ boxShadow: isLeader ? '4px 4px 0px #000' : '2px 2px 0px #000' }}
-                              >
+                              <div key={opt.id} className={`relative overflow-hidden rounded-xl border-2 border-[#000000] transition-all ${
+                                isWinner
+                                  ? (isDark ? 'bg-[#C1FF33]/10' : 'bg-[#C1FF33]/20')
+                                  : (isDark ? 'bg-[#252542]' : 'bg-gray-50')
+                              }`} style={{ boxShadow: isWinner ? '4px 4px 0px #000' : 'none' }}>
                                 <div
-                                  className={`absolute inset-y-0 left-0 transition-all duration-1000 ${idx === 0 ? 'bg-emerald-400/20' : 'bg-rose-400/20'}`}
+                                  className={`absolute inset-y-0 left-0 ${barColors[i % barColors.length]} opacity-25 transition-all duration-1000`}
                                   style={{ width: `${pct}%` }}
                                 />
-                                <div className="relative z-10 flex flex-col items-center gap-1.5">
-                                  <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black ${
-                                    idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]'
-                                  } ${isLeader ? 'w-12 h-12 text-2xl' : 'w-8 h-8 text-lg'}`}>
-                                    {idx === 0 ? '✓' : '✕'}
+                                <div className="relative z-10 flex items-center justify-between gap-4 px-4 py-3 sm:py-4">
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    {isWinner && <span className="text-xl shrink-0">🏆</span>}
+                                    <span className={`font-black leading-tight ${
+                                      isWinner
+                                        ? 'text-lg sm:text-xl text-[#000000]'
+                                        : `text-base sm:text-lg ${isDark ? 'text-white/80' : 'text-[#1E1E1E]/70'}`
+                                    }`}>
+                                      {opt.text}
+                                    </span>
                                   </div>
-                                  <span className={`font-black leading-tight ${
-                                    isLeader
-                                      ? (isDark ? 'text-white text-xl sm:text-2xl' : 'text-[#000000] text-xl sm:text-2xl')
-                                      : (isDark ? 'text-white/70 text-base sm:text-lg' : 'text-[#1E1E1E]/70 text-base sm:text-lg')
-                                  }`}>
-                                    {opt?.text || (idx === 0 ? 'True' : 'False')}
-                                  </span>
-                                  {isLeader && <span className="text-base">🏆</span>}
-                                  <div className="flex items-baseline gap-1">
+                                  <div className="flex items-baseline gap-2 shrink-0">
                                     <span className={`font-black font-mono ${
-                                      isLeader ? 'text-3xl sm:text-4xl text-[#2F36C9]' : `text-xl sm:text-2xl ${isDark ? 'text-white/40' : 'text-[#000000]/35'}`
+                                      isWinner ? 'text-3xl sm:text-4xl text-[#2F36C9]' : `text-xl sm:text-2xl ${isDark ? 'text-white/60' : 'text-[#000000]/50'}`
                                     }`}>
                                       {pct}%
                                     </span>
-                                    <span className={`font-mono font-bold text-xs ${isLeader ? 'text-[#000000]' : 'text-gray-400'}`}>
-                                      {count} suara
+                                    <span className={`text-sm font-mono font-bold ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
+                                      ({opt.count})
                                     </span>
                                   </div>
                                 </div>
@@ -618,79 +541,169 @@ export const ProjectorDisplay: React.FC = () => {
                             );
                           })}
                         </div>
-                      </div>
-                    );
-                  })()}
+                      );
+                    })()}
 
-                  {/* ── RATING ── */}
-                  {q.type === 'rating' && (() => {
-                    const avg = totalQResponses > 0
-                      ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalQResponses).toFixed(1)
-                      : '0.0';
-                    const pct = Math.min(100, Math.round((parseFloat(avg) / (q.ratingMax || 5)) * 100));
-                    return (
-                      <div className="flex items-center gap-4">
-                        <div className={`rounded-2xl border-4 border-[#000000] px-5 py-3 text-center shrink-0 ${
-                          isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
-                        }`} style={{ boxShadow: '3px 3px 0px #000' }}>
-                          <span className="block text-4xl sm:text-5xl font-black font-mono text-[#2F36C9]">{avg}</span>
-                          <span className="text-xs font-black font-mono text-gray-500">/ {q.ratingMax || 5}.0</span>
-                        </div>
-                        <div className="flex-1">
+                    {/* ── TRUE/FALSE ── */}
+                    {q.type === 'true_false' && (() => {
+                      const opts = q.options || [{ id: 'tf-1', text: 'True' }, { id: 'tf-2', text: 'False' }];
+                      const opt0 = opts[0];
+                      const opt1 = opts[1];
+                      const counts: Record<string, number> = {};
+                      qResponses.forEach(r => {
+                        (r.selectedOptionIds || []).forEach(id => {
+                          counts[id] = (counts[id] || 0) + 1;
+                        });
+                      });
+                      const c0 = counts[opt0?.id] || 0;
+                      const c1 = counts[opt1?.id] || 0;
+                      const total = c0 + c1;
+                      const p0 = total > 0 ? Math.round((c0 / total) * 100) : 0;
+                      const p1 = total > 0 ? 100 - p0 : 0;
+                      const leader = total === 0 ? -1 : c0 > c1 ? 0 : c1 > c0 ? 1 : -1;
+
+                      if (total === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
+
+                      return (
+                        <div className="space-y-4">
                           <div className="flex h-6 rounded-xl border-2 border-[#000000] overflow-hidden">
-                            <div className="h-full bg-[#C1FF33] transition-all duration-1000" style={{ width: `${pct}%` }} />
-                            <div className="h-full flex-1 bg-gray-100" />
+                            <div className="h-full bg-emerald-400 transition-all duration-1000" style={{ width: `${p0}%` }} />
+                            <div className="h-full bg-rose-400 flex-1 transition-all duration-1000" />
                           </div>
-                          <p className={`mt-1.5 text-xs font-bold font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                            Rata-rata dari {totalQResponses} responden
-                          </p>
+                          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                            {[opt0, opt1].map((opt, idx) => {
+                              const count = idx === 0 ? c0 : c1;
+                              const pct = idx === 0 ? p0 : p1;
+                              const isLeader = leader === idx;
+                              const isLoser = leader !== -1 && !isLeader;
+                              return (
+                                <div
+                                  key={opt?.id || idx}
+                                  className={`relative overflow-hidden rounded-2xl border-4 p-6 sm:p-8 text-center transition-all duration-500 flex flex-col items-center justify-center ${
+                                    idx === 0
+                                      ? (isDark ? 'bg-emerald-900/40 border-emerald-500' : 'bg-emerald-50 border-emerald-400')
+                                      : (isDark ? 'bg-rose-900/40 border-rose-500' : 'bg-rose-50 border-rose-400')
+                                  } ${isLoser ? 'opacity-55' : 'opacity-100'}`}
+                                  style={{ boxShadow: isLeader ? '6px 6px 0px #000' : '3px 3px 0px #000' }}
+                                >
+                                  <div
+                                    className={`absolute inset-y-0 left-0 transition-all duration-1000 ${idx === 0 ? 'bg-emerald-400/20' : 'bg-rose-400/20'}`}
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                  <div className="relative z-10 flex flex-col items-center gap-2">
+                                    <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black ${
+                                      idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]'
+                                    } ${isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl'}`}>
+                                      {idx === 0 ? '✓' : '✕'}
+                                    </div>
+                                    <span className={`font-black leading-tight ${
+                                      isLeader
+                                        ? (isDark ? 'text-white text-2xl sm:text-3xl' : 'text-[#000000] text-2xl sm:text-3xl')
+                                        : (isDark ? 'text-white/70 text-lg sm:text-xl' : 'text-[#1E1E1E]/70 text-lg sm:text-xl')
+                                    }`}>
+                                      {opt?.text || (idx === 0 ? 'True' : 'False')}
+                                    </span>
+                                    {isLeader && <span className="text-xl">🏆</span>}
+                                    <div className="flex items-baseline gap-2 mt-2">
+                                      <span className={`font-black font-mono ${
+                                        isLeader ? 'text-4xl sm:text-5xl text-[#2F36C9]' : `text-2xl sm:text-3xl ${isDark ? 'text-white/50' : 'text-[#000000]/40'}`
+                                      }`}>
+                                        {pct}%
+                                      </span>
+                                      <span className={`font-mono font-bold text-sm ${isLeader ? 'text-[#000000]' : 'text-gray-500'}`}>
+                                        {count} suara
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
+                      );
+                    })()}
+
+                    {/* ── RATING ── */}
+                    {q.type === 'rating' && (() => {
+                      const avg = totalQResponses > 0
+                        ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalQResponses).toFixed(1)
+                        : '0.0';
+                      const pct = Math.min(100, Math.round((parseFloat(avg) / (q.ratingMax || 5)) * 100));
+                      return (
+                        <div className="flex items-center gap-5">
+                          <div className={`rounded-2xl border-4 border-[#000000] px-6 py-4 text-center shrink-0 ${
+                            isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
+                          }`} style={{ boxShadow: '4px 4px 0px #000' }}>
+                            <span className="block text-5xl sm:text-6xl font-black font-mono text-[#2F36C9]">{avg}</span>
+                            <span className="text-xs font-black font-mono text-gray-500">/ {q.ratingMax || 5}.0</span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex h-8 rounded-xl border-2 border-[#000000] overflow-hidden">
+                              <div className="h-full bg-[#C1FF33] transition-all duration-1000" style={{ width: `${pct}%` }} />
+                              <div className="h-full flex-1 bg-gray-100" />
+                            </div>
+                            <p className={`mt-2 text-sm font-bold font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                              Rata-rata dari {totalQResponses} responden
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* ── WORD CLOUD ── */}
+                    {q.type === 'word_cloud' && (() => {
+                      const wordMap: Record<string, number> = {};
+                      qResponses.forEach(r => {
+                        const w = (r.textResponse || '').trim().toLowerCase();
+                        if (w) wordMap[w] = (wordMap[w] || 0) + 1;
+                      });
+                      const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 6);
+                      const maxW = Math.max(...topWords.map(w => wordMap[w]), 1);
+                      const bgPalette = ['bg-[#C1FF33] text-[#000000]', 'bg-[#2F36C9] text-white', 'bg-[#FF1784] text-white', 'bg-[#0D9488] text-white'];
+                      return (
+                        <div className="flex flex-wrap items-center gap-3">
+                          {topWords.length > 0 ? topWords.map((word, i) => (
+                            <span
+                              key={word}
+                              className={`inline-flex items-center gap-1.5 font-black rounded-xl border-2 border-[#000000] px-4 py-2 ${bgPalette[i % bgPalette.length]}`}
+                              style={{ fontSize: `${0.85 + (wordMap[word] / maxW) * 0.75}rem`, boxShadow: '3px 3px 0px #000' }}
+                            >
+                              {word} <span className="text-xs opacity-70 font-mono">({wordMap[word]})</span>
+                            </span>
+                          )) : <div className="text-sm text-gray-400 italic font-mono">Belum ada kata.</div>}
+                        </div>
+                      );
+                    })()}
+
+                    {/* ── OPEN TEXT ── */}
+                    {q.type === 'open_text' && (
+                      <div className={`rounded-xl border-2 border-[#000000] p-4 ${isDark ? 'bg-[#252542]' : 'bg-gray-50'}`}>
+                        <p className={`text-base sm:text-lg italic font-mono ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                          {totalQResponses > 0
+                            ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
+                            : 'Belum ada tanggapan.'}
+                        </p>
+                        {totalQResponses > 1 && (
+                          <p className="text-xs text-gray-400 font-mono mt-2">+{totalQResponses - 1} respons lainnya</p>
+                        )}
                       </div>
-                    );
-                  })()}
+                    )}
 
-                  {/* ── WORD CLOUD ── */}
-                  {q.type === 'word_cloud' && (() => {
-                    const wordMap: Record<string, number> = {};
-                    qResponses.forEach(r => {
-                      const w = (r.textResponse || '').trim().toLowerCase();
-                      if (w) wordMap[w] = (wordMap[w] || 0) + 1;
-                    });
-                    const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 6);
-                    const maxW = Math.max(...topWords.map(w => wordMap[w]), 1);
-                    const bgPalette = ['bg-[#C1FF33] text-[#000000]', 'bg-[#2F36C9] text-white', 'bg-[#FF1784] text-white', 'bg-[#0D9488] text-white'];
-                    return (
-                      <div className="flex flex-wrap items-center gap-2">
-                        {topWords.length > 0 ? topWords.map((word, i) => (
-                          <span
-                            key={word}
-                            className={`inline-flex items-center gap-1 font-black rounded-xl border-2 border-[#000000] px-3 py-1.5 ${bgPalette[i % bgPalette.length]}`}
-                            style={{ fontSize: `${0.8 + (wordMap[word] / maxW) * 0.7}rem`, boxShadow: '2px 2px 0px #000' }}
-                          >
-                            {word} <span className="text-xs opacity-70 font-mono">({wordMap[word]})</span>
-                          </span>
-                        )) : <div className="text-sm text-gray-400 italic font-mono">Belum ada kata.</div>}
-                      </div>
-                    );
-                  })()}
+                  </div>
+                );
+              })}
+            </div>
 
-                  {/* ── OPEN TEXT ── */}
-                  {q.type === 'open_text' && (
-                    <div className={`rounded-xl border-2 border-[#000000] p-3.5 ${isDark ? 'bg-[#252542]' : 'bg-gray-50'}`}>
-                      <p className={`text-sm sm:text-base italic font-mono ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                        {totalQResponses > 0
-                          ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
-                          : 'Belum ada tanggapan.'}
-                      </p>
-                      {totalQResponses > 1 && (
-                        <p className="text-xs text-gray-400 font-mono mt-1.5">+{totalQResponses - 1} respons lainnya</p>
-                      )}
-                    </div>
-                  )}
+          </div>
 
-                </div>
-              );
-            })}
+          {/* Celebration Footer Bar */}
+          <div className={`rounded-xl border-2 border-[#000000] p-3 text-center font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-2 ${
+            isDark ? 'bg-[#1a1a2e] text-gray-300' : 'bg-white text-gray-700'
+          }`} style={{ boxShadow: '3px 3px 0px #000000' }}>
+            <span>🎉</span>
+            <span>Terima kasih telah berpartisipasi dalam sesi live interaction ini!</span>
+            <span>•</span>
+            <span className="text-[#2F36C9] font-black uppercase">Piktera Live Polling</span>
           </div>
 
         </main>
