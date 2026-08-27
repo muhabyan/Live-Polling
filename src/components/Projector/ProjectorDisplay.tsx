@@ -447,8 +447,8 @@ export const ProjectorDisplay: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Multiple Choice & True/False */}
-                  {(q.type === 'multiple_choice' || q.type === 'true_false') && (() => {
+                  {/* Multiple Choice — single bar winner */}
+                  {q.type === 'multiple_choice' && (() => {
                     const counts: Record<string, number> = {};
                     qResponses.forEach(r => {
                       (r.selectedOptionIds || []).forEach(optId => {
@@ -471,11 +471,64 @@ export const ProjectorDisplay: React.FC = () => {
                         <div className="text-sm font-black shrink-0 flex items-center space-x-2 font-mono">
                           <span>{topOpt.text}</span>
                           <span className="text-[#2F36C9]">{topPct}%</span>
-                          <span className="text-xs text-gray-400">({topCount} suara)</span>
+                          <span className="text-xs text-gray-500">({topCount} suara)</span>
                         </div>
                       </div>
                     ) : (
                       <div className="text-xs text-gray-400 italic font-mono">Belum ada jawaban.</div>
+                    );
+                  })()}
+
+                  {/* True/False — dual split bar + leader highlight */}
+                  {q.type === 'true_false' && (() => {
+                    const opts = q.options || [{ id: 'tf-1', text: 'True' }, { id: 'tf-2', text: 'False' }];
+                    const opt0 = opts[0];
+                    const opt1 = opts[1];
+                    const counts: Record<string, number> = {};
+                    qResponses.forEach(r => {
+                      (r.selectedOptionIds || []).forEach(id => {
+                        counts[id] = (counts[id] || 0) + 1;
+                      });
+                    });
+                    const c0 = counts[opt0?.id] || 0;
+                    const c1 = counts[opt1?.id] || 0;
+                    const total = c0 + c1;
+                    const p0 = total > 0 ? Math.round((c0 / total) * 100) : 0;
+                    const p1 = total > 0 ? 100 - p0 : 0;
+                    const leader = c0 >= c1 ? 0 : 1;
+
+                    if (total === 0) return <div className="text-xs text-gray-400 italic font-mono">Belum ada jawaban.</div>;
+
+                    return (
+                      <div className="space-y-1.5">
+                        {/* Dual split bar */}
+                        <div className="flex h-4 rounded-md border-2 border-[#000000] overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-400 transition-all duration-1000"
+                            style={{ width: `${p0}%` }}
+                          />
+                          <div
+                            className="h-full bg-rose-400 transition-all duration-1000 flex-1"
+                          />
+                        </div>
+                        {/* Labels */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className={`flex items-center gap-1 ${leader === 0 ? 'font-black text-sm text-[#000000]' : 'font-bold text-xs text-gray-500'}`}>
+                            {leader === 0 && <span>🏆</span>}
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"/>
+                            <span>{opt0?.text}</span>
+                            <span className="text-[#2F36C9] font-mono">{p0}%</span>
+                            <span className="text-gray-500 font-mono">({c0})</span>
+                          </div>
+                          <div className={`flex items-center gap-1 ${leader === 1 ? 'font-black text-sm text-[#000000]' : 'font-bold text-xs text-gray-500'}`}>
+                            {leader === 1 && <span>🏆</span>}
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"/>
+                            <span>{opt1?.text}</span>
+                            <span className="text-[#2F36C9] font-mono">{p1}%</span>
+                            <span className="text-gray-500 font-mono">({c1})</span>
+                          </div>
+                        </div>
+                      </div>
                     );
                   })()}
 
@@ -573,8 +626,8 @@ export const ProjectorDisplay: React.FC = () => {
             )}
           </div>
 
-          {/* 1. MULTIPLE CHOICE & TRUE/FALSE VISUALIZER */}
-          {currentQ && (currentQ.type === 'multiple_choice' || currentQ.type === 'true_false') && (
+          {/* 1a. MULTIPLE CHOICE VISUALIZER */}
+          {currentQ && currentQ.type === 'multiple_choice' && (
             <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
               {(currentQ.options || []).map((opt, idx) => {
                 const count = optionStats[opt.id] || 0;
@@ -598,7 +651,6 @@ export const ProjectorDisplay: React.FC = () => {
                     }`}
                     style={{ boxShadow: '4px 4px 0px #000000' }}
                   >
-                    {/* Percentage Bar Fill */}
                     <div
                       className={`absolute inset-y-0 left-0 transition-all duration-700 ease-out ${
                         isRevealed && isCorrect
@@ -607,8 +659,6 @@ export const ProjectorDisplay: React.FC = () => {
                       }`}
                       style={{ width: showResults ? `${pct}%` : '0%' }}
                     />
-
-                    {/* Option Content */}
                     <div className="relative z-10 flex items-center justify-between gap-3">
                       <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 pr-2">
                         <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg border-2 border-[#000000] flex items-center justify-center font-black text-sm sm:text-base shrink-0 ${
@@ -622,24 +672,16 @@ export const ProjectorDisplay: React.FC = () => {
                           {opt.text}
                         </span>
                       </div>
-
-                      {/* Vote Count & Percent */}
                       <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
                         {showResults ? (
                           <>
                             <span className={`text-xl sm:text-3xl font-black font-mono tracking-tight ${
                               isDark ? 'text-white' : 'text-[#000000]'
-                            }`}>
-                              {pct}%
-                            </span>
-                            <span className="text-xs sm:text-sm text-gray-400 font-mono">
-                              ({count})
-                            </span>
+                            }`}>{pct}%</span>
+                            <span className="text-xs sm:text-sm text-gray-500 font-mono">({count})</span>
                           </>
                         ) : (
-                          <span className="neo-badge bg-white text-[#000000] text-xs font-mono">
-                            ●●●
-                          </span>
+                          <span className="neo-badge bg-white text-[#000000] text-xs font-mono">●●●</span>
                         )}
                       </div>
                     </div>
@@ -648,6 +690,110 @@ export const ProjectorDisplay: React.FC = () => {
               })}
             </div>
           )}
+
+          {/* 1b. TRUE/FALSE — DYNAMIC DUAL CARD (winner grows bigger) */}
+          {currentQ && currentQ.type === 'true_false' && (() => {
+            const opts = currentQ.options || [{ id: 'tf-1', text: 'True', isCorrect: true }, { id: 'tf-2', text: 'False', isCorrect: false }];
+            const opt0 = opts[0];
+            const opt1 = opts[1];
+            const c0 = optionStats[opt0?.id] || 0;
+            const c1 = optionStats[opt1?.id] || 0;
+            const total = c0 + c1;
+            const p0 = total > 0 ? Math.round((c0 / total) * 100) : 50;
+            const p1 = total > 0 ? 100 - p0 : 50;
+            const showResults = currentEvent.showResultsOnProjector;
+            const isRevealed = currentEvent.revealAnswer;
+
+            // Leader: 0 = opt0 wins, 1 = opt1 wins, -1 = tie
+            const leader = total === 0 ? -1 : c0 > c1 ? 0 : c1 > c0 ? 1 : -1;
+
+            const cardClass = (idx: number) => {
+              const isLeader = leader === idx;
+              const isLoser = leader !== -1 && leader !== idx;
+              const bgColor = idx === 0 ? (isRevealed ? 'bg-emerald-100 border-emerald-500' : isDark ? 'bg-emerald-900/40' : 'bg-emerald-50') : (isRevealed ? 'bg-rose-100 border-rose-400' : isDark ? 'bg-rose-900/40' : 'bg-rose-50');
+              return [
+                'relative overflow-hidden rounded-2xl border-4 transition-all duration-700 flex flex-col items-center justify-center text-center p-5 sm:p-8',
+                bgColor,
+                isLeader ? 'shadow-[6px_6px_0px_#000]' : 'shadow-[3px_3px_0px_#000]',
+                isLoser ? 'opacity-60' : 'opacity-100',
+              ].join(' ');
+            };
+
+            const iconClass = (idx: number) => {
+              const isLeader = leader === idx;
+              return [
+                'rounded-xl border-2 border-[#000000] flex items-center justify-center font-black mb-3 transition-all duration-700',
+                idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]',
+                isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl',
+              ].join(' ');
+            };
+
+            return (
+              <div className="max-w-4xl mx-auto w-full space-y-4">
+                {/* Dual split bar */}
+                <div className="flex h-5 rounded-xl border-2 border-[#000000] overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-400 transition-all duration-1000"
+                    style={{ width: showResults ? `${p0}%` : '50%' }}
+                  />
+                  <div className="h-full bg-rose-400 flex-1 transition-all duration-1000" />
+                </div>
+
+                {/* Dual cards */}
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                  {[opt0, opt1].map((opt, idx) => {
+                    const count = idx === 0 ? c0 : c1;
+                    const pct = idx === 0 ? p0 : p1;
+                    const isLeader = leader === idx;
+
+                    return (
+                      <div key={opt?.id || idx} className={cardClass(idx)}>
+                        {/* Fill bar */}
+                        {showResults && (
+                          <div
+                            className={`absolute inset-y-0 left-0 transition-all duration-1000 ${
+                              idx === 0 ? 'bg-emerald-400/25' : 'bg-rose-400/25'
+                            }`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        )}
+                        <div className="relative z-10 flex flex-col items-center">
+                          <div className={iconClass(idx)}>
+                            {idx === 0 ? '✓' : '✕'}
+                          </div>
+                          <span className={`font-black leading-tight transition-all duration-700 ${
+                            isLeader
+                              ? (isDark ? 'text-white text-3xl sm:text-4xl' : 'text-[#000000] text-3xl sm:text-4xl')
+                              : (isDark ? 'text-white/80 text-xl sm:text-2xl' : 'text-[#1E1E1E]/80 text-xl sm:text-2xl')
+                          }`}>
+                            {opt?.text || (idx === 0 ? 'True' : 'False')}
+                          </span>
+                          {isLeader && total > 0 && <span className="mt-1 text-xl">🏆</span>}
+                          {showResults && total > 0 && (
+                            <div className="mt-3 flex items-baseline gap-2">
+                              <span className={`font-black font-mono transition-all duration-700 ${
+                                isLeader ? 'text-3xl sm:text-5xl text-[#2F36C9]' : 'text-xl sm:text-2xl text-[#2F36C9]/70'
+                              }`}>
+                                {pct}%
+                              </span>
+                              <span className={`font-mono font-bold ${
+                                isLeader ? 'text-sm text-[#000000]' : 'text-xs text-gray-500'
+                              }`}>
+                                {count} suara
+                              </span>
+                            </div>
+                          )}
+                          {!showResults && (
+                            <span className="mt-3 neo-badge bg-white text-[#000000] text-sm font-mono">●●●</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 2. WORD CLOUD VISUALIZER */}
           {currentQ && currentQ.type === 'word_cloud' && (
