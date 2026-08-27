@@ -241,7 +241,7 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
               const isSelected = selectedOptionIds.includes(opt.id);
               const isFirst = optIdx === 0;
               const badgeColor = isFirst ? '#34D399' : '#FB7185';
-              const badgeIcon = isFirst ? '✓' : '✕';
+              const badgeIcon = isFirst ? 'A' : 'B';
 
               return (
                 <button

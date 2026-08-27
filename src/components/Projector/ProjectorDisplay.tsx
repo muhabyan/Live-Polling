@@ -560,17 +560,12 @@ export const ProjectorDisplay: React.FC = () => {
                                     style={{ width: `${pct}%` }}
                                   />
                                   <div className="relative z-10 flex flex-col items-center gap-2">
-                                    <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black ${
-                                      idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]'
-                                    } ${isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl'}`}>
-                                      {idx === 0 ? '✓' : '✕'}
-                                    </div>
                                     <span className={`font-black leading-tight ${
                                       isLeader
                                         ? (isDark ? 'text-white text-2xl sm:text-3xl' : 'text-[#000000] text-2xl sm:text-3xl')
                                         : (isDark ? 'text-white/70 text-lg sm:text-xl' : 'text-[#1E1E1E]/70 text-lg sm:text-xl')
                                     }`}>
-                                      {opt?.text || (idx === 0 ? 'True' : 'False')}
+                                      {opt?.text || (idx === 0 ? 'Option A' : 'Option B')}
                                     </span>
                                     {isLeader && <span className="text-xl">🏆</span>}
                                     <div className="flex items-baseline gap-2 mt-2">
@@ -783,19 +778,10 @@ export const ProjectorDisplay: React.FC = () => {
               const isLoser = leader !== -1 && leader !== idx;
               const bgColor = idx === 0 ? (isRevealed ? 'bg-emerald-100 border-emerald-500' : isDark ? 'bg-emerald-900/40' : 'bg-emerald-50') : (isRevealed ? 'bg-rose-100 border-rose-400' : isDark ? 'bg-rose-900/40' : 'bg-rose-50');
               return [
-                'relative overflow-hidden rounded-2xl border-4 transition-all duration-700 flex flex-col items-center justify-center text-center p-5 sm:p-8',
+                'relative overflow-hidden rounded-2xl border-4 transition-all duration-700 flex flex-col items-center justify-center text-center p-6 sm:p-10',
                 bgColor,
                 isLeader ? 'shadow-[6px_6px_0px_#000]' : 'shadow-[3px_3px_0px_#000]',
                 isLoser ? 'opacity-60' : 'opacity-100',
-              ].join(' ');
-            };
-
-            const iconClass = (idx: number) => {
-              const isLeader = leader === idx;
-              return [
-                'rounded-xl border-2 border-[#000000] flex items-center justify-center font-black mb-3 transition-all duration-700',
-                idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]',
-                isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl',
               ].join(' ');
             };
 
@@ -829,26 +815,23 @@ export const ProjectorDisplay: React.FC = () => {
                           />
                         )}
                         <div className="relative z-10 flex flex-col items-center">
-                          <div className={iconClass(idx)}>
-                            {idx === 0 ? '✓' : '✕'}
-                          </div>
                           <span className={`font-black leading-tight transition-all duration-700 ${
                             isLeader
-                              ? (isDark ? 'text-white text-3xl sm:text-4xl' : 'text-[#000000] text-3xl sm:text-4xl')
-                              : (isDark ? 'text-white/80 text-xl sm:text-2xl' : 'text-[#1E1E1E]/80 text-xl sm:text-2xl')
+                              ? (isDark ? 'text-white text-3xl sm:text-5xl' : 'text-[#000000] text-3xl sm:text-5xl')
+                              : (isDark ? 'text-white/80 text-2xl sm:text-3xl' : 'text-[#1E1E1E]/80 text-2xl sm:text-3xl')
                           }`}>
-                            {opt?.text || (idx === 0 ? 'True' : 'False')}
+                            {opt?.text || (idx === 0 ? 'Option A' : 'Option B')}
                           </span>
-                          {isLeader && total > 0 && <span className="mt-1 text-xl">🏆</span>}
+                          {isLeader && total > 0 && <span className="mt-2 text-2xl">🏆</span>}
                           {showResults && total > 0 && (
-                            <div className="mt-3 flex items-baseline gap-2">
+                            <div className="mt-4 flex items-baseline gap-2">
                               <span className={`font-black font-mono transition-all duration-700 ${
-                                isLeader ? 'text-3xl sm:text-5xl text-[#2F36C9]' : 'text-xl sm:text-2xl text-[#2F36C9]/70'
+                                isLeader ? 'text-4xl sm:text-6xl text-[#2F36C9]' : 'text-2xl sm:text-3xl text-[#2F36C9]/70'
                               }`}>
                                 {pct}%
                               </span>
                               <span className={`font-mono font-bold ${
-                                isLeader ? 'text-sm text-[#000000]' : 'text-xs text-gray-500'
+                                isLeader ? 'text-base text-[#000000]' : 'text-xs text-gray-500'
                               }`}>
                                 {count} suara
                               </span>
