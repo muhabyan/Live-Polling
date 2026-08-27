@@ -384,71 +384,96 @@ export const ProjectorDisplay: React.FC = () => {
           </div>
         </main>
       ) : currentEvent.status === 'ended' ? (
-        /* GRAND FINALE */
-        <main className="my-auto py-6 sm:py-10 max-w-5xl mx-auto w-full relative z-10">
-          
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center justify-center mb-3">
-              <PikteraMascot size="lg" mood="celebrating" />
-              <span className="neo-badge bg-[#C1FF33] text-[#000000] mt-4 text-xs font-black">
+        /* GRAND FINALE — 2-column landscape, fits projector in one screen */
+        <main className="flex-1 flex flex-col lg:flex-row gap-5 lg:gap-6 py-4 sm:py-6 w-full relative z-10 min-h-0 overflow-hidden">
+
+          {/* LEFT COLUMN: Fixed info panel */}
+          <div className="lg:w-[300px] xl:w-[340px] shrink-0 flex flex-col gap-4">
+
+            {/* Mascot + badge */}
+            <div className="flex flex-col items-center gap-2">
+              <PikteraMascot size="sm" mood="celebrating" />
+              <span className="neo-badge bg-[#C1FF33] text-[#000000] text-xs font-black">
                 <Sparkles className="w-3 h-3" />
                 <span>Session Concluded</span>
               </span>
             </div>
 
-            <h1 className={`text-4xl sm:text-6xl font-black tracking-tight font-heading uppercase ${
+            {/* Event title */}
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight font-heading uppercase text-center leading-tight ${
               isDark ? 'text-white' : 'text-[#000000]'
             }`}>
               {currentEvent.title}
             </h1>
 
-            {/* Stats Line */}
-            <div className="flex items-center justify-center space-x-6 sm:space-x-12 my-8">
-              <div className="neo-card p-4 text-center">
-                <span className="block text-3xl sm:text-5xl font-black font-mono text-[#2F36C9]">
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                <span className="block text-2xl sm:text-3xl font-black font-mono text-[#2F36C9]">
                   {currentEvent.participants.length}
                 </span>
-                <span className="text-[11px] font-black uppercase font-mono text-gray-600">Peserta</span>
+                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Peserta</span>
               </div>
-              <div className="neo-card p-4 text-center">
-                <span className="block text-3xl sm:text-5xl font-black font-mono text-[#FF1784]">
+              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                <span className="block text-2xl sm:text-3xl font-black font-mono text-[#FF1784]">
                   {currentEvent.responses.length}
                 </span>
-                <span className="text-[11px] font-black uppercase font-mono text-gray-600">Respon</span>
+                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Respon</span>
               </div>
-              <div className="neo-card p-4 text-center">
-                <span className="block text-3xl sm:text-5xl font-black font-mono text-[#000000]">
+              <div className={`rounded-xl border-2 border-[#000000] p-3 text-center ${
+                isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+              }`} style={{ boxShadow: '3px 3px 0 #000' }}>
+                <span className={`block text-2xl sm:text-3xl font-black font-mono ${isDark ? 'text-white' : 'text-[#000000]'}`}>
                   {currentEvent.questions.length}/{currentEvent.questions.length}
                 </span>
-                <span className="text-[11px] font-black uppercase font-mono text-gray-600">Soal Selesai</span>
+                <span className="text-[10px] font-black uppercase font-mono text-gray-500">Selesai</span>
               </div>
             </div>
+
+            {/* Credits Roll */}
+            {currentEvent.participants.length > 0 && (
+              <div className="flex-1 min-h-0">
+                <ParticipantCreditsRoll
+                  participants={currentEvent.participants}
+                  theme={theme}
+                  maxHeight="max-h-[180px] lg:max-h-full"
+                  isQuizMode={currentEvent.isQuizMode}
+                  title="All Attendees"
+                />
+              </div>
+            )}
           </div>
 
-          {/* Question Results Rows — Redesigned for Projector Clarity */}
-          <div className="space-y-6 max-w-5xl mx-auto">
+          {/* RIGHT COLUMN: Question results — scrollable internally */}
+          <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: '#C1FF33 transparent' }}>
+
             {currentEvent.questions.map((q, qIdx) => {
               const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
               const totalQResponses = qResponses.length;
 
               return (
-                <div key={q.id} className={`rounded-2xl border-4 border-[#000000] p-5 sm:p-7 space-y-4 ${
+                <div key={q.id} className={`rounded-2xl border-4 border-[#000000] p-4 sm:p-5 space-y-3 ${
                   isDark ? 'bg-[#1a1a2e]' : 'bg-white'
-                }`} style={{ boxShadow: '5px 5px 0px #000000' }}>
+                }`} style={{ boxShadow: '4px 4px 0px #000000' }}>
 
                   {/* Question header */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="neo-badge bg-[#2F36C9] text-white text-sm font-mono shrink-0 px-3 py-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="neo-badge bg-[#2F36C9] text-white text-xs font-mono shrink-0 px-2.5 py-1">
                         {String(qIdx + 1).padStart(2, '0')}
                       </span>
-                      <h3 className={`text-lg sm:text-2xl font-black tracking-tight leading-snug ${
+                      <h3 className={`text-base sm:text-xl font-black tracking-tight leading-snug ${
                         isDark ? 'text-white' : 'text-[#000000]'
                       }`}>
                         {q.title}
                       </h3>
                     </div>
-                    <span className={`shrink-0 text-sm font-black font-mono px-3 py-1.5 rounded-xl border-2 border-[#000000] ${
+                    <span className={`shrink-0 text-xs font-black font-mono px-2.5 py-1 rounded-lg border-2 border-[#000000] ${
                       isDark ? 'bg-[#252542] text-white' : 'bg-gray-50 text-[#000000]'
                     }`}>
                       {totalQResponses} suara
@@ -475,39 +500,38 @@ export const ProjectorDisplay: React.FC = () => {
                     ];
 
                     return (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {sorted.map((opt, i) => {
                           const pct = totalQResponses > 0 ? Math.round((opt.count / totalQResponses) * 100) : 0;
                           const isWinner = opt.count === topCount && topCount > 0;
                           return (
-                            <div key={opt.id} className={`relative overflow-hidden rounded-xl border-2 border-[#000000] transition-all ${
+                            <div key={opt.id} className={`relative overflow-hidden rounded-xl border-2 border-[#000000] ${
                               isWinner
                                 ? (isDark ? 'bg-[#C1FF33]/10' : 'bg-[#C1FF33]/20')
                                 : (isDark ? 'bg-[#252542]' : 'bg-gray-50')
                             }`} style={{ boxShadow: isWinner ? '3px 3px 0px #000' : 'none' }}>
-                              {/* Bar fill */}
                               <div
                                 className={`absolute inset-y-0 left-0 ${barColors[i % barColors.length]} opacity-25 transition-all duration-1000`}
                                 style={{ width: `${pct}%` }}
                               />
-                              <div className="relative z-10 flex items-center justify-between gap-4 px-4 py-3 sm:py-4">
-                                <div className="flex items-center gap-3 min-w-0">
-                                  {isWinner && <span className="text-lg shrink-0">🏆</span>}
+                              <div className="relative z-10 flex items-center justify-between gap-3 px-3 py-2.5 sm:py-3">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {isWinner && <span className="shrink-0">🏆</span>}
                                   <span className={`font-black leading-tight ${
                                     isWinner
-                                      ? 'text-lg sm:text-xl text-[#000000]'
-                                      : `text-base sm:text-lg ${isDark ? 'text-white/80' : 'text-[#1E1E1E]/70'}`
+                                      ? 'text-base sm:text-lg text-[#000000]'
+                                      : `text-sm sm:text-base ${isDark ? 'text-white/80' : 'text-[#1E1E1E]/70'}`
                                   }`}>
                                     {opt.text}
                                   </span>
                                 </div>
-                                <div className="flex items-baseline gap-2 shrink-0">
+                                <div className="flex items-baseline gap-1.5 shrink-0">
                                   <span className={`font-black font-mono ${
-                                    isWinner ? 'text-3xl sm:text-4xl text-[#2F36C9]' : `text-xl sm:text-2xl ${isDark ? 'text-white/60' : 'text-[#000000]/50'}`
+                                    isWinner ? 'text-2xl sm:text-3xl text-[#2F36C9]' : `text-lg sm:text-xl ${isDark ? 'text-white/60' : 'text-[#000000]/50'}`
                                   }`}>
                                     {pct}%
                                   </span>
-                                  <span className={`text-sm font-mono font-bold ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
+                                  <span className={`text-xs font-mono font-bold ${isDark ? 'text-white/40' : 'text-gray-400'}`}>
                                     ({opt.count})
                                   </span>
                                 </div>
@@ -519,7 +543,7 @@ export const ProjectorDisplay: React.FC = () => {
                     );
                   })()}
 
-                  {/* ── TRUE/FALSE — Big dual cards ── */}
+                  {/* ── TRUE/FALSE ── */}
                   {q.type === 'true_false' && (() => {
                     const opts = q.options || [{ id: 'tf-1', text: 'True' }, { id: 'tf-2', text: 'False' }];
                     const opt0 = opts[0];
@@ -540,14 +564,12 @@ export const ProjectorDisplay: React.FC = () => {
                     if (total === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
 
                     return (
-                      <div className="space-y-3">
-                        {/* Split bar */}
-                        <div className="flex h-6 rounded-xl border-2 border-[#000000] overflow-hidden">
+                      <div className="space-y-2.5">
+                        <div className="flex h-5 rounded-xl border-2 border-[#000000] overflow-hidden">
                           <div className="h-full bg-emerald-400 transition-all duration-1000" style={{ width: `${p0}%` }} />
                           <div className="h-full bg-rose-400 flex-1 transition-all duration-1000" />
                         </div>
-                        {/* Side-by-side big cards */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3">
                           {[opt0, opt1].map((opt, idx) => {
                             const count = idx === 0 ? c0 : c1;
                             const pct = idx === 0 ? p0 : p1;
@@ -556,39 +578,38 @@ export const ProjectorDisplay: React.FC = () => {
                             return (
                               <div
                                 key={opt?.id || idx}
-                                className={`relative overflow-hidden rounded-2xl border-4 transition-all duration-500 p-5 sm:p-7 text-center ${
+                                className={`relative overflow-hidden rounded-2xl border-4 p-4 sm:p-5 text-center transition-all duration-500 ${
                                   idx === 0
                                     ? (isDark ? 'bg-emerald-900/40 border-emerald-500' : 'bg-emerald-50 border-emerald-400')
                                     : (isDark ? 'bg-rose-900/40 border-rose-500' : 'bg-rose-50 border-rose-400')
-                                } ${isLoser ? 'opacity-55' : 'opacity-100'}`}
-                                style={{ boxShadow: isLeader ? '5px 5px 0px #000' : '2px 2px 0px #000' }}
+                                } ${isLoser ? 'opacity-55' : ''}`}
+                                style={{ boxShadow: isLeader ? '4px 4px 0px #000' : '2px 2px 0px #000' }}
                               >
-                                {/* bg fill */}
                                 <div
                                   className={`absolute inset-y-0 left-0 transition-all duration-1000 ${idx === 0 ? 'bg-emerald-400/20' : 'bg-rose-400/20'}`}
                                   style={{ width: `${pct}%` }}
                                 />
-                                <div className="relative z-10 flex flex-col items-center gap-2">
-                                  <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black transition-all duration-500 ${
+                                <div className="relative z-10 flex flex-col items-center gap-1.5">
+                                  <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black ${
                                     idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]'
-                                  } ${isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl'}`}>
+                                  } ${isLeader ? 'w-12 h-12 text-2xl' : 'w-8 h-8 text-lg'}`}>
                                     {idx === 0 ? '✓' : '✕'}
                                   </div>
-                                  <span className={`font-black leading-tight transition-all duration-500 ${
+                                  <span className={`font-black leading-tight ${
                                     isLeader
-                                      ? (isDark ? 'text-white text-2xl sm:text-3xl' : 'text-[#000000] text-2xl sm:text-3xl')
-                                      : (isDark ? 'text-white/70 text-lg sm:text-xl' : 'text-[#1E1E1E]/70 text-lg sm:text-xl')
+                                      ? (isDark ? 'text-white text-xl sm:text-2xl' : 'text-[#000000] text-xl sm:text-2xl')
+                                      : (isDark ? 'text-white/70 text-base sm:text-lg' : 'text-[#1E1E1E]/70 text-base sm:text-lg')
                                   }`}>
                                     {opt?.text || (idx === 0 ? 'True' : 'False')}
                                   </span>
-                                  {isLeader && <span className="text-xl">🏆</span>}
-                                  <div className="flex items-baseline gap-1.5 mt-1">
-                                    <span className={`font-black font-mono transition-all duration-500 ${
-                                      isLeader ? 'text-4xl sm:text-5xl text-[#2F36C9]' : `text-2xl sm:text-3xl ${isDark ? 'text-white/50' : 'text-[#000000]/40'}`
+                                  {isLeader && <span className="text-base">🏆</span>}
+                                  <div className="flex items-baseline gap-1">
+                                    <span className={`font-black font-mono ${
+                                      isLeader ? 'text-3xl sm:text-4xl text-[#2F36C9]' : `text-xl sm:text-2xl ${isDark ? 'text-white/40' : 'text-[#000000]/35'}`
                                     }`}>
                                       {pct}%
                                     </span>
-                                    <span className={`font-mono font-bold ${isLeader ? 'text-sm text-[#000000]' : 'text-xs text-gray-500'}`}>
+                                    <span className={`font-mono font-bold text-xs ${isLeader ? 'text-[#000000]' : 'text-gray-400'}`}>
                                       {count} suara
                                     </span>
                                   </div>
@@ -607,24 +628,20 @@ export const ProjectorDisplay: React.FC = () => {
                       ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalQResponses).toFixed(1)
                       : '0.0';
                     const pct = Math.min(100, Math.round((parseFloat(avg) / (q.ratingMax || 5)) * 100));
-
                     return (
-                      <div className="flex items-center gap-5">
-                        <div className={`rounded-2xl border-4 border-[#000000] px-6 py-4 text-center shrink-0 ${
+                      <div className="flex items-center gap-4">
+                        <div className={`rounded-2xl border-4 border-[#000000] px-5 py-3 text-center shrink-0 ${
                           isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
-                        }`} style={{ boxShadow: '4px 4px 0px #000' }}>
-                          <span className="block text-5xl sm:text-6xl font-black font-mono text-[#2F36C9]">{avg}</span>
-                          <span className="text-sm font-black font-mono text-gray-500">/ {q.ratingMax || 5}.0</span>
+                        }`} style={{ boxShadow: '3px 3px 0px #000' }}>
+                          <span className="block text-4xl sm:text-5xl font-black font-mono text-[#2F36C9]">{avg}</span>
+                          <span className="text-xs font-black font-mono text-gray-500">/ {q.ratingMax || 5}.0</span>
                         </div>
                         <div className="flex-1">
-                          <div className="flex h-8 rounded-xl border-2 border-[#000000] overflow-hidden">
-                            <div
-                              className="h-full bg-[#C1FF33] transition-all duration-1000"
-                              style={{ width: `${pct}%` }}
-                            />
+                          <div className="flex h-6 rounded-xl border-2 border-[#000000] overflow-hidden">
+                            <div className="h-full bg-[#C1FF33] transition-all duration-1000" style={{ width: `${pct}%` }} />
                             <div className="h-full flex-1 bg-gray-100" />
                           </div>
-                          <p className={`mt-2 text-sm font-bold font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <p className={`mt-1.5 text-xs font-bold font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             Rata-rata dari {totalQResponses} responden
                           </p>
                         </div>
@@ -641,45 +658,32 @@ export const ProjectorDisplay: React.FC = () => {
                     });
                     const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 6);
                     const maxW = Math.max(...topWords.map(w => wordMap[w]), 1);
-
+                    const bgPalette = ['bg-[#C1FF33] text-[#000000]', 'bg-[#2F36C9] text-white', 'bg-[#FF1784] text-white', 'bg-[#0D9488] text-white'];
                     return (
-                      <div className="flex flex-wrap items-center gap-3">
-                        {topWords.length > 0 ? (
-                          topWords.map((word, i) => {
-                            const scale = wordMap[word] / maxW;
-                            const sizes = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'];
-                            const bgPalette = ['bg-[#C1FF33] text-[#000000]', 'bg-[#2F36C9] text-white', 'bg-[#FF1784] text-white', 'bg-[#0D9488] text-white'];
-                            return (
-                              <span
-                                key={word}
-                                className={`inline-flex items-center gap-1.5 font-black rounded-xl border-2 border-[#000000] px-4 py-2 ${bgPalette[i % bgPalette.length]}`}
-                                style={{
-                                  fontSize: `${0.85 + scale * 0.75}rem`,
-                                  boxShadow: '3px 3px 0px #000000'
-                                }}
-                              >
-                                {word}
-                                <span className="text-xs opacity-70 font-mono">({wordMap[word]})</span>
-                              </span>
-                            );
-                          })
-                        ) : (
-                          <div className="text-sm text-gray-400 italic font-mono">Belum ada kata.</div>
-                        )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {topWords.length > 0 ? topWords.map((word, i) => (
+                          <span
+                            key={word}
+                            className={`inline-flex items-center gap-1 font-black rounded-xl border-2 border-[#000000] px-3 py-1.5 ${bgPalette[i % bgPalette.length]}`}
+                            style={{ fontSize: `${0.8 + (wordMap[word] / maxW) * 0.7}rem`, boxShadow: '2px 2px 0px #000' }}
+                          >
+                            {word} <span className="text-xs opacity-70 font-mono">({wordMap[word]})</span>
+                          </span>
+                        )) : <div className="text-sm text-gray-400 italic font-mono">Belum ada kata.</div>}
                       </div>
                     );
                   })()}
 
                   {/* ── OPEN TEXT ── */}
                   {q.type === 'open_text' && (
-                    <div className={`rounded-xl border-2 border-[#000000] p-4 ${isDark ? 'bg-[#252542]' : 'bg-gray-50'}`}>
-                      <p className={`text-base sm:text-lg italic font-mono ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                    <div className={`rounded-xl border-2 border-[#000000] p-3.5 ${isDark ? 'bg-[#252542]' : 'bg-gray-50'}`}>
+                      <p className={`text-sm sm:text-base italic font-mono ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
                         {totalQResponses > 0
                           ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
                           : 'Belum ada tanggapan.'}
                       </p>
                       {totalQResponses > 1 && (
-                        <p className="text-xs text-gray-400 font-mono mt-2">+{totalQResponses - 1} respons lainnya</p>
+                        <p className="text-xs text-gray-400 font-mono mt-1.5">+{totalQResponses - 1} respons lainnya</p>
                       )}
                     </div>
                   )}
@@ -688,19 +692,6 @@ export const ProjectorDisplay: React.FC = () => {
               );
             })}
           </div>
-
-          {/* End Credits Roll */}
-          {currentEvent.participants.length > 0 && (
-            <div className="mt-10 pt-6 border-t-2 border-[#000000]/10 w-full max-w-4xl mx-auto">
-              <ParticipantCreditsRoll
-                participants={currentEvent.participants}
-                theme={theme}
-                maxHeight="max-h-[220px] sm:max-h-[300px]"
-                isQuizMode={currentEvent.isQuizMode}
-                title="Special Thanks & All Attendees"
-              />
-            </div>
-          )}
 
         </main>
       ) : (
