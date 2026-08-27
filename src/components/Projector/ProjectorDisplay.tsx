@@ -1052,18 +1052,29 @@ export const ProjectorDisplay: React.FC = () => {
             )}
           </div>
 
-          {/* Live Timer Badge */}
-          <div className="neo-badge bg-[#000000] text-white px-4 py-1.5 text-lg sm:text-xl font-mono">
-            <Clock className="w-4 h-4" />
-            <span>
-              {(() => {
-                const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-              })()}
-            </span>
-          </div>
+          {/* Live Timer Badge — Enlarged for clear visibility on projector/laptop */}
+          {(() => {
+            const remaining = currentEvent.timerRemainingSeconds ?? (currentQ?.timerSeconds || 45);
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            const isUrgent = remaining <= 10 && remaining > 0;
+            const isZero = remaining === 0;
+
+            return (
+              <div className={`neo-badge ${
+                isZero
+                  ? 'bg-rose-500 text-white'
+                  : isUrgent
+                  ? 'bg-amber-400 text-[#000000] animate-pulse'
+                  : isDark ? 'bg-white text-[#000000]' : 'bg-[#000000] text-white'
+              } px-5 py-2 sm:px-6 sm:py-2.5 text-2xl sm:text-3xl font-black font-mono tracking-wider flex items-center space-x-2.5`}
+              style={{ boxShadow: '3px 3px 0px #000000' }}>
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
+                <span>{timeStr}</span>
+              </div>
+            );
+          })()}
         </footer>
       )}
       </div>
