@@ -11,8 +11,7 @@ import {
   MessageSquare,
   Radio,
   Sun,
-  Moon,
-  ArrowLeft
+  Moon
 } from 'lucide-react';
 import { BrandLogo } from '../Shared/BrandLogo';
 import { PikteraMascot } from '../Shared/PikteraMascot';
@@ -199,23 +198,10 @@ export const ProjectorDisplay: React.FC = () => {
       <div className="w-full max-w-screen-xl mx-auto flex flex-col justify-between min-h-screen-dvh p-4 sm:p-6 lg:p-10">
       
       {/* Top Projector Stage Bar */}
-      <header className="flex items-center justify-between pb-4 sm:pb-6 border-b-2 border-[#000000] gap-3 relative z-10">
+      <header className="flex items-center justify-between pb-2 sm:pb-4 gap-3 relative z-10">
         
         {/* Left: Branding & Progress */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          {isHost && (
-            <button
-              onClick={() => setActiveView('admin')}
-              className={`neo-btn px-2.5 py-1.5 text-xs font-bold ${
-                isDark ? 'bg-[#1a1a2e] text-white' : 'bg-white text-[#000000]'
-              }`}
-              title="Kembali ke Admin Dashboard"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </button>
-          )}
-
           <BrandLogo size="sm" showText={true} theme={isDark ? 'dark' : 'light'} />
           <div>
             <div className="flex items-center space-x-2">
@@ -228,15 +214,11 @@ export const ProjectorDisplay: React.FC = () => {
                 <span className="neo-badge bg-[#C1FF33] text-[#000000] font-mono">
                   Q {currentEvent.currentQuestionIndex + 1} / {currentEvent.questions.length}
                 </span>
-              ) : currentEvent.status === 'ended' ? (
-                <span className="neo-badge bg-[#FF1784] text-white font-mono">
-                  Grand Finale
-                </span>
-              ) : (
+              ) : currentEvent.status === 'waiting' ? (
                 <span className="neo-badge bg-[#C1FF33] text-[#000000] font-mono">
                   Lobby
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="text-xs font-bold text-gray-500 font-mono">
               Live Stage
