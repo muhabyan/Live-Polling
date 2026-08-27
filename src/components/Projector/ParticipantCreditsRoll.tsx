@@ -118,10 +118,6 @@ export const ParticipantCreditsRoll: React.FC<ParticipantCreditsRollProps> = ({
             <Film className="w-3 h-3" />
             <span>{title} ({count})</span>
           </span>
-          <span className="text-[10px] text-gray-400 font-mono hidden sm:inline flex items-center space-x-1">
-            <Sparkles className="w-2.5 h-2.5 text-[#FACC15]" />
-            <span>Movie Credits Roll</span>
-          </span>
         </div>
 
         {/* Speed & Pause Controls */}
