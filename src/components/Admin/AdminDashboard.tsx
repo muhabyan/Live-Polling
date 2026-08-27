@@ -768,7 +768,7 @@ export const AdminDashboard: React.FC = () => {
                               <span className="w-5 h-5 shrink-0 rounded bg-emerald-100 border border-[#1E1E1E] flex items-center justify-center text-xs font-black text-emerald-800">1</span>
                               <input
                                 type="text"
-                                value={q.options?.[0]?.text || 'True'}
+                                value={q.options?.[0]?.text ?? ''}
                                 onChange={(e) => {
                                   const text = e.target.value;
                                   setFormQuestions(prev => prev.map((item, i) => {
@@ -789,7 +789,7 @@ export const AdminDashboard: React.FC = () => {
                               <span className="w-5 h-5 shrink-0 rounded bg-rose-100 border border-[#1E1E1E] flex items-center justify-center text-xs font-black text-rose-800">2</span>
                               <input
                                 type="text"
-                                value={q.options?.[1]?.text || 'False'}
+                                value={q.options?.[1]?.text ?? ''}
                                 onChange={(e) => {
                                   const text = e.target.value;
                                   setFormQuestions(prev => prev.map((item, i) => {
