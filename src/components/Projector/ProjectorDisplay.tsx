@@ -425,31 +425,37 @@ export const ProjectorDisplay: React.FC = () => {
             </div>
           </div>
 
-          {/* Question Results Rows */}
-          <div className="space-y-4 max-w-4xl mx-auto">
+          {/* Question Results Rows — Redesigned for Projector Clarity */}
+          <div className="space-y-6 max-w-5xl mx-auto">
             {currentEvent.questions.map((q, qIdx) => {
               const qResponses = currentEvent.responses.filter(r => r.questionId === q.id);
               const totalQResponses = qResponses.length;
 
               return (
-                <div key={q.id} className="neo-card p-4 space-y-2">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <div className="flex items-baseline space-x-2.5 min-w-0">
-                      <span className="neo-badge bg-[#2F36C9] text-white text-xs font-mono">
-                        0{qIdx + 1}
+                <div key={q.id} className={`rounded-2xl border-4 border-[#000000] p-5 sm:p-7 space-y-4 ${
+                  isDark ? 'bg-[#1a1a2e]' : 'bg-white'
+                }`} style={{ boxShadow: '5px 5px 0px #000000' }}>
+
+                  {/* Question header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="neo-badge bg-[#2F36C9] text-white text-sm font-mono shrink-0 px-3 py-1">
+                        {String(qIdx + 1).padStart(2, '0')}
                       </span>
-                      <h3 className={`text-base sm:text-lg font-black tracking-tight truncate ${
+                      <h3 className={`text-lg sm:text-2xl font-black tracking-tight leading-snug ${
                         isDark ? 'text-white' : 'text-[#000000]'
                       }`}>
                         {q.title}
                       </h3>
                     </div>
-                    <span className="text-xs font-mono font-bold text-gray-500 shrink-0">
-                      {totalQResponses} respon
+                    <span className={`shrink-0 text-sm font-black font-mono px-3 py-1.5 rounded-xl border-2 border-[#000000] ${
+                      isDark ? 'bg-[#252542] text-white' : 'bg-gray-50 text-[#000000]'
+                    }`}>
+                      {totalQResponses} suara
                     </span>
                   </div>
 
-                  {/* Multiple Choice — single bar winner */}
+                  {/* ── MULTIPLE CHOICE ── */}
                   {q.type === 'multiple_choice' && (() => {
                     const counts: Record<string, number> = {};
                     qResponses.forEach(r => {
@@ -457,31 +463,63 @@ export const ProjectorDisplay: React.FC = () => {
                         counts[optId] = (counts[optId] || 0) + 1;
                       });
                     });
-                    const topOptId = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
-                    const topOpt = (q.options || []).find(o => o.id === topOptId);
-                    const topCount = topOptId ? counts[topOptId] : 0;
-                    const topPct = totalQResponses > 0 && topCount ? Math.round((topCount / totalQResponses) * 100) : 0;
+                    const sorted = (q.options || [])
+                      .map(o => ({ ...o, count: counts[o.id] || 0 }))
+                      .sort((a, b) => b.count - a.count);
+                    const topCount = sorted[0]?.count || 0;
 
-                    return topOpt ? (
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1 h-4 rounded-md border-2 border-[#000000] bg-white overflow-hidden relative">
-                          <div
-                            className="h-full bg-[#C1FF33] transition-all duration-1000"
-                            style={{ width: `${topPct}%` }}
-                          />
-                        </div>
-                        <div className="text-sm font-black shrink-0 flex items-center space-x-2 font-mono">
-                          <span>{topOpt.text}</span>
-                          <span className="text-[#2F36C9]">{topPct}%</span>
-                          <span className="text-xs text-gray-500">({topCount} suara)</span>
-                        </div>
+                    if (totalQResponses === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
+
+                    const barColors = [
+                      'bg-[#C1FF33]', 'bg-[#2F36C9]', 'bg-[#FF1784]', 'bg-[#0D9488]', 'bg-[#D97706]', 'bg-[#7C3AED]'
+                    ];
+
+                    return (
+                      <div className="space-y-3">
+                        {sorted.map((opt, i) => {
+                          const pct = totalQResponses > 0 ? Math.round((opt.count / totalQResponses) * 100) : 0;
+                          const isWinner = opt.count === topCount && topCount > 0;
+                          return (
+                            <div key={opt.id} className={`relative overflow-hidden rounded-xl border-2 border-[#000000] transition-all ${
+                              isWinner
+                                ? (isDark ? 'bg-[#C1FF33]/10' : 'bg-[#C1FF33]/20')
+                                : (isDark ? 'bg-[#252542]' : 'bg-gray-50')
+                            }`} style={{ boxShadow: isWinner ? '3px 3px 0px #000' : 'none' }}>
+                              {/* Bar fill */}
+                              <div
+                                className={`absolute inset-y-0 left-0 ${barColors[i % barColors.length]} opacity-25 transition-all duration-1000`}
+                                style={{ width: `${pct}%` }}
+                              />
+                              <div className="relative z-10 flex items-center justify-between gap-4 px-4 py-3 sm:py-4">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  {isWinner && <span className="text-lg shrink-0">🏆</span>}
+                                  <span className={`font-black leading-tight ${
+                                    isWinner
+                                      ? 'text-lg sm:text-xl text-[#000000]'
+                                      : `text-base sm:text-lg ${isDark ? 'text-white/80' : 'text-[#1E1E1E]/70'}`
+                                  }`}>
+                                    {opt.text}
+                                  </span>
+                                </div>
+                                <div className="flex items-baseline gap-2 shrink-0">
+                                  <span className={`font-black font-mono ${
+                                    isWinner ? 'text-3xl sm:text-4xl text-[#2F36C9]' : `text-xl sm:text-2xl ${isDark ? 'text-white/60' : 'text-[#000000]/50'}`
+                                  }`}>
+                                    {pct}%
+                                  </span>
+                                  <span className={`text-sm font-mono font-bold ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
+                                    ({opt.count})
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    ) : (
-                      <div className="text-xs text-gray-400 italic font-mono">Belum ada jawaban.</div>
                     );
                   })()}
 
-                  {/* True/False — dual split bar + leader highlight */}
+                  {/* ── TRUE/FALSE — Big dual cards ── */}
                   {q.type === 'true_false' && (() => {
                     const opts = q.options || [{ id: 'tf-1', text: 'True' }, { id: 'tf-2', text: 'False' }];
                     const opt0 = opts[0];
@@ -497,44 +535,73 @@ export const ProjectorDisplay: React.FC = () => {
                     const total = c0 + c1;
                     const p0 = total > 0 ? Math.round((c0 / total) * 100) : 0;
                     const p1 = total > 0 ? 100 - p0 : 0;
-                    const leader = c0 >= c1 ? 0 : 1;
+                    const leader = total === 0 ? -1 : c0 > c1 ? 0 : c1 > c0 ? 1 : -1;
 
-                    if (total === 0) return <div className="text-xs text-gray-400 italic font-mono">Belum ada jawaban.</div>;
+                    if (total === 0) return <div className="text-sm text-gray-400 italic font-mono">Belum ada jawaban.</div>;
 
                     return (
-                      <div className="space-y-1.5">
-                        {/* Dual split bar */}
-                        <div className="flex h-4 rounded-md border-2 border-[#000000] overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-400 transition-all duration-1000"
-                            style={{ width: `${p0}%` }}
-                          />
-                          <div
-                            className="h-full bg-rose-400 transition-all duration-1000 flex-1"
-                          />
+                      <div className="space-y-3">
+                        {/* Split bar */}
+                        <div className="flex h-6 rounded-xl border-2 border-[#000000] overflow-hidden">
+                          <div className="h-full bg-emerald-400 transition-all duration-1000" style={{ width: `${p0}%` }} />
+                          <div className="h-full bg-rose-400 flex-1 transition-all duration-1000" />
                         </div>
-                        {/* Labels */}
-                        <div className="flex items-center justify-between gap-2">
-                          <div className={`flex items-center gap-1 ${leader === 0 ? 'font-black text-sm text-[#000000]' : 'font-bold text-xs text-gray-500'}`}>
-                            {leader === 0 && <span>🏆</span>}
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"/>
-                            <span>{opt0?.text}</span>
-                            <span className="text-[#2F36C9] font-mono">{p0}%</span>
-                            <span className="text-gray-500 font-mono">({c0})</span>
-                          </div>
-                          <div className={`flex items-center gap-1 ${leader === 1 ? 'font-black text-sm text-[#000000]' : 'font-bold text-xs text-gray-500'}`}>
-                            {leader === 1 && <span>🏆</span>}
-                            <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"/>
-                            <span>{opt1?.text}</span>
-                            <span className="text-[#2F36C9] font-mono">{p1}%</span>
-                            <span className="text-gray-500 font-mono">({c1})</span>
-                          </div>
+                        {/* Side-by-side big cards */}
+                        <div className="grid grid-cols-2 gap-4">
+                          {[opt0, opt1].map((opt, idx) => {
+                            const count = idx === 0 ? c0 : c1;
+                            const pct = idx === 0 ? p0 : p1;
+                            const isLeader = leader === idx;
+                            const isLoser = leader !== -1 && !isLeader;
+                            return (
+                              <div
+                                key={opt?.id || idx}
+                                className={`relative overflow-hidden rounded-2xl border-4 transition-all duration-500 p-5 sm:p-7 text-center ${
+                                  idx === 0
+                                    ? (isDark ? 'bg-emerald-900/40 border-emerald-500' : 'bg-emerald-50 border-emerald-400')
+                                    : (isDark ? 'bg-rose-900/40 border-rose-500' : 'bg-rose-50 border-rose-400')
+                                } ${isLoser ? 'opacity-55' : 'opacity-100'}`}
+                                style={{ boxShadow: isLeader ? '5px 5px 0px #000' : '2px 2px 0px #000' }}
+                              >
+                                {/* bg fill */}
+                                <div
+                                  className={`absolute inset-y-0 left-0 transition-all duration-1000 ${idx === 0 ? 'bg-emerald-400/20' : 'bg-rose-400/20'}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                                <div className="relative z-10 flex flex-col items-center gap-2">
+                                  <div className={`rounded-xl border-2 border-[#000000] flex items-center justify-center font-black transition-all duration-500 ${
+                                    idx === 0 ? 'bg-emerald-400 text-[#000000]' : 'bg-rose-400 text-[#000000]'
+                                  } ${isLeader ? 'w-14 h-14 text-3xl' : 'w-10 h-10 text-xl'}`}>
+                                    {idx === 0 ? '✓' : '✕'}
+                                  </div>
+                                  <span className={`font-black leading-tight transition-all duration-500 ${
+                                    isLeader
+                                      ? (isDark ? 'text-white text-2xl sm:text-3xl' : 'text-[#000000] text-2xl sm:text-3xl')
+                                      : (isDark ? 'text-white/70 text-lg sm:text-xl' : 'text-[#1E1E1E]/70 text-lg sm:text-xl')
+                                  }`}>
+                                    {opt?.text || (idx === 0 ? 'True' : 'False')}
+                                  </span>
+                                  {isLeader && <span className="text-xl">🏆</span>}
+                                  <div className="flex items-baseline gap-1.5 mt-1">
+                                    <span className={`font-black font-mono transition-all duration-500 ${
+                                      isLeader ? 'text-4xl sm:text-5xl text-[#2F36C9]' : `text-2xl sm:text-3xl ${isDark ? 'text-white/50' : 'text-[#000000]/40'}`
+                                    }`}>
+                                      {pct}%
+                                    </span>
+                                    <span className={`font-mono font-bold ${isLeader ? 'text-sm text-[#000000]' : 'text-xs text-gray-500'}`}>
+                                      {count} suara
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     );
                   })()}
 
-                  {/* Rating */}
+                  {/* ── RATING ── */}
                   {q.type === 'rating' && (() => {
                     const avg = totalQResponses > 0
                       ? (qResponses.reduce((acc, r) => acc + (r.ratingValue || 0), 0) / totalQResponses).toFixed(1)
@@ -542,52 +609,78 @@ export const ProjectorDisplay: React.FC = () => {
                     const pct = Math.min(100, Math.round((parseFloat(avg) / (q.ratingMax || 5)) * 100));
 
                     return (
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1 h-4 rounded-md border-2 border-[#000000] bg-white overflow-hidden relative">
-                          <div
-                            className="h-full bg-[#C1FF33] transition-all duration-1000"
-                            style={{ width: `${pct}%` }}
-                          />
+                      <div className="flex items-center gap-5">
+                        <div className={`rounded-2xl border-4 border-[#000000] px-6 py-4 text-center shrink-0 ${
+                          isDark ? 'bg-[#252542]' : 'bg-[#FFF8F0]'
+                        }`} style={{ boxShadow: '4px 4px 0px #000' }}>
+                          <span className="block text-5xl sm:text-6xl font-black font-mono text-[#2F36C9]">{avg}</span>
+                          <span className="text-sm font-black font-mono text-gray-500">/ {q.ratingMax || 5}.0</span>
                         </div>
-                        <div className="text-sm font-black shrink-0 flex items-center space-x-2 font-mono">
-                          <span>Skor:</span>
-                          <span className="text-[#2F36C9]">{avg}</span>
-                          <span className="text-xs text-gray-400">/ {q.ratingMax || 5}.0</span>
+                        <div className="flex-1">
+                          <div className="flex h-8 rounded-xl border-2 border-[#000000] overflow-hidden">
+                            <div
+                              className="h-full bg-[#C1FF33] transition-all duration-1000"
+                              style={{ width: `${pct}%` }}
+                            />
+                            <div className="h-full flex-1 bg-gray-100" />
+                          </div>
+                          <p className={`mt-2 text-sm font-bold font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Rata-rata dari {totalQResponses} responden
+                          </p>
                         </div>
                       </div>
                     );
                   })()}
 
-                  {/* Word Cloud */}
+                  {/* ── WORD CLOUD ── */}
                   {q.type === 'word_cloud' && (() => {
                     const wordMap: Record<string, number> = {};
                     qResponses.forEach(r => {
                       const w = (r.textResponse || '').trim().toLowerCase();
                       if (w) wordMap[w] = (wordMap[w] || 0) + 1;
                     });
-                    const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 4);
+                    const topWords = Object.keys(wordMap).sort((a, b) => wordMap[b] - wordMap[a]).slice(0, 6);
+                    const maxW = Math.max(...topWords.map(w => wordMap[w]), 1);
 
                     return (
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-3">
                         {topWords.length > 0 ? (
-                          topWords.map((word) => (
-                            <span key={word} className="neo-badge bg-[#C1FF33] text-[#000000] text-xs font-mono">
-                              #{word} ({wordMap[word]})
-                            </span>
-                          ))
+                          topWords.map((word, i) => {
+                            const scale = wordMap[word] / maxW;
+                            const sizes = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'];
+                            const bgPalette = ['bg-[#C1FF33] text-[#000000]', 'bg-[#2F36C9] text-white', 'bg-[#FF1784] text-white', 'bg-[#0D9488] text-white'];
+                            return (
+                              <span
+                                key={word}
+                                className={`inline-flex items-center gap-1.5 font-black rounded-xl border-2 border-[#000000] px-4 py-2 ${bgPalette[i % bgPalette.length]}`}
+                                style={{
+                                  fontSize: `${0.85 + scale * 0.75}rem`,
+                                  boxShadow: '3px 3px 0px #000000'
+                                }}
+                              >
+                                {word}
+                                <span className="text-xs opacity-70 font-mono">({wordMap[word]})</span>
+                              </span>
+                            );
+                          })
                         ) : (
-                          <div className="text-xs text-gray-400 italic font-mono">Belum ada kata.</div>
+                          <div className="text-sm text-gray-400 italic font-mono">Belum ada kata.</div>
                         )}
                       </div>
                     );
                   })()}
 
-                  {/* Open Text */}
+                  {/* ── OPEN TEXT ── */}
                   {q.type === 'open_text' && (
-                    <div className="text-sm italic font-mono text-gray-600">
-                      {totalQResponses > 0
-                        ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
-                        : 'Belum ada tanggapan.'}
+                    <div className={`rounded-xl border-2 border-[#000000] p-4 ${isDark ? 'bg-[#252542]' : 'bg-gray-50'}`}>
+                      <p className={`text-base sm:text-lg italic font-mono ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                        {totalQResponses > 0
+                          ? `"${qResponses[qResponses.length - 1]?.textResponse || ''}"`
+                          : 'Belum ada tanggapan.'}
+                      </p>
+                      {totalQResponses > 1 && (
+                        <p className="text-xs text-gray-400 font-mono mt-2">+{totalQResponses - 1} respons lainnya</p>
+                      )}
                     </div>
                   )}
 
