@@ -231,15 +231,17 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
           </div>
         )}
 
-        {/* TYPE 2: TRUE / FALSE */}
+        {/* TYPE 2: TRUE / FALSE & BINARY CHOICE */}
         {question.type === 'true_false' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {(question.options || [
               { id: 'tf-true', text: 'True' },
               { id: 'tf-false', text: 'False' }
-            ]).map((opt) => {
+            ]).map((opt, optIdx) => {
               const isSelected = selectedOptionIds.includes(opt.id);
-              const isTrue = opt.text.toLowerCase().includes('true');
+              const isFirst = optIdx === 0;
+              const badgeColor = isFirst ? '#34D399' : '#FB7185';
+              const badgeIcon = isFirst ? '✓' : '✕';
 
               return (
                 <button
@@ -247,28 +249,27 @@ export const ParticipantLiveQuestion: React.FC<ParticipantLiveQuestionProps> = (
                   type="button"
                   disabled={isLocked}
                   onClick={() => handleOptionToggle(opt.id)}
-                  className={`p-5 sm:p-6 rounded-lg border-2 border-[#1E1E1E] transition-all flex flex-col items-center text-center justify-center cursor-pointer ${
+                  className={`p-5 sm:p-6 rounded-xl border-2 border-[#1E1E1E] transition-all flex flex-col items-center text-center justify-center cursor-pointer ${
                     isSelected
                       ? 'shadow-none translate-x-[2px] translate-y-[2px]'
                       : ''
                   } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'}`}
                   style={{
-                    backgroundColor: isSelected ? (isTrue ? '#34D399' : '#FB7185') : '#FFFFFF',
+                    backgroundColor: isSelected ? badgeColor : '#FFFFFF',
                     boxShadow: isSelected ? 'none' : '4px 4px 0px #1E1E1E',
                   }}
                 >
-                  <div className={`w-11 h-11 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-lg font-black mb-2 ${
+                  <div className={`w-11 h-11 rounded-lg border-2 border-[#1E1E1E] flex items-center justify-center text-lg font-black mb-2 transition-transform ${
                     isSelected 
-                      ? 'bg-white text-[#1E1E1E]' 
-                      : isTrue 
-                      ? 'bg-[#34D399] text-[#1E1E1E]' 
-                      : 'bg-[#FB7185] text-[#1E1E1E]'
-                  }`}>
-                    {isTrue ? '✓' : '✕'}
+                      ? 'bg-white text-[#1E1E1E] scale-110' 
+                      : 'text-[#1E1E1E]'
+                  }`}
+                  style={{
+                    backgroundColor: isSelected ? '#FFFFFF' : badgeColor,
+                  }}>
+                    {badgeIcon}
                   </div>
-                  <span className={`text-base font-black ${
-                    isSelected ? 'text-[#1E1E1E]' : 'text-[#1E1E1E]'
-                  }`}>
+                  <span className="text-base sm:text-lg font-black text-[#1E1E1E]">
                     {opt.text}
                   </span>
                 </button>

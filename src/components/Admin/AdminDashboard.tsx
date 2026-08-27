@@ -700,6 +700,116 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                       )}
 
+                      {/* Options for True/False & Binary Choice */}
+                      {q.type === 'true_false' && (
+                        <div className="space-y-2 p-2.5 bg-[#FFFDF9] border-2 border-[#1E1E1E] rounded-lg">
+                          <div className="flex flex-wrap items-center justify-between gap-1">
+                            <span className="text-[10px] font-black text-gray-500 uppercase font-mono">Pilihan Binary / Opsi:</span>
+                            <div className="flex flex-wrap items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormQuestions(prev => prev.map((item, i) => {
+                                    if (i !== idx) return item;
+                                    return {
+                                      ...item,
+                                      options: [
+                                        { id: item.options?.[0]?.id || 'tf-1', text: 'Realistis', isCorrect: true },
+                                        { id: item.options?.[1]?.id || 'tf-2', text: 'Mitos', isCorrect: false },
+                                      ]
+                                    };
+                                  }));
+                                }}
+                                className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 border border-[#1E1E1E] rounded cursor-pointer transition-colors"
+                              >
+                                Realistis / Mitos
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormQuestions(prev => prev.map((item, i) => {
+                                    if (i !== idx) return item;
+                                    return {
+                                      ...item,
+                                      options: [
+                                        { id: item.options?.[0]?.id || 'tf-1', text: 'Benar', isCorrect: true },
+                                        { id: item.options?.[1]?.id || 'tf-2', text: 'Salah', isCorrect: false },
+                                      ]
+                                    };
+                                  }));
+                                }}
+                                className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-100 hover:bg-emerald-200 border border-[#1E1E1E] rounded cursor-pointer transition-colors"
+                              >
+                                Benar / Salah
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormQuestions(prev => prev.map((item, i) => {
+                                    if (i !== idx) return item;
+                                    return {
+                                      ...item,
+                                      options: [
+                                        { id: item.options?.[0]?.id || 'tf-1', text: 'Setuju', isCorrect: true },
+                                        { id: item.options?.[1]?.id || 'tf-2', text: 'Tidak Setuju', isCorrect: false },
+                                      ]
+                                    };
+                                  }));
+                                }}
+                                className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 hover:bg-blue-200 border border-[#1E1E1E] rounded cursor-pointer transition-colors"
+                              >
+                                Setuju / Tidak
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="flex items-center space-x-1.5">
+                              <span className="w-5 h-5 shrink-0 rounded bg-emerald-100 border border-[#1E1E1E] flex items-center justify-center text-xs font-black text-emerald-800">1</span>
+                              <input
+                                type="text"
+                                value={q.options?.[0]?.text || 'True'}
+                                onChange={(e) => {
+                                  const text = e.target.value;
+                                  setFormQuestions(prev => prev.map((item, i) => {
+                                    if (i !== idx) return item;
+                                    const opts = item.options && item.options.length >= 2 ? [...item.options] : [
+                                      { id: 'tf-1', text: 'True', isCorrect: true },
+                                      { id: 'tf-2', text: 'False', isCorrect: false }
+                                    ];
+                                    opts[0] = { ...opts[0], text };
+                                    return { ...item, options: opts };
+                                  }));
+                                }}
+                                placeholder="e.g. Realistis / Benar / True"
+                                className="flex-1 px-2 py-1 bg-white border-2 border-[#1E1E1E] rounded-md text-xs font-bold"
+                              />
+                            </div>
+                            <div className="flex items-center space-x-1.5">
+                              <span className="w-5 h-5 shrink-0 rounded bg-rose-100 border border-[#1E1E1E] flex items-center justify-center text-xs font-black text-rose-800">2</span>
+                              <input
+                                type="text"
+                                value={q.options?.[1]?.text || 'False'}
+                                onChange={(e) => {
+                                  const text = e.target.value;
+                                  setFormQuestions(prev => prev.map((item, i) => {
+                                    if (i !== idx) return item;
+                                    const opts = item.options && item.options.length >= 2 ? [...item.options] : [
+                                      { id: 'tf-1', text: 'True', isCorrect: true },
+                                      { id: 'tf-2', text: 'False', isCorrect: false }
+                                    ];
+                                    opts[1] = { ...opts[1], text };
+                                    return { ...item, options: opts };
+                                  }));
+                                }}
+                                placeholder="e.g. Mitos / Salah / False"
+                                className="flex-1 px-2 py-1 bg-white border-2 border-[#1E1E1E] rounded-md text-xs font-bold"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Rating Scale Customization */}
                       {q.type === 'rating' && (
                         <div className="p-2.5 bg-white border-2 border-[#1E1E1E] rounded-lg space-y-2 text-xs">
